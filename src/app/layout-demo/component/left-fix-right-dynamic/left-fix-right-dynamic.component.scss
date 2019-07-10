@@ -1,0 +1,15 @@
+.warp{
+  width: 100%;
+  position: relative;
+  .nav-slider{
+    position: absolute;
+    width: 200px;
+    left: 0;
+    background-color: red;
+  }
+  .content{
+    background-color: black;
+    color: #fff;
+    margin-left: 200px;
+  }
+}

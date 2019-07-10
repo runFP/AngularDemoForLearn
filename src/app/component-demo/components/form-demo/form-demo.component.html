@@ -1,0 +1,55 @@
+<p>
+  form-demo works!
+</p>
+<div>
+  <dl>
+    <dt><strong>formGroup决定formControlName所属的组</strong></dt>
+    <dd>可以在多处地方声明formGroup,只要formGroup相同，formControl就属于同一个组,通过声明formGroup
+      来决定所属的组的方式，使得表单的组合非常灵活.
+    </dd>
+    <dd>
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <div>
+          <label>
+            First Name:
+            <input type="text" formControlName="firstName">
+          </label>
+        </div>
+        <div>
+          <label>
+            Last Name:
+            <input type="text" formControlName="lastName">
+          </label>
+        </div>
+        <div>
+          <label>
+            可以操控同一个formControlName，该元素formControlName为abc,formGroup为profileForm
+            <input type="text" formControlName="abc">
+          </label>
+        </div>
+        <div>
+          <label [formGroup]="anotherForm">
+            嵌套在profileForm组中其他组的formControl
+            <input type="text" formControlName="abc">
+          </label>
+        </div>
+        <button type="submit" [disabled]="!profileForm.valid || !profileForm.dirty">Submit</button>
+      </form>
+      <div [formGroup]="profileForm">
+        <label>
+          别处声明formGroup为profileForm,该元素formControlName也为abc，改formControlName和上面的同名同组，因此可以共同控制
+          <input type="text" formControlName="abc">
+        </label>
+      </div>
+
+      <button (click)="show()">showProfileForm</button>
+      <button (click)="showA()">showAntherForm</button>
+    </dd>
+    <dt><strong> formArray是formGroup的一种变体，区别只是数据序列化不一样</strong>
+    </dt>
+    <dd>formArray是数组形式，formGroup是对象形式,因此在不知道key或者不知道formControl个数的情况下，formArray非常有用，能够
+      更好的遍历和操纵(add,remove,insert,..etc)formControl
+    </dd>
+  </dl>
+</div>
+

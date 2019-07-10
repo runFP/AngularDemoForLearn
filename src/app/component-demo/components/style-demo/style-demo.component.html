@@ -1,0 +1,61 @@
+<p>
+  style-demo works!
+</p>
+<h5>
+  [class.className]和[style.style-property]绑定
+</h5>
+<dl>
+  <dt>用新的className覆盖当前class</dt>
+  <dd>
+    [attr.class]="className变量" eg className='newClassName',用newClassName覆盖当前class
+  </dd>
+  <dd>
+    <div class="item clearance special" [attr.class]="resetClasses">Reset all classes at once</div>
+  </dd>
+  <dt>追加新的className，不会覆盖当前class</dt>
+  <dd>
+    [class.className]="boolean" true追加，false不加<span style="color: #8b254a">(如果当前class已经拥有className，为false也会去掉当前className)</span>
+  </dd>
+  <dd>
+    <div class="item clearance special" [class.new-class]="resetClasses">Reset all classes at once</div>
+  </dd>
+  <dd>当前class拥有special，[class.special]="!resetClasses" 条件为false后special也被去掉</dd>
+  <dd>
+    <div class="special" [class.special]="!resetClasses">This one is not so special.</div>
+  </dd>
+  <dt>
+    [style.style-property]="表达式",当前拥有相同的style-property会被覆盖（若表达式为null或者属性值为字符的但没加引号，当前相同的style-property会被去掉），注意由于是动态绑定属性值为字符的需要加上单引号
+  </dt>
+  <dd>
+    <div style="color: red;background-color: black" [style.color]="'blue'">a123 加了单引号，成功替换</div>
+    <div style="color: red;background-color: black" [style.color]="null">a123 没加单引号已有同名style-property被去掉</div>
+  </dd>
+  <dt>
+    [style.style-property.unit] 某些表达式可以带有单位
+  </dt>
+  <dd>
+    <div [style.font-size.px]="16">16px文字</div>
+    <div [style.font-size.rem]="1">1rem文字</div>
+  </dd>
+</dl>
+
+<h5>
+  [ngClass]和[ngStyle]绑定
+</h5>
+<dl>
+  <dt>
+    [ngClass]最实用的地方在于可以批量添加class，如果是单一class，使用[class.className]更好
+    [ngClass]="class变量" class变量为key-value,key为className:string，value:boolean为是否使用改className
+  </dt>
+  <dd>
+    <div [ngClass]="currentClasses">This div is initially saveable, unchanged, and special.</div>
+  </dd>
+  <dt>
+    [ngStyle]类似于[ngClass]也是为了批量添加style
+  </dt>
+  <dd>
+    <div [ngStyle]="currentStyles">
+      This div is initially italic, normal weight, and extra large (24px).
+    </div>
+  </dd>
+</dl>

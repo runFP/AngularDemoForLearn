@@ -1,0 +1,34 @@
+<p>
+  simple-ag-grid works!
+</p>
+<ag-grid-angular
+  #agGrid
+  style="width: 500px; height: 200px;"
+  class="ag-theme-balham"
+  [gridOptions]="gridOptions"
+  [rowData]="rowData"
+  [columnDefs]="columnDefs"
+  [pinnedTopRowData]="pinnedTopRowData"
+  rowSelection="multiple"
+  (gridReady)="onGridReady($event)"
+>
+</ag-grid-angular>
+<dl>
+  <dt></dt>
+  <dd>重设数据
+    <button (click)="resetData()">resetData</button>
+  </dd>
+  <dd>滚动到第9行
+    <button (click)="goToLine()">goToLine</button>
+  </dd>
+  <dd>获取选中的行
+    <button (click)="getSelectedRows()">getSelectedRows</button>
+  </dd>
+  <dd>设置冻结行/固定行
+    <button (click)="setPinnedRow()">setPinnedRow</button>
+  </dd>
+</dl>
+
+
+
+

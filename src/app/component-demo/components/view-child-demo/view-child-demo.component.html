@@ -1,0 +1,13 @@
+<p>
+  view-child-demo works!
+</p>
+<div>viewChild的read决定以哪一种令牌方式来解析查找结果</div>
+这里默认是按指令查找，所以解析后也是一个指令
+<pane id="1" *ngIf="shouldShow"></pane>
+<pane id="2" *ngIf="!shouldShow"></pane>
+
+<button (click)="toggle()">Toggle</button>
+
+<div>Selected: {{selectedPane}}</div>
+
+

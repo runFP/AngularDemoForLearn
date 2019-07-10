@@ -1,0 +1,8 @@
+<p>
+  dynamic-component-and-customize-element works!
+  动态组件和自定义元素比较
+</p>
+
+<input #input value="Message">
+<button (click)="popup.showAsComponent(input.value)">Show as component</button>
+<button (click)="popup.showAsElement(input.value)">Show as element</button>

@@ -1,0 +1,23 @@
+div {
+  margin: 8px;
+  font-size: 12px;
+  line-height: 24px;
+  color: #666;
+}
+
+strong {
+  font-size: 14px;
+  color: #000;
+}
+
+dl {
+  dt {
+    margin-top: 32px;
+    &:first-child {
+      margin: 0;
+    }
+  }
+}
+
+
+

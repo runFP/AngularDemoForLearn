@@ -1,0 +1,22 @@
+<p>
+  simple-directive works!
+</p>
+
+<ul>
+  <li>
+    由于指令带了*号，因此注入了TemplateRef，*号会把模板分解为外嵌模板（ng-template）和内嵌模板(内部元素)
+  </li>
+  <li>
+    当前上下文的viewContainer，每一个元素都有自己的视图容器，理解这一点非常重要
+  </li>
+</ul>
+
+<button (click)="condition = !condition">toggle condition to {{condition}}</button>
+<p *appUnless="condition" class="unless a">
+  (A) This paragraph is displayed because the condition is false.
+</p>
+
+<p *appUnless="!condition" class="unless b">
+  (B) Although the condition is true,
+  this paragraph is displayed because appUnless is set to false.
+</p>

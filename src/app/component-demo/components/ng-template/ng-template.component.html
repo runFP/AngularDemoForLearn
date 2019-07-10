@@ -1,0 +1,27 @@
+<h1>理解ngTemplate，ng-container, ng-content </h1>
+<p>
+  ngTemplate 引用模板，主要作用是用来创建和标记一段可复用的代码为模板，通过#来标识其身份，默认是不渲染在页面中
+</p>
+<p>
+  ng-content 指令/组件中的占位符，来标记指令/组件中的内容经过渲染后，应该出现在指令/组件中的什么位置,主要把内容投射到宿主的某个位置
+</p>
+<p>
+  ng-container 容器，主要用来控制流程变化时(eg:ngIf/ngFor等)，无需多输出一些无用的dom
+</p>
+
+<h2>ngTemplateOutlet和ngTemplateOutletContext以及$implicit</h2>
+<p>
+  ngTemplateOutletContext 为一个view容器赋值上下文
+  $implicit 为一个view容器上下文的默认值（即模板中没有定义与上下文相同字段时，采用的值），例如下面的引用模板定义了一个模板输入变量name,但为其赋值上下文myContext中并没有这个字段,那么$implicit就默认赋值给name
+</p>
+<ng-container *ngTemplateOutlet="greet"></ng-container>
+<hr>
+<ng-container *ngTemplateOutlet="eng; context: myContext"></ng-container>
+<hr>
+<ng-container *ngTemplateOutlet="svk; context: myContext"></ng-container>
+<hr>
+
+
+<ng-template #greet><span>Hello</span></ng-template>
+<ng-template #eng let-name><span>Hello {{name}}!</span></ng-template>
+<ng-template #svk let-person="localSk"><span>Ahoj {{person}}!</span></ng-template>
