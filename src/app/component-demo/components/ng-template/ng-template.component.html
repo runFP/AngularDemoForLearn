@@ -1,27 +1,89 @@
-<h1>理解ngTemplate，ng-container, ng-content </h1>
-<p>
-  ngTemplate 引用模板，主要作用是用来创建和标记一段可复用的代码为模板，通过#来标识其身份，默认是不渲染在页面中
-</p>
-<p>
-  ng-content 指令/组件中的占位符，来标记指令/组件中的内容经过渲染后，应该出现在指令/组件中的什么位置,主要把内容投射到宿主的某个位置
-</p>
-<p>
-  ng-container 容器，主要用来控制流程变化时(eg:ngIf/ngFor等)，无需多输出一些无用的dom
-</p>
-
-<h2>ngTemplateOutlet和ngTemplateOutletContext以及$implicit</h2>
-<p>
-  ngTemplateOutletContext 为一个view容器赋值上下文
-  $implicit 为一个view容器上下文的默认值（即模板中没有定义与上下文相同字段时，采用的值），例如下面的引用模板定义了一个模板输入变量name,但为其赋值上下文myContext中并没有这个字段,那么$implicit就默认赋值给name
-</p>
-<ng-container *ngTemplateOutlet="greet"></ng-container>
-<hr>
-<ng-container *ngTemplateOutlet="eng; context: myContext"></ng-container>
-<hr>
-<ng-container *ngTemplateOutlet="svk; context: myContext"></ng-container>
-<hr>
-
-
 <ng-template #greet><span>Hello</span></ng-template>
 <ng-template #eng let-name><span>Hello {{name}}!</span></ng-template>
 <ng-template #svk let-person="localSk"><span>Ahoj {{person}}!</span></ng-template>
+
+<dl>
+  <dt>
+    ngTemplate 引用模板，主要作用是用来创建和标记一段可复用的代码为模板，通过#模板引用变量来导出其实例，默认是不渲染在页面中,通常结合结构性指令渲染,
+  </dt>
+  <dd>
+    <ng-template>ignored</ng-template>不结合结构性指令，被忽略
+  </dd>
+  <dd>
+    <ng-template ngIf="show">not ignored</ng-template>结合了ngif会渲染
+  </dd>
+  <dd>
+    <ng-container *ngTemplateOutlet="greet"></ng-container>
+  </dd>
+  <dt>ngTemplate还可以和ngIf结合使用，作为条件渲染输出,<span class="red">同时结构性指令也需要跟ng-template结合使用,或者使用*号语法,否则会报错</span>then为真时显示,else为假时显示,当存在then时，自身所属的元素不会被渲染
+  </dt>
+  <dd>
+    <div *ngIf="show;then thenBlock; else elseBlock">this is ignored</div>
+    <ng-template #thenBlock>thenBlock</ng-template>
+    <ng-template #elseBlock>elseBlock</ng-template>
+  </dd>
+  <dt>ngTemplateOutletContext 为一个view容器赋值上下文</dt>
+  <dd>
+    <ng-container *ngTemplateOutlet="svk; context: myContext"></ng-container>
+  </dd>
+  <dt>$implicit
+    为一个view容器上下文的默认值（即模板中没有定义与上下文相同字段时，采用的值），例如下面的引用模板定义了一个模板输入变量name,但为其赋值上下文myContext中并没有这个字段,那么$implicit就默认赋值给name
+  </dt>
+  <dd>
+    <ng-container *ngTemplateOutlet="eng; context: myContext"></ng-container>
+  </dd>
+  <dt>ng-container容器，当指令没有宿主元素时，主要用来控制流程变化时(eg:ngIf/ngFor等)，无需多输出一些无用的dom以及将代码分块</dt>
+  <dd>
+  </dd>
+  <dt>ng-content 指令/组件中的占位符，来标记指令/组件中的内容经过渲染后，应该出现在指令/组件中的什么位置,主要把内容投射到宿主的某个位置</dt>
+  <dd></dd>
+  <dt>#模板引用变量</dt>
+  <dd>模板引用变量如果没有指定属性值，默认指就是所声明的元素</dd>
+  <dd>
+    <input type="text" #phone (input)="update()">
+    #input.value: {{phone.value}}
+  </dd>
+  <dt>let模板输入变量 <a href="https://angular.io/guide/structural-directives#template-input-variable" target="_blank"></a>
+  </dt>
+  <dd>模板输入变量是在声明元素的上下文定义一个变量，必须用在模板中（ng-template），</dd>
+  <dd>
+    <ng-template *ngIf="show" let-inputVariable>输入变量{{inputVariable}}</ng-template>
+  </dd>
+  <dt>
+    输入变量和引用变量最大的区别在于他们的作用域不同，模板引用变量的作用域被限制在在其宿主模板中，输入变量的作用域被限制在模板单例中
+  </dt>
+  <dd>
+    例如有p>a>b+c,b的结构，在a模板中不能重复定义相同模板引用变量，但模板输入变量可以在b,c中重复定义相同模板输入变量
+  </dd>
+  <dd>因此不要在一个模板中使用相同的变量名字重复定义模板引用变量(结果会变得完全不可以预估，可能会被覆盖，可能也不会被覆盖)，而模板输入变量可以在其他结构性指令中重复定义</dd>
+  <dd>
+    该模板引用变量同名，因此不知道哪个输入框才被真正引用，不可预估（改变某个输入框的值不会有值输出）
+    <input type="text" #onlyName (input)="update()" placeholder="onlyOne Template reference name">
+    <input type="text" #onlyName (input)="update()" placeholder="overwrite duplication defined template reference name">
+    #onlyName.value:{{onlyName.value}}
+  </dd>
+  <dd>
+    重复定义的模板输入变量
+    <ul>
+      <li *ngFor="let name of names; let i = index">{{i}}:{{name.name}}</li>
+    </ul>
+    <ul>
+      <li *ngFor="let name of names2">{{i}}:{{name.name}}</li>
+    </ul>
+  </dd>
+  <dt></dt>
+  <dd>
+    模板引用变量的值为声明的元素 <button (click)="showTemplateReferToElement()">show templateRefer as Element</button>
+    <div #templateRefAsElement>templateRef to Element</div>
+  </dd>
+  <dd>
+    模板引用变量的值为组件 <button (click)="showTemplateReferToComponent()">show templateRefer as component</button>
+    <test-refer-template #templateRefAsComponent></test-refer-template>
+  </dd>
+  <dd>
+    模板引用变量的值为指令,要先引用指令后才能给模板引用变量赋值,指令的exportAs要定义 <button (click)="showTemplateReferToDirective()">show templateRefer as directive</button>
+    <div #templateRefAsDirective="directiveVariable" testReferTemplateAsDirective></div>
+  </dd>
+</dl>
+
+

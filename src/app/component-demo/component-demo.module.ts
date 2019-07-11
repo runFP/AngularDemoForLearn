@@ -17,6 +17,8 @@ import {MyPopupComponent} from './components/dynamic-component-and-customize-ele
 import {PopupService} from './components/dynamic-component-and-customize-element/my-popup/my-popup.service';
 import { StyleDemoComponent } from './components/style-demo/style-demo.component';
 import {ShareModule} from '../share/share.module';
+import {ReferTemplateVariableComponent} from './components/ng-template/referComponent.component';
+import {ReferTemplateVariableDirective} from './components/ng-template/referDirective.directive';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,9 @@ import {ShareModule} from '../share/share.module';
     FormDemoComponent,
     DynamicComponentAndCustomizeElementComponent,
     MyPopupComponent,
-    StyleDemoComponent
+    StyleDemoComponent,
+    ReferTemplateVariableComponent,
+    ReferTemplateVariableDirective
   ],
   imports: [
     CommonModule,
