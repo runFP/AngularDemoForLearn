@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ng-template',
@@ -10,6 +11,7 @@ export class NgTemplateComponent implements OnInit {
   @ViewChild('templateRefAsComponent') templateRefAsComponent;
   @ViewChild('templateRefAsDirective') templateRefAsDirective;
 
+  linkstr = '<strong style="color: red">321123123</strong>hahahahahah';
 
   myContext: object = {$implicit: 'World', localSk: 'Svet'};
 
@@ -21,7 +23,9 @@ export class NgTemplateComponent implements OnInit {
   names: any[] = [{name: 'name1'}, {name: 'name2'}];
   names2: any[] = [{name: 'name3'}, {name: 'name4'}];
 
-  constructor() {
+  constructor(
+    private domSanitizer: DomSanitizer
+  ) {
   }
 
   ngOnInit() {

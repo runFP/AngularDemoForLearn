@@ -83,5 +83,4 @@ export class ObservableDemoComponent implements OnInit {
 
     of(1).pipe(map(x => of(x * 2))).subscribe(x => console.log(x));
   }
-
 }

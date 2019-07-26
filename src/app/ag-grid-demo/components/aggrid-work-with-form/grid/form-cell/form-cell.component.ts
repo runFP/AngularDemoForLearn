@@ -5,10 +5,10 @@ import {ControlValueAccessor, FormArray, NG_VALUE_ACCESSOR} from '@angular/forms
   selector: 'app-form-cell',
   template: `
     <div *ngIf="formGroup" [formGroup]="formGroup">
-      <!--<mat-form-field [floatLabel]="'never'" style="width: 100%">-->
-      <!--<input matInput [formControlName]="key" [id]="key" placeholder="Enter {{columnName}}">-->
-      <!--</mat-form-field>-->
-      <app-text-span [formControlName]="key" [id]="key" [value]="value"></app-text-span>
+      <mat-form-field [floatLabel]="'never'" style="width: 100%">
+      <input matInput [formControlName]="key" [id]="key" placeholder="Enter {{columnName}}">
+      </mat-form-field>
+      <!--<app-text-span [formControlName]="key" [id]="key" [value]="value"></app-text-span>-->
     </div>
   `,
 })

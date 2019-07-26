@@ -15,6 +15,9 @@ import {FormCellComponent} from './components/aggrid-work-with-form/grid/form-ce
 import {BranchService} from './components/aggrid-work-with-form/grid/branch.service';
 import {TextSpanComponent} from './components/aggrid-work-with-form/grid/form-cell/textSpan.component';
 import {ShareModule} from '../share/share.module';
+import {CellRenderComponent} from './components/simple-ag-grid/cellRender.component';
+import {AgFormCellComponent} from './components/aggrid-work-with-form/ag-form-cell/ag-form-cell.component';
+import {AgSpanComponent} from './components/aggrid-work-with-form/ag-form-cell/ag-span.component';
 
 const agGridWorkWithForm = [
   AgGridModule.withComponents([FormCellComponent]),
@@ -28,6 +31,9 @@ const agGridWorkWithForm = [
     GridComponent,
     FormCellComponent,
     TextSpanComponent,
+    CellRenderComponent,
+    AgFormCellComponent,
+    AgSpanComponent
   ],
   imports: [
     CommonModule,
@@ -35,9 +41,12 @@ const agGridWorkWithForm = [
     AgGridDemoRoutingModule,
     ShareModule,
     agGridWorkWithForm,
-    AgGridModule.withComponents([FormCellComponent])
   ],
   providers: [BranchService],
+  entryComponents: [
+    CellRenderComponent,
+    AgFormCellComponent
+  ]
 })
 export class AgGridDemoModule {
 }

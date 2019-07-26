@@ -1,0 +1,12 @@
+<p>
+  form-validator-demo works!
+</p>
+<div [formGroup]="formGroup">
+  <input type="text" formControlName="name">
+
+</div>
+<div *ngFor="let item of arr.controls;let i = index" [formGroup]="arr">
+  <input type="text" [formControlName]="i">
+</div>
+<button [disabled]="formGroup.invalid" (click)="submit()">submit</button>
+<button (click)="get()">get</button>

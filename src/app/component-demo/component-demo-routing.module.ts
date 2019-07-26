@@ -8,6 +8,7 @@ import {ViewChildDemoComponent} from './components/view-child-demo/view-child-de
 import {FormDemoComponent} from './components/form-demo/form-demo.component';
 import {DynamicComponentAndCustomizeElementComponent} from './components/dynamic-component-and-customize-element/dynamic-component-and-customize-element.component';
 import {StyleDemoComponent} from './components/style-demo/style-demo.component';
+import {FormValidatorDemoComponent} from './components/form-validator-demo/form-validator-demo.component';
 
 const childRoutes: Routes = [
   {path: 'template', component: NgTemplateComponent},
@@ -16,6 +17,7 @@ const childRoutes: Routes = [
   {path: 'form', component: FormDemoComponent},
   {path: 'dcAce', component: DynamicComponentAndCustomizeElementComponent}, // 动态组件和自定义元素比较
   {path: 'style', component: StyleDemoComponent}, // 动态组件和自定义元素比较
+  {path: 'formValidator', component: FormValidatorDemoComponent}, // 动态组件和自定义元素比较
 ];
 
 const routes: Routes = [

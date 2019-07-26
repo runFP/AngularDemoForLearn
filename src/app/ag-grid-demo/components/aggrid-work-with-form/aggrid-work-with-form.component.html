@@ -1,4 +1,16 @@
 <p>
-  aggrid-work-with-form works!
+  ag-Grid结合表单校验
 </p>
-<app-grid></app-grid>
+<ag-grid-angular
+  style="width: 500px; height: 200px;"
+  class="ag-theme-balham"
+  [columnDefs]="columnDefs"
+  [rowData]="rowData"
+  [context]="getContext()"
+  [gridOptions]="gridOptions"
+  (gridReady)="onGirdReady($event)"
+></ag-grid-angular>
+<button [disabled]="agFormGroup.invalid">submit</button>
+<button (click)="showAgFormGroup()">showAgFormGroup</button>
+<button (click)="addNewLine()">addNewLine</button>
+

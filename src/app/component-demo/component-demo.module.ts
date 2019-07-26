@@ -19,6 +19,7 @@ import { StyleDemoComponent } from './components/style-demo/style-demo.component
 import {ShareModule} from '../share/share.module';
 import {ReferTemplateVariableComponent} from './components/ng-template/referComponent.component';
 import {ReferTemplateVariableDirective} from './components/ng-template/referDirective.directive';
+import { FormValidatorDemoComponent } from './components/form-validator-demo/form-validator-demo.component';
 
 @NgModule({
   declarations: [
@@ -33,13 +34,13 @@ import {ReferTemplateVariableDirective} from './components/ng-template/referDire
     MyPopupComponent,
     StyleDemoComponent,
     ReferTemplateVariableComponent,
-    ReferTemplateVariableDirective
+    ReferTemplateVariableDirective,
+    FormValidatorDemoComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     DemoComponentRoutingModule,
-    BrowserAnimationsModule,
     ShareModule
   ],
   providers: [PopupService],

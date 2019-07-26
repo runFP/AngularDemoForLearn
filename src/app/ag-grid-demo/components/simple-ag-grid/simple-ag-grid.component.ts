@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {AgGridAngular} from 'ag-grid-angular';
 
 import {ClientSideRowModel, FilterChangedEvent, FilterModifiedEvent, GridOptions, RowNode, SortChangedEvent} from 'ag-grid';
+import {CellRenderComponent} from './cellRender.component';
 
 interface ObjectType {
   [key: string]: any;
@@ -33,10 +34,30 @@ export class SimpleAgGridComponent implements OnInit {
     }, // 排序
     {headerName: 'Model', field: 'model', filter: true}, // 过滤
     {headerName: 'Price', field: 'price', checkboxSelection: true},
-    {headerName: 'A', field: 'a'},
+    {
+      headerName: 'A',
+      field: 'a',
+      cellRendererParams: {color: 'red'}, /** 为渲染器提供参数 */
+      type: 'cellRenderColumn' /** 为该列标记类型，可以批量设置列的配置 */
+    },
     {headerName: 'B', field: 'b'},
     {headerName: 'C', field: 'c'},
   ];
+
+  /** 注册组件
+   * 这种方式比直接引用组件更容易批量修改，通过可以让gird配置项保持为一个简单的JSON
+   *  key-value key代表映射表内的组件名字，value为组件
+   * */
+  frameworkComponents = {
+    'test': CellRenderComponent /** 由于这种形式是动态渲染，因此动态组件需要在entryComponents定义，否则angular会报错*/
+  };
+
+  /** 定义类类型
+   * key-value key代表类型的名字，用于在columnDefs中的列定义的type字段，value表示改类型需要设置的列配置,eg:单元格渲染组件，单元格编辑组件
+   * */
+  columnTypes = {
+    cellRenderColumn: {cellRenderer: 'test'},
+  };
 
 
   /*  autoGroupColumnDef = {
@@ -150,7 +171,6 @@ export class SimpleAgGridComponent implements OnInit {
     console.log('I\'m scroll to eighth line!!!');
   }
 
-
   /**
    * 获取选中数据
    */
@@ -165,6 +185,16 @@ export class SimpleAgGridComponent implements OnInit {
    * 设置冻结行
    */
   setPinnedRow() {
+  }
+
+  /**
+   * 刷新第一行A列
+   * */
+  refreshColumn() {
+    debugger
+    const firstRow = this.gridApi.getDisplayedRowAtIndex(0);
+    firstRow.setDataValue('a', Number(Math.random().toFixed(2)));
+    this.gridApi.refreshCells({columns: ['a']});
   }
 
   onGridReady(params) {

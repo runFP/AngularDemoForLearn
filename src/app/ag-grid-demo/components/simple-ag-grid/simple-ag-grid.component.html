@@ -9,6 +9,8 @@
   [rowData]="rowData"
   [columnDefs]="columnDefs"
   [pinnedTopRowData]="pinnedTopRowData"
+  [frameworkComponents]="frameworkComponents"
+  [columnTypes]="columnTypes"
   rowSelection="multiple"
   (gridReady)="onGridReady($event)"
 >
@@ -26,6 +28,10 @@
   </dd>
   <dd>设置冻结行/固定行
     <button (click)="setPinnedRow()">setPinnedRow</button>
+  </dd>
+  <dd>
+    刷新第一行A列
+    <button (click)="refreshColumn()">refresh column A</button>
   </dd>
 </dl>
 

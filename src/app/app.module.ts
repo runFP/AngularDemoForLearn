@@ -17,6 +17,7 @@ import {CdkStepperModule} from '@angular/cdk/stepper';
 import {OverlayModule} from '@angular/cdk/overlay';
 import {OverlayPanelComponent} from './overlay-panel/overlay-panel.component';
 import {CdkOverlayComponent} from './cdk-overlay/cdk-overlay.component';
+import {LayoutModule} from './layout/layout.module';
 
 
 const cdcMoudle = [CdkStepperModule, OverlayModule];
@@ -36,6 +37,7 @@ const cdcMoudle = [CdkStepperModule, OverlayModule];
     MyOwnCustomMaterialModule,
     BrowserAnimationsModule,
     AgGridModule.withComponents([]),
+    LayoutModule,
     ...cdcMoudle,
   ],
   entryComponents: [OverlayPanelComponent],

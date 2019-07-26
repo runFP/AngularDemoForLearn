@@ -85,5 +85,6 @@
     <div #templateRefAsDirective="directiveVariable" testReferTemplateAsDirective></div>
   </dd>
 </dl>
+<a routerLink="../content" [innerHtml]="domSanitizer.bypassSecurityTrustHtml(linkstr)"></a>
 
 

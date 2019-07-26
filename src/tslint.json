@@ -4,13 +4,21 @@
     "directive-selector": [
       true,
       "attribute",
-      ["app","test"],
+      [
+        "app",
+        "test"
+      ],
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      ["app","test"],
+      [
+        "app",
+        "test",
+        "ag",
+        "layout"
+      ],
       "kebab-case"
     ],
     "no-inferrable-types": [
