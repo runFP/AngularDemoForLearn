@@ -4,12 +4,20 @@ import {Routes, RouterModule} from '@angular/router';
 import {HomeComponent} from './home/home.component';
 import {SimpleDirectiveComponent} from './simple-directive/simple-directive.component';
 
-const childRoutes: Routes = [
+export const childRoutes: Routes = [
   {path: 'simple', component: SimpleDirectiveComponent}
 ];
 
-const routes: Routes = [
+export const routes: Routes = [
   {path: 'directive', component: HomeComponent, children: childRoutes}
+];
+
+export const names = [
+  {
+    name: '指令', children: [
+      {name: '简单示例'},
+    ]
+  }
 ];
 
 @NgModule({

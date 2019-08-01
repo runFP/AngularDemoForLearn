@@ -1,7 +1,6 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from '@angular/core';
 import {Overlay, OverlayConfig} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {OverlayPanelComponent} from '../overlay-panel/overlay-panel.component';
 import {DOCUMENT} from '@angular/common';
 
 @Component({
@@ -33,7 +32,7 @@ export class CdkOverlayComponent {
     });
     // OverlayPanelComponent是动态组件
     // 创建一个ComponentPortal，attach到OverlayRef，这个时候我们这个overlay层就显示出来了。
-    overlayRef.attach(new ComponentPortal(OverlayPanelComponent, this.viewContainerRef));
+    // overlayRef.attach(new ComponentPortal(OverlayPanelComponent, this.viewContainerRef));
     // 监听overlayRef上的键盘按键事件
     overlayRef.keydownEvents().subscribe((event: KeyboardEvent) => {
       console.log(overlayRef._keydownEventSubscriptions + ' times');

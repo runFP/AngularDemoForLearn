@@ -44,7 +44,8 @@ const routes: Routes = [
        * 当把path: 'AgGridDemoModule'改为path:'',则可以http://localhost:4200/agGrid/simple访问
        * */
       {
-        path: 'AgGridDemoModule', loadChildren: () => AgGridDemoModule,
+        path: '', loadChildren: () => AgGridDemoModule,
+        // path: 'AgGridDemoModule', loadChildren: () => AgGridDemoModule,
       },
 
       {

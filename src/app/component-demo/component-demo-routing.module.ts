@@ -10,7 +10,7 @@ import {DynamicComponentAndCustomizeElementComponent} from './components/dynamic
 import {StyleDemoComponent} from './components/style-demo/style-demo.component';
 import {FormValidatorDemoComponent} from './components/form-validator-demo/form-validator-demo.component';
 
-const childRoutes: Routes = [
+export const childRoutes: Routes = [
   {path: 'template', component: NgTemplateComponent},
   {path: 'content', component: NgContentComponent},
   {path: 'viewChild', component: ViewChildDemoComponent},
@@ -20,10 +20,24 @@ const childRoutes: Routes = [
   {path: 'formValidator', component: FormValidatorDemoComponent}, // 动态组件和自定义元素比较
 ];
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'components', component: HomeComponent,
     children: childRoutes,
+  }
+];
+
+export const names = [
+  {
+    name: '组件', children: [
+      {name: 'template'},
+      {name: 'content'},
+      {name: 'viewChild'},
+      {name: 'form'},
+      {name: '动态组件/自定义元素'},
+      {name: 'style'},
+      {name: 'formValidator'},
+    ]
   }
 ];
 

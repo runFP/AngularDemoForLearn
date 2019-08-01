@@ -1,17 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~@angular/cdk/overlay-prebuilt.css';
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 
 html, body {
-  height: 100%;
   font-size: 12px;
   line-height: 24px;
   color: #666;
 }
 
 body {
-  padding: 16px;
+  padding: 0;
+  margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
@@ -33,5 +34,9 @@ dt{
 .red{
   font-weight: bold;
   color: red;
+}
+
+ul{
+  list-style: none;
 }
 

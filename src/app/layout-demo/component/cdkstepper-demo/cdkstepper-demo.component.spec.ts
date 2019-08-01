@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OverlayPanelComponent } from './overlay-panel.component';
+import { CDKStepperDemoComponent } from './cdkstepper-demo.component';
 
-describe('OverlayPanelComponent', () => {
-  let component: OverlayPanelComponent;
-  let fixture: ComponentFixture<OverlayPanelComponent>;
+describe('CDKStepperDemoComponent', () => {
+  let component: CDKStepperDemoComponent;
+  let fixture: ComponentFixture<CDKStepperDemoComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OverlayPanelComponent ]
+      declarations: [ CDKStepperDemoComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OverlayPanelComponent);
+    fixture = TestBed.createComponent(CDKStepperDemoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

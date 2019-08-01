@@ -1,3 +1,12 @@
-<p>
-  sidebar works!
-</p>
+<div class="sidebar">
+  <ul>
+    <li *ngFor="let menu of menus">
+      <span [routerLink]="menu.path">{{menu.name}}</span>
+      <ul>
+        <li *ngFor="let cm of menu.children">
+          <span [routerLink]="cm.path">{{cm.name}}</span>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

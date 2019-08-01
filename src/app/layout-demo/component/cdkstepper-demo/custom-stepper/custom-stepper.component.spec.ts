@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AppCustomStepperComponent } from './app-custom-stepper.component';
+import { CustomStepperComponent } from './custom-stepper.component';
 
-describe('AppCustomStepperComponent', () => {
-  let component: AppCustomStepperComponent;
-  let fixture: ComponentFixture<AppCustomStepperComponent>;
+describe('CustomStepperComponent', () => {
+  let component: CustomStepperComponent;
+  let fixture: ComponentFixture<CustomStepperComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AppCustomStepperComponent ]
+      declarations: [ CustomStepperComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AppCustomStepperComponent);
+    fixture = TestBed.createComponent(CustomStepperComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

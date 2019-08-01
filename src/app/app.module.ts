@@ -12,12 +12,11 @@ import 'ag-grid-enterprise';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MyOwnCustomMaterialModule} from './my-own-custom-material/my-own-custom-material-module';
-import {CustomStepperComponent} from './app-custom-stepper/custom-stepper.component';
 import {CdkStepperModule} from '@angular/cdk/stepper';
 import {OverlayModule} from '@angular/cdk/overlay';
-import {OverlayPanelComponent} from './overlay-panel/overlay-panel.component';
-import {CdkOverlayComponent} from './cdk-overlay/cdk-overlay.component';
+// import {CdkOverlayComponent} from './cdk-overlay/cdk-overlay.component';
 import {LayoutModule} from './layout/layout.module';
+
 
 
 const cdcMoudle = [CdkStepperModule, OverlayModule];
@@ -25,9 +24,7 @@ const cdcMoudle = [CdkStepperModule, OverlayModule];
 @NgModule({
   declarations: [
     AppComponent,
-    CustomStepperComponent,
-    OverlayPanelComponent,
-    CdkOverlayComponent
+    // CdkOverlayComponent
   ],
   imports: [
     BrowserModule,
@@ -40,7 +37,7 @@ const cdcMoudle = [CdkStepperModule, OverlayModule];
     LayoutModule,
     ...cdcMoudle,
   ],
-  entryComponents: [OverlayPanelComponent],
+  entryComponents: [],
   providers: [],
   bootstrap: [AppComponent]
 })
