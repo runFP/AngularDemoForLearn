@@ -13,3 +13,12 @@
     article1231231231231111111111111111111111111sdafasdfasfasfasfasf
   </article>
 </div>
+
+水纹按钮的原理
+1.先绘画一层透明的径向渐变层，并且利用scale放大,让其可以覆盖整个按钮，在定义过渡效果为scale和透明度
+2.在定义点击active伪事件，设置scale为(0,0)和透明度为不透明,这样点击时候就把径向渐变层变为不透明和宽高均为0
+3.松开时，执行过渡效果，就有了从无到有，不透明到透明的过程
+<div class="container text-center">
+  <button class="btn btn-default ripple btn-lg">Button</button>
+  <button class="btn btn-default ripple btn-lg">Button with very long content</button>
+</div>

@@ -3,8 +3,21 @@
   我们只需要实现其样式并根据需求来调用API完成需要的功能
 </p>
 
+
 <app-custom-stepper>
-  <cdk-step><p>This is any content of "Step 1"</p></cdk-step>
+  <!--cdk-step 如果不使用表单可以传递属性completed来决定是否可以前进，在linear模式下有效-->
+  <cdk-step [completed]="firstComplete">
+    <p>firstComplete:{{firstComplete}}</p>
+    <p>This is any content of "Step 1"</p>
+    <p>
+      <button (click)="fisrtComplete()" mat-raised-button>to Complete</button>
+      点击completed为true，可以下一步
+    </p>
+    <p>
+      <button (click)="fisrtUnfinished()" mat-raised-button>to unfinished</button>
+      点击completed为false，无法下一步
+    </p>
+  </cdk-step>
   <cdk-step><p>This is any content of "Step 2"</p></cdk-step>
   <cdk-step><p>This is any content of "Step 3"</p></cdk-step>
 </app-custom-stepper>

@@ -6,4 +6,13 @@ import {Component} from '@angular/core';
   styleUrls: ['./cdkstepper-demo.component.scss'],
 })
 export class CDKStepperDemoComponent {
+  firstComplete = false;
+
+  fisrtComplete() {
+    this.firstComplete = true;
+  }
+
+  fisrtUnfinished() {
+    this.firstComplete = false;
+  }
 }
