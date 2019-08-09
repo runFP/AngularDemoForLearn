@@ -12,12 +12,14 @@ import {
   names as directiveNames
 } from '../../../directive-demo/directive-demo-routing.module';
 import {routes as layoutRoutes, childRoutes as layoutCRoutes, names as layoutNames} from '../../../layout-demo/layout-demo-routing.module';
+import {routes as errorRoutes, childRoutes as errorCRoutes, names as errorNames} from '../../../error/error-routing.module';
 
 let menus = [
   {path: agRoutes, children: agCRoutes, names: agNames},
   {path: componentRoutes, children: componentCRoutes, names: componentNames},
   {path: directiveRoutes, children: directiveCRoutes, names: directiveNames},
   {path: layoutRoutes, children: layoutCRoutes, names: layoutNames},
+  {path: errorRoutes, children: errorCRoutes, names: errorNames},
 ];
 
 menus = processMenu(menus);

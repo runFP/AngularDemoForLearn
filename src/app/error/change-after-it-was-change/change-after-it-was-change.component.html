@@ -1,0 +1,26 @@
+<h3>"Expression has changed after it was checked"错误分析</h3>
+该错误只会在开发模式下产生，如果调用了enableProdMode()方法，应用中不会接受到该错误
+
+
+<div>1.由于Angular渲染过程中自身再一次变更数据，导致Angular不能够知道当前的值是哪一个，容易造成无限循环（初始化了值，在ngAfterViewInit方法中再次变更）</div>
+
+<div>I'm {{message}}</div>
+<hr>
+<div>错误原因</div>
+<ul>
+  <li>由于Angular单向数据流规则，不允许在视图被合成之后在去更新视图</li>
+  <li>ngAfterViewInit是变更检测回合的一部分(视图完成组合后)</li>
+  <li>updateMessage方法改变了绑定数据</li>
+</ul>
+<div>要点</div>
+<ul>
+  <li>当绑定发生更改时，需要触发一轮更改检测</li>
+</ul>
+<div>解决方法</div>
+<ul>
+  <li>1)使用setTimeout方法来变更值，先让视图渲染完毕，把变更值方法放在下一个js事件队列中</li>
+  <li>2)在ngOnInit方法中变更值，在第一轮变更检测之前改变值</li>
+  <li>3)通过rxjs异步变更值来触发变更检测，和第一种方案差不多</li>
+  <li>4)变更后，手动触发一轮变更检测</li>
+</ul>
+

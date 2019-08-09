@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-simple-directive',
@@ -6,8 +6,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./simple-directive.component.scss']
 })
 export class SimpleDirectiveComponent implements OnInit {
+  condition = false;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }

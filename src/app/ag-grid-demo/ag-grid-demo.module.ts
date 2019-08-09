@@ -18,6 +18,7 @@ import {ShareModule} from '../share/share.module';
 import {CellRenderComponent} from './components/simple-ag-grid/cellRender.component';
 import {AgFormCellComponent} from './components/aggrid-work-with-form/ag-form-cell/ag-form-cell.component';
 import {AgSpanComponent} from './components/aggrid-work-with-form/ag-form-cell/ag-span.component';
+import { LiftCycleHookComponent } from './components/lift-cycle-hook/lift-cycle-hook.component';
 
 const agGridWorkWithForm = [
   AgGridModule.withComponents([FormCellComponent]),
@@ -33,7 +34,8 @@ const agGridWorkWithForm = [
     TextSpanComponent,
     CellRenderComponent,
     AgFormCellComponent,
-    AgSpanComponent
+    AgSpanComponent,
+    LiftCycleHookComponent
   ],
   imports: [
     CommonModule,

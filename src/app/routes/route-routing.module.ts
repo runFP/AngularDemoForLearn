@@ -5,6 +5,8 @@ import {ComponentDemoModule} from '../component-demo/component-demo.module';
 import {AgGridDemoModule} from '../ag-grid-demo/ag-grid-demo.module';
 import {DirectiveDemoModule} from '../directive-demo/directive-demo.module';
 import {RXjsModule} from '../rxjs/rxjs.module';
+import {ErrorModule} from '../error/error.module';
+
 import {LayoutDemoModule} from '../layout-demo/layout-demo.module';
 
 /**
@@ -55,6 +57,7 @@ const routes: Routes = [
       {path: '', loadChildren: () => RXjsModule},
       /** 字符形式引入*/
       {path: '', loadChildren: '../layout-demo/layout-demo.module#LayoutDemoModule'},
+      {path: '', loadChildren: () => ErrorModule},
     ],
   },
   /** 通配符要放在最后面*/

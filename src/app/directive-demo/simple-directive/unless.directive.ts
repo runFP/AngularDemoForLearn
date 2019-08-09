@@ -11,8 +11,8 @@ export class UnlessDirective {
     private viewContainer: ViewContainerRef // 当前上下文的viewContainer，每一个元素都有自己的视图容器，理解这一点非常重要
   ) {
     console.log(this.templateRef);
-    const abc = this.templateRef.createEmbeddedView(this);
-  }
+    console.log(this);
+    }
 
   @Input() set appUnless(condition: boolean) {
     if (!condition && !this.hasView) {
