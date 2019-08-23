@@ -1,3 +1,10 @@
-<ag-grid-angular [gridOptions]="gridOptions">
-
+<button (click)="setColumnDef()">setDef</button>
+<ag-grid-angular
+  style="width: 500px; height: 200px;"
+  class="ag-theme-balham"
+  [gridOptions]="gridOptions"
+  [columnDefs]="columnDefs"
+  [defaultColDef]="defaultColDef"
+  [rowData]="rowData"
+>
 </ag-grid-angular>

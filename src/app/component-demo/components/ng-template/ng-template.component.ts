@@ -7,9 +7,9 @@ import {DomSanitizer} from '@angular/platform-browser';
   styleUrls: ['./ng-template.component.scss']
 })
 export class NgTemplateComponent implements OnInit {
-  @ViewChild('templateRefAsElement') templateRefAsElement;
-  @ViewChild('templateRefAsComponent') templateRefAsComponent;
-  @ViewChild('templateRefAsDirective') templateRefAsDirective;
+  @ViewChild('templateRefAsElement', {static: false}) templateRefAsElement;
+  @ViewChild('templateRefAsComponent', {static: false}) templateRefAsComponent;
+  @ViewChild('templateRefAsDirective', {static: false}) templateRefAsDirective;
 
   linkstr = '<strong style="color: red">321123123</strong>hahahahahah';
 

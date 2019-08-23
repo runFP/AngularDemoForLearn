@@ -14,7 +14,7 @@ interface ObjectType {
   styleUrls: ['./simple-ag-grid.component.scss']
 })
 export class SimpleAgGridComponent implements OnInit {
-  @ViewChild('agGrid') agGrid: AgGridAngular;
+  @ViewChild('agGrid', {static: false}) agGrid: AgGridAngular;
 
   private gridApi;
 
@@ -148,7 +148,6 @@ export class SimpleAgGridComponent implements OnInit {
     return rows.reduce((acc, cur) => acc + cur.data.price, 0);
   }
 
-
   constructor() {
   }
 
@@ -191,7 +190,7 @@ export class SimpleAgGridComponent implements OnInit {
    * 刷新第一行A列
    * */
   refreshColumn() {
-    debugger
+    debugger;
     const firstRow = this.gridApi.getDisplayedRowAtIndex(0);
     firstRow.setDataValue('a', Number(Math.random().toFixed(2)));
     this.gridApi.refreshCells({columns: ['a']});

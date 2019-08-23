@@ -15,13 +15,13 @@ export class Pane {
 export class ViewChildDemoComponent {
 
   /** 通过read替换解析令牌，返回一个ElementRef元素 */
-  @ViewChild(Pane, {read: ElementRef})
+  @ViewChild(Pane, {read: ElementRef, static: false})
   set pane1(v) {
     console.log('pane1 is mark as ElementRef', v);
   }
 
   /** 由于Pane是一个指令，默认查找解析返回一个指令 */
-  @ViewChild(Pane)
+  @ViewChild(Pane, {static: false})
   set pane(v: Pane) {
     console.log('pane is mark as default', v);
     setTimeout(() => {

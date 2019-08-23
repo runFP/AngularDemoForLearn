@@ -5,7 +5,7 @@ import {RoutesModule} from './routes/routes.module';
 import {HttpClientModule} from '@angular/common/http';
 
 
-/* ag-Grid */
+/** ag-Grid */
 import {AgGridModule} from 'ag-grid-angular';
 import 'ag-grid-enterprise';
 
@@ -14,6 +14,14 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MyOwnCustomMaterialModule} from './my-own-custom-material/my-own-custom-material-module';
 import {LayoutModule} from './layout/layout.module';
 
+/** ng-zorro */
+import { AppRoutingModule } from './app-routing.module';
+import { IconsProviderModule } from './icons-provider.module';
+import { NgZorroAntdModule, NZ_I18N, zh_CN } from 'ng-zorro-antd';
+import { registerLocaleData } from '@angular/common';
+import zh from '@angular/common/locales/zh';
+
+registerLocaleData(zh);
 
 
 
@@ -30,9 +38,12 @@ import {LayoutModule} from './layout/layout.module';
     BrowserAnimationsModule,
     AgGridModule.withComponents([]),
     LayoutModule,
+    // AppRoutingModule,
+    IconsProviderModule,
+    NgZorroAntdModule,
   ],
   entryComponents: [],
-  providers: [],
+  providers: [{ provide: NZ_I18N, useValue: zh_CN }],
   bootstrap: [AppComponent]
 })
 export class AppModule {

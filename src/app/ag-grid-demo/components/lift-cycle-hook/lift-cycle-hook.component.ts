@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {GridOptions} from 'ag-grid';
 
 @Component({
   selector: 'app-lift-cycle-hook',
@@ -7,10 +6,79 @@ import {GridOptions} from 'ag-grid';
   styleUrls: ['./lift-cycle-hook.component.scss']
 })
 export class LiftCycleHookComponent implements OnInit {
-  // gridOptions: GridOptions;
   gridOptions: any;
 
+  gridApi;
+
+  columnDefs: any[] = [
+    {field: 'name', headerName: 'Name', resizable: true, width: 50},
+    {field: 'age', headerName: 'Age'},
+    {field: 'sex', headerName: 'Sex'},
+  ];
+
+  defaultColDef = {
+    tooltip: param => param.value
+  };
+
+
+  rowData: any[] = [
+    {name: 'xiaoming', age: '3', sex: 'nan'},
+    {name: 'xiaohong', age: '4', sex: 'nv'},
+    {name: 'xiaohua', age: '5', sex: 'nv'},
+  ];
+
+
   constructor() {
+  }
+
+  /**
+   * 当列内容宽度小于列宽度时，动态设置columnDefs 添加tooltipFile属性，但会有性能问题
+   * 因为api.setColumnDefs会重绘表格，一般不建议使用
+   * */
+  originColumnDefs = {index: null, colDef: null, columnState: null};
+
+  /** 添加内容提示（tooltip） */
+  autoSetTooltip(event) {
+    const node = event.event.path[0];
+    const cloneNode = node.cloneNode(true);
+    cloneNode.style.width = 'auto';
+    event.api.gridPanel.getCenterContainer().appendChild(cloneNode);
+    const cloneNodeWidth = cloneNode.offsetWidth;
+    const actualWidth = event.column.actualWidth;
+    cloneNode.remove();
+
+    if ((cloneNodeWidth > actualWidth) && !('tooltipField' in event.colDef)) {
+      this.setColDefs(event);
+    }
+  }
+
+  /** 设置grid的columnDefs */
+  setColDefs(event) {
+    const columnDefs = event.api.columnController.columnDefs;
+    const field = event.colDef.field;
+    const colDefIndex = columnDefs.findIndex(c => c.field === field);
+    if (colDefIndex !== -1) {
+      const coldef = columnDefs[colDefIndex];
+      this.originColumnDefs.index = colDefIndex;
+      this.originColumnDefs.colDef = Object.assign({}, coldef);
+      this.originColumnDefs.columnState = event.columnApi.getColumnState();
+      coldef.tooltipField = field;
+      event.api.setColumnDefs(columnDefs);
+    }
+  }
+
+  /** 删除内容提示(tooltip) */
+  recoveColDefs(event) {
+    if (this.originColumnDefs.index !== null) {
+      const columnDefs = event.api.columnController.columnDefs;
+      const index = this.originColumnDefs.index;
+      const columnState = this.originColumnDefs.columnState;
+      columnDefs[index] = this.originColumnDefs.colDef;
+      event.api.setColumnDefs([]);
+      event.api.setColumnDefs(columnDefs);
+      event.columnApi.setColumnState(columnState);
+      this.originColumnDefs = {index: null, colDef: null, columnState: null};
+    }
   }
 
   ngOnInit() {
@@ -30,10 +98,13 @@ export class LiftCycleHookComponent implements OnInit {
       },
       onCellMouseOver: (event) => {
         console.log('onCellMouseOver');
+        /** 表格内容宽度小于列宽度时添加内容提示 */
+        // this.autoSetTooltip(event);
         console.log(event);
       },
       onCellMouseOut: (event) => {
         console.log('onCellMouseOut');
+        // this.recoveColDefs(event);
         console.log(event);
       },
       onCellMouseDown: (event) => {
@@ -198,6 +269,7 @@ export class LiftCycleHookComponent implements OnInit {
       onGridReady: (event) => {
         console.log('onGridReady');
         console.log(event);
+        this.gridApi = event.api;
       },
       onGridSizeChanged: (event) => {
         console.log('onGridSizeChanged');

@@ -56,7 +56,7 @@ const routes: Routes = [
       {path: '', loadChildren: () => DirectiveDemoModule},
       {path: '', loadChildren: () => RXjsModule},
       /** 字符形式引入*/
-      {path: '', loadChildren: '../layout-demo/layout-demo.module#LayoutDemoModule'},
+      {path: '', loadChildren: () => import('../layout-demo/layout-demo.module').then(m => m.LayoutDemoModule)},
       {path: '', loadChildren: () => ErrorModule},
     ],
   },

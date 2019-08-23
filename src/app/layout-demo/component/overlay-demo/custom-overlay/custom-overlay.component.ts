@@ -9,7 +9,7 @@ import {ComponentPortal, TemplatePortal} from '@angular/cdk/portal';
 })
 export class CustomOverlayComponent implements OnInit {
 
-  @ViewChild('abc', {read: TemplateRef})
+  @ViewChild('abc', {read: TemplateRef, static: false})
   abc: TemplateRef<any>;
 
   constructor(private overlay: Overlay, private viewContainer: ViewContainerRef) {
