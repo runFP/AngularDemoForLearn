@@ -1,0 +1,34 @@
+<p>portal-demo</p>
+<h3>portal提供了一个灵活的系统来将动态内容呈现到应用程序中。</h3>
+知识点
+<ul>
+  <li> 通常一个portal功能由至少一个portal和一个portalOutlet组成</li>
+  <li>portal是一块可被动态渲染进页面开得的插槽中的UI</li>
+  <li>portalOutlet是一个portal插槽</li>
+  <li>已经attach了portal的portalOutlet无法在绑定其他portal,需要先将portal从portalOutlet中取出,使用detch方法</li>
+</ul>
+使用步骤
+<ul>
+  <li>确定portalOutlet的位置</li>
+  <li>定义好待插入的内容component或者templateRef</li>
+  <li>将component转换为componentPortal对象,该组件需要在entryComponents中定义</li>
+  <li>将templateRef转换为tempalteRefPortal对象</li>
+  <li>将portal对象赋值到portalOutlet中</li>
+</ul>
+
+<h5>例子：动态切换portal为component或者templateRef</h5>
+<!--确定portalOutlet的位置,并赋值为一个portal变量-->
+<div class="example-portal-outlet">
+  <ng-template [cdkPortalOutlet]="selectedPortal" ></ng-template>
+</div>
+
+<!--定义一个tempalteRef，并在代码中将其转为portal对象 -->
+<ng-template #templatePortalContent>Hello, this is a template portal</ng-template>
+
+<!--利用指令，声明式定义一个portal对象-->
+<ng-template #declarativeTemRef="cdkPortal" cdkPortal>Hello, this is a declarative template portal</ng-template>
+
+<!--切换portal的值-->
+<button (click)="selectedPortal = componentPortal" mat-raised-button>Render component portal</button>
+<button (click)="selectedPortal = templatePortal" mat-raised-button>Render template portal</button>
+<button (click)="setHostPortalOutlet()">set HostPortalOutlet by method</button>

@@ -1,5 +1,10 @@
-<p>
-  overlay-demo works!
-</p>
-
+<p>overlay-demo</p>
+<h3>overlay提供一种方法在屏幕中打开浮动面板</h3>
+知识点
+<ul>
+  <li>overlay依赖一小组结构样式才能正常工作，因此如果你没有使用Angular Material,需要引入@import '~@angular/cdk/overlay-prebuilt.css';</li>
+  <li>可以通过componentRef.instance来手动为组件属性赋值，eg: Object.assign(componentRef.instance, properties)</li>
+  <li>留意这个demo控制台输出的信息，注意组件形式的portal的组件生命周期执行顺序,对了解Angular的渲染机制非常有帮助</li>
+</ul>
 <app-custom-overlay></app-custom-overlay>
+

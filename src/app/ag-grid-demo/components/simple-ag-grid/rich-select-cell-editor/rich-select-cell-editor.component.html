@@ -1,0 +1,3 @@
+<nz-select [(ngModel)]="selectedValue" nzAllowClear [nzSize]="'small'" style="width:100%">
+  <nz-option *ngFor="let o of listOfOption"  [nzValue]="o.value" [nzLabel]="o.label"></nz-option>
+</nz-select>

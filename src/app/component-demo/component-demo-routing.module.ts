@@ -9,6 +9,10 @@ import {FormDemoComponent} from './components/form-demo/form-demo.component';
 import {DynamicComponentAndCustomizeElementComponent} from './components/dynamic-component-and-customize-element/dynamic-component-and-customize-element.component';
 import {StyleDemoComponent} from './components/style-demo/style-demo.component';
 import {FormValidatorDemoComponent} from './components/form-validator-demo/form-validator-demo.component';
+import {DynamicComponentComponent} from './components/dynamic-component/dynamic-component.component';
+import {DomSanitizerDemoComponent} from './components/dom-sanitizer-demo/dom-sanitizer-demo.component';
+import {CreateDynamicModuleAndComponentComponent} from './components/create-dynamic-module-and-component/create-dynamic-module-and-component.component';
+import {TlistDemoComponent} from './components/create-dynamic-module-and-component/tlist-demo/tlist-demo.component';
 
 export const childRoutes: Routes = [
   {path: 'template', component: NgTemplateComponent},
@@ -18,6 +22,10 @@ export const childRoutes: Routes = [
   {path: 'dcAce', component: DynamicComponentAndCustomizeElementComponent}, // 动态组件和自定义元素比较
   {path: 'style', component: StyleDemoComponent}, // 动态组件和自定义元素比较
   {path: 'formValidator', component: FormValidatorDemoComponent}, // 动态组件和自定义元素比较
+  {path: 'dynamicComponentLoad', component: DynamicComponentComponent}, // 动态组件和自定义元素比较
+  {path: 'sanitizer', component: DomSanitizerDemoComponent}, // 插入templateRef
+  {path: 'createModuleComponentDynamic', component: CreateDynamicModuleAndComponentComponent}, // 动态创建组件和模块
+  {path: 'text', component: TlistDemoComponent}, // 动态创建组件和模块
 ];
 
 export const routes: Routes = [
@@ -37,6 +45,10 @@ export const names = [
       {name: '动态组件/自定义元素'},
       {name: 'style'},
       {name: 'formValidator'},
+      {name: '动态加载组件'},
+      {name: '动态加载模板'},
+      {name: '动态创建模块组件'},
+      {name: 'text'},
     ]
   }
 ];

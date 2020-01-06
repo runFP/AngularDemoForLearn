@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material';
 
-import {Column, ColumnApi, GridApi, GridReadyEvent, RowNode} from 'ag-grid';
+import {Column, ColumnApi, GridApi, GridReadyEvent, RowNode} from 'ag-grid-community';
 import {FormCellComponent} from './form-cell/form-cell.component';
 import {BranchService} from './branch.service';
 
@@ -52,7 +52,7 @@ export class GridComponent {
     this.rowData = currentBranch.stock;
   }
 
-  private refreshFormControls() {
+  refreshFormControls() {
     if (this.api) {
       // slight chicken and egg here - the grid cells will be created before the grid is ready, but
       // we need set formGroup up front

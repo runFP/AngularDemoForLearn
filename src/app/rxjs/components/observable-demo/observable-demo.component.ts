@@ -18,6 +18,11 @@ export class ObservableDemoComponent implements OnInit {
 
   // 高阶
   // concatAll等价于 concurrency 参数(最大并发数)为1的 mergeAll
+  /**
+   * concatAll()会订阅每一个出现的Observable的内部observable（例如b内部有个a，就会订阅a）,
+   * 重点需要注意的是，它会在复制所有observable发射的值，直到observable完成（complete），才会继续订阅下一个，
+   * 可以观察下面那个结合rang，每次延迟1秒发射值
+   * */
   concatAll(): void {
     console.log('---------------------concatAll begin-------------------');
     console.log('concatAll把subscribe订阅后还是Observable打平，直接变成值');
@@ -73,14 +78,29 @@ export class ObservableDemoComponent implements OnInit {
 
   // 创建
   rang(): void {
+    /**
+     * concatAll()会订阅每一个出现的Observable的内部observable（例如b内部有个a，就会订阅a）,
+     * 重点需要注意的是，它会在复制所有observable发射的值，直到observable完成（complete），才会继续订阅下一个
+     * 当第一个带着1的observable到来时，会先复制他的值1，然后等其执行完毕，才去执行下一个带2的observable，延迟了1秒，递推因此这里每一个生成数都被递增的延迟了一秒
+     * */
     // 把rang生成的每个数都往后推迟1秒
-    // range(10, 10).pipe(map(x => of(x).pipe(delay(1000))), concatAll()).subscribe(x => console.log(x));
+    range(10, 10).pipe(map(x => of(x).pipe(delay(1000))), concatAll()).subscribe(x => console.log(x));
     // // 把range推迟1秒
-    // range(10, 10).pipe(delay(1000)).subscribe(x => console.log(x));
+    // range(10, 10).pipe(delay(3000)).subscribe(x => console.log(x));
     //
     // // range(10, 10).pipe(timeinterval()).subscribe(x => console.log(x));
     // const seconds = interval(1000);
 
-    of(1).pipe(map(x => of(x * 2))).subscribe(x => console.log(x));
+    // of(1).pipe(map(x => of(x * 2)), concatAll()).subscribe(x => console.log(x));
+  }
+
+  goOf() {
+    return of(of([1, 2, 3]).subscribe(res => {
+      return of(res);
+    }));
+  }
+
+  getOf() {
+    this.goOf().subscribe(res => res.unsubscribe());
   }
 }

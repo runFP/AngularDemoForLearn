@@ -1,13 +1,7 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 import {DefaultComponent} from '../layout/default/default.component';
-import {ComponentDemoModule} from '../component-demo/component-demo.module';
-import {AgGridDemoModule} from '../ag-grid-demo/ag-grid-demo.module';
-import {DirectiveDemoModule} from '../directive-demo/directive-demo.module';
 import {RXjsModule} from '../rxjs/rxjs.module';
-import {ErrorModule} from '../error/error.module';
-
-import {LayoutDemoModule} from '../layout-demo/layout-demo.module';
 
 /**
  * 路由加载的几种方法
@@ -46,18 +40,19 @@ const routes: Routes = [
        * 当把path: 'AgGridDemoModule'改为path:'',则可以http://localhost:4200/agGrid/simple访问
        * */
       {
-        path: '', loadChildren: () => AgGridDemoModule,
-        // path: 'AgGridDemoModule', loadChildren: () => AgGridDemoModule,
+        path: '', loadChildren: () => import('../ag-grid-demo/ag-grid-demo.module').then(m => m.AgGridDemoModule),
       },
-
+      /**
+       * angular 8.0 AOT编译模式需使用import(path).then(m=>m.module) 形式懒加载模块
+       * 7.0使用的是字符串形式modulePath#module
+       * */
       {
-        path: '', loadChildren: () => ComponentDemoModule,
+        path: '', loadChildren: () => import('../component-demo/component-demo.module').then(m => m.ComponentDemoModule),
       },
-      {path: '', loadChildren: () => DirectiveDemoModule},
-      {path: '', loadChildren: () => RXjsModule},
-      /** 字符形式引入*/
+      {path: '', loadChildren: () => import('../directive-demo/directive-demo.module').then(m => m.DirectiveDemoModule)},
+      {path: '', loadChildren: () => import('../rxjs/rxjs.module').then(m => m.RXjsModule)},
       {path: '', loadChildren: () => import('../layout-demo/layout-demo.module').then(m => m.LayoutDemoModule)},
-      {path: '', loadChildren: () => ErrorModule},
+      {path: '', loadChildren: () => import('../error/error.module').then(m => m.ErrorModule)},
     ],
   },
   /** 通配符要放在最后面*/
@@ -65,6 +60,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
+  // imports: [RouterModule.forRoot(routes, {enableTracing: true, scrollPositionRestoration: 'enabled'})],
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })

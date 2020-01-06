@@ -4,6 +4,9 @@ import {FormsModule} from '@angular/forms';
 import {RoutesModule} from './routes/routes.module';
 import {HttpClientModule} from '@angular/common/http';
 
+import {JitCompiler} from '@angular/compiler';
+
+
 
 /** ag-Grid */
 import {AgGridModule} from 'ag-grid-angular';
@@ -25,6 +28,7 @@ registerLocaleData(zh);
 
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,7 +38,6 @@ registerLocaleData(zh);
     FormsModule,
     RoutesModule,
     HttpClientModule,
-    MyOwnCustomMaterialModule,
     BrowserAnimationsModule,
     AgGridModule.withComponents([]),
     LayoutModule,
@@ -43,7 +46,9 @@ registerLocaleData(zh);
     NgZorroAntdModule,
   ],
   entryComponents: [],
-  providers: [{ provide: NZ_I18N, useValue: zh_CN }],
+  providers: [
+    { provide: NZ_I18N, useValue: zh_CN }
+    ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

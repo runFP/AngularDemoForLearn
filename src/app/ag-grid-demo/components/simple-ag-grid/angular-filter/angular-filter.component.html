@@ -1,0 +1,22 @@
+<div class="custom-filter">
+  <input type="text" [ngModel]="text" (ngModelChange)="onChange($event)" #filterInput placeholder="查询">
+  <div class="filter-content">
+    <span class="checkAll">
+       <label
+         nz-checkbox
+         [(ngModel)]="allChecked"
+         (ngModelChange)="updateAllChecked()"
+         [nzIndeterminate]="indeterminate"
+       >全选</label>
+    </span>
+    <ul>
+      <li *ngFor="let item of filterItems">
+        <label
+          nz-checkbox
+          [(ngModel)]="item.checked"
+          (ngModelChange)="updateSingleChecked()"
+        >{{item.value}}</label>
+      </li>
+    </ul>
+  </div>
+</div>

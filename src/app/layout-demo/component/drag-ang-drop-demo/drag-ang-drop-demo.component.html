@@ -1,0 +1,58 @@
+<h5>简单的拖放例子</h5>
+<div cdkDrag>
+  <div class="title" cdkDragHandle>can drag</div>
+  <div class="content">disable drag</div>
+</div>
+<mat-divider></mat-divider>
+
+<h5>动态变更为可拖动层，并通过dragRef.withHandles设置为只能title拖动</h5>
+<button (click)="setCdkDragDynamically()">set cdkDrag dynamically</button>
+<button (click)="resetDrag()">resetDrag</button>
+<button (click)="toggleDrag()">toggle drag</button>
+
+<div #dynamicallyDrag>
+  <div class="title" cdkDragHandle>click button above,change to drag dynamically</div>
+  <div class="content">I {{dragDisable?'can\'t':'can'}} drag!</div>
+</div>
+
+<h5>为Nz-modal添加拖动</h5>
+<h5>需要注意nz-modal元素的display属性值是不是block，因为在项目中nz-modal的display为inline,而transform在inline元素中无效，导致无法拖动</h5>
+<h5>可设置css nz-modal{{'{'}}display:block{{'}'}}解决</h5>
+<button nz-button [nzType]="'primary'" (click)="showModal()"><span>Show Modal</span></button>
+<button nz-button nzType="primary" (click)="createTplModal(tplTitle, tplContent, tplFooter)" #connectButton style="margin-left: 300px;">
+  <span>Template</span>
+</button>
+
+<ng-template #tplTitle>
+  <span>Title Template</span>
+</ng-template>
+<ng-template #tplContent>
+  <p>some contents...</p>
+  <p>some contents...</p>
+  <p>some contents...</p>
+  <p>some contents...</p>
+  <p>some contents...</p>
+</ng-template>
+<ng-template #tplFooter>1312323
+  <button nz-button nzType="primary" (click)="destroyTplModal()" [nzLoading]="tplModalButtonLoading">
+    Close after submit
+  </button>
+</ng-template>
+
+<nz-modal
+  [(nzVisible)]="isVisible"
+  [nzTitle]="dragableHeader"
+  (nzAfterOpen)="handleOpen()"
+  (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()"
+  [nzMask]="false"
+  [nzStyle]="{top:0}"
+  nzWrapClassName="abc"
+>
+  <p>Content one</p>
+  <p>Content two</p>
+  <p>Content three</p>
+</nz-modal>
+<ng-template #dragableHeader>
+  <div cdkDragHandle>drag me</div>
+</ng-template>

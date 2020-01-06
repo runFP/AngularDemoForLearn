@@ -13,12 +13,14 @@ import {
 } from '../../../directive-demo/directive-demo-routing.module';
 import {routes as layoutRoutes, childRoutes as layoutCRoutes, names as layoutNames} from '../../../layout-demo/layout-demo-routing.module';
 import {routes as errorRoutes, childRoutes as errorCRoutes, names as errorNames} from '../../../error/error-routing.module';
+import {routes as rxjsRoutes, childRoutes as rxjsCRoutes, names as rxjsNames} from '../../../rxjs/rxjs-routing.module';
 
 let menus = [
   {path: agRoutes, children: agCRoutes, names: agNames},
   {path: componentRoutes, children: componentCRoutes, names: componentNames},
   {path: directiveRoutes, children: directiveCRoutes, names: directiveNames},
   {path: layoutRoutes, children: layoutCRoutes, names: layoutNames},
+  {path: rxjsRoutes, children: rxjsCRoutes, names: rxjsNames},
   {path: errorRoutes, children: errorCRoutes, names: errorNames},
 ];
 
@@ -30,7 +32,7 @@ function processMenu(paths) {
   const processMenus = [];
   paths.forEach((menu) => {
     const m = {
-      path: menu.path[0].path,
+      path: `/${menu.path[0].path}`,
       children: [],
       name: menu.names[0].name,
     };

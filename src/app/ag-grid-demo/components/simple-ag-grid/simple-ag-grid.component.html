@@ -11,7 +11,9 @@
   [pinnedTopRowData]="pinnedTopRowData"
   [frameworkComponents]="frameworkComponents"
   [columnTypes]="columnTypes"
-  rowSelection="multiple"
+  updateColorCell
+  [suppressContextMenu]="false"
+  [defaultColDef]="defaultColDef"
   (gridReady)="onGridReady($event)"
 >
 </ag-grid-angular>
@@ -26,12 +28,31 @@
   <dd>获取选中的行
     <button (click)="getSelectedRows()">getSelectedRows</button>
   </dd>
+  <dd>获取选中的范围
+    <button (click)="getCellRanges()">getSelectedRows</button>
+  </dd>
   <dd>设置冻结行/固定行
     <button (click)="setPinnedRow()">setPinnedRow</button>
   </dd>
   <dd>
     刷新第一行A列
     <button (click)="refreshColumn()">refresh column A</button>
+  </dd>
+  <dd>
+    获取列状态
+    <button (click)="getColumnState()">getColumnState</button>
+  </dd>
+  <dd>
+    获取列状态
+    <button (click)="getValueColumns()">getColumnState</button>
+  </dd>
+  <dd>
+    获取所有颜色变更记录
+    <button (click)="getAllRecord()">getAllRecord</button>
+  </dd>
+  <dd>
+    选择某列，变更颜色
+    <input [(colorPicker)]="color" [style.background]="color" (colorPickerClose)="pickerClose($event)"/>
   </dd>
 </dl>
 

@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {AgGridModule} from 'ag-grid-angular';
 import {AgGridDemoRoutingModule} from './ag-grid-demo-routing.module';
@@ -18,10 +18,18 @@ import {ShareModule} from '../share/share.module';
 import {CellRenderComponent} from './components/simple-ag-grid/cellRender.component';
 import {AgFormCellComponent} from './components/aggrid-work-with-form/ag-form-cell/ag-form-cell.component';
 import {AgSpanComponent} from './components/aggrid-work-with-form/ag-form-cell/ag-span.component';
-import { LiftCycleHookComponent } from './components/lift-cycle-hook/lift-cycle-hook.component';
+import {LiftCycleHookComponent} from './components/lift-cycle-hook/lift-cycle-hook.component';
+import {CellEditComponent} from './components/simple-ag-grid/cellEditerPopup';
+import {NgZorroAntdModule} from 'ng-zorro-antd';
+import {OverlayModule} from '@angular/cdk/overlay';
+import {AngularFilterComponent} from './components/simple-ag-grid/angular-filter/angular-filter.component';
+import { RichSelectCellEditorComponent } from './components/simple-ag-grid/rich-select-cell-editor/rich-select-cell-editor.component';
+import { RestoreScrollDirective } from './components/lift-cycle-hook/restore-scroll.directive';
+import { UpdateColorCellDirective } from './components/lift-cycle-hook/update-color-cell/update-color-cell.directive';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 const agGridWorkWithForm = [
-  AgGridModule.withComponents([FormCellComponent]),
+  AgGridModule.withComponents([FormCellComponent, CellEditComponent, AngularFilterComponent]),
 ];
 
 @NgModule({
@@ -33,21 +41,32 @@ const agGridWorkWithForm = [
     FormCellComponent,
     TextSpanComponent,
     CellRenderComponent,
+    CellEditComponent,
     AgFormCellComponent,
     AgSpanComponent,
-    LiftCycleHookComponent
+    LiftCycleHookComponent,
+    AngularFilterComponent,
+    RichSelectCellEditorComponent,
+    RestoreScrollDirective,
+    UpdateColorCellDirective,
   ],
   imports: [
+    OverlayModule,
+    FormsModule,
     CommonModule,
     ReactiveFormsModule,
     AgGridDemoRoutingModule,
     ShareModule,
     agGridWorkWithForm,
+    NgZorroAntdModule,
+    ColorPickerModule
   ],
   providers: [BranchService],
   entryComponents: [
     CellRenderComponent,
-    AgFormCellComponent
+    CellEditComponent,
+    AgFormCellComponent,
+    RichSelectCellEditorComponent,
   ]
 })
 export class AgGridDemoModule {

@@ -1,13 +1,13 @@
 import {Component} from '@angular/core';
-import {ICellRendererParams} from 'ag-grid';
 import {ICellRendererAngularComp} from 'ag-grid-angular';
+import {ICellRendererParams} from 'ag-grid-community';
 
 
 @Component({
   selector: 'test-cell-renderer',
   template: `
     <span [style.color]="color" *ngIf="show; else elseBlock">{{value}}-{{text()}}</span>
-    <ng-template #elseBlock><span>hahahahahahah</span></ng-template>
+    <ng-template #elseBlock><span>renderByComponent</span></ng-template>
   `
 })
 export class CellRenderComponent implements ICellRendererAngularComp {
@@ -25,10 +25,12 @@ export class CellRenderComponent implements ICellRendererAngularComp {
   }
 
   refresh(params: ICellRendererParams) {
+    console.log('refresh');
     this.color = 'blue';
     this._text = 'lalala';
     this.show = true;
-    return true; /** 只有返回true才会触发模板重新渲染，false只会单纯替换值*/
+    return true;
+    /** 只有返回true才会触发模板重新渲染，false只会单纯替换值*/
   }
 
   public text(): string {

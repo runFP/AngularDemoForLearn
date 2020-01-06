@@ -24,7 +24,7 @@ export class NgTemplateComponent implements OnInit {
   names2: any[] = [{name: 'name3'}, {name: 'name4'}];
 
   constructor(
-    private domSanitizer: DomSanitizer
+    public domSanitizer: DomSanitizer
   ) {
   }
 

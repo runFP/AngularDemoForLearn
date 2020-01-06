@@ -134,7 +134,9 @@ export class AggridWorkWithFormComponent implements OnInit {
 
       });
 
-      /** 根据行id存储列formArray*/
+      /** 根据行id存储列formArray,实际应用中应该使用uuid来存储，因为rowID在删除增加行时，会发生变化，导致校验对应的行失败
+       * 并且应该先把值先一次过对formControl赋值一次，不然aggrid出现懒加载的时候，有些行没加载完，就会导致校验失败
+       * */
       this.agFormGroup.addControl(r.id, rowFormArray);
     });
   }

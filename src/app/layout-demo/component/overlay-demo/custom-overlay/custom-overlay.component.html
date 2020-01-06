@@ -1,5 +1,35 @@
-<ng-template #abc>
-  <p>
-    custom-overlay works!
-  </p>
+<button (click)="changePosition()">changePosition</button>
+<button
+  cdkOverlayOrigin
+  #origin="cdkOverlayOrigin"
+  (click)="isOpen=!isOpen"
+  style="margin-left: 300px;margin-top: 200px;"
+>
+  click
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="isOpen"
+  [cdkConnectedOverlayPositions]="overlayPositions"
+>
+  <div style="background-color: #fff;border: 1px solid #333; width: 200px">
+    <ul>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+      <li>1</li>
+    </ul>
+  </div>
+
 </ng-template>

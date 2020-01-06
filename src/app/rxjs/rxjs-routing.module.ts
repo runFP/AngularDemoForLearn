@@ -3,11 +3,18 @@ import {Routes, RouterModule} from '@angular/router';
 import {HomeComponent} from './home/home.component';
 import {ObservableDemoComponent} from './components/observable-demo/observable-demo.component';
 
-const childRoutes: Routes = [
+export const childRoutes: Routes = [
   {path: 'observable', component: ObservableDemoComponent}
 ];
-const routes: Routes = [
+export const routes: Routes = [
   {path: 'rxjs', component: HomeComponent, children: childRoutes}
+];
+export const names = [
+  {
+    name: 'rxjs', children: [
+      {name: 'observable'},
+    ]
+  }
 ];
 
 @NgModule({

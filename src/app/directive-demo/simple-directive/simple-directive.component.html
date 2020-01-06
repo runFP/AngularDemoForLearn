@@ -19,3 +19,9 @@
   (B) Although the condition is true,
   this paragraph is displayed because appUnless is set to false.
 </p>
+
+<ng-container *ngTemplateOutlet="passDir"></ng-container>
+
+<ng-template #passDir>
+  <p *appUnless>TempalteRef that include a directive which as a paramter pass in,directive inside template will be instantly </p>
+</ng-template>

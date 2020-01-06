@@ -6,4 +6,14 @@
 ul {
   margin: 8px;
   padding: 0;
+  li{
+    cursor: pointer;
+    ul{
+      li{
+        &:hover{
+          color: #8b254a;
+        }
+      }
+    }
+  }
 }

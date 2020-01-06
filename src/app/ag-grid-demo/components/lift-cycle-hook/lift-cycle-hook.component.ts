@@ -1,4 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {UpdateColorCellDirective} from './update-color-cell/update-color-cell.directive';
+
+const LEVEL = ['A', 'B', 'C', 'D', 'S'];
 
 @Component({
   selector: 'app-lift-cycle-hook',
@@ -6,29 +9,198 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./lift-cycle-hook.component.scss']
 })
 export class LiftCycleHookComponent implements OnInit {
+  @ViewChild(UpdateColorCellDirective, {static: false}) ucc;
+
   gridOptions: any;
 
   gridApi;
 
+  color = '#fff';
+
   columnDefs: any[] = [
     {field: 'name', headerName: 'Name', resizable: true, width: 50},
-    {field: 'age', headerName: 'Age'},
+    {
+      field: 'age', headerName: 'Age',
+    },
     {field: 'sex', headerName: 'Sex'},
+    {field: 'class', headerName: 'Class'},
+    {field: 'a', headerName: 'A'},
+    {field: 'b', headerName: 'B'},
+    {field: 'c', headerName: 'C'},
+    {field: 'd', headerName: 'd'},
+    {field: 's', headerName: 'S'},
   ];
 
   defaultColDef = {
-    tooltip: param => param.value
+    tooltip: param => param.value,
+    cellStyle: param => {
+      let exist = false;
+      let color = null;
+      const cc = param.data.cc;
+      if (cc) {
+        for (const c in cc) {
+          if (cc[c].indexOf(param.column.colId) !== -1) {
+            exist = true;
+            color = c;
+            break;
+          }
+        }
+        if (exist) {
+          return {backgroundColor: color};
+        }
+      }
+    }
   };
 
-
   rowData: any[] = [
-    {name: 'xiaoming', age: '3', sex: 'nan'},
-    {name: 'xiaohong', age: '4', sex: 'nv'},
-    {name: 'xiaohua', age: '5', sex: 'nv'},
+    {
+      name: 'xiaoming',
+      age: 1,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: {'#ff0000': ['a', 'c']},
+    },
+    {
+      name: 'xiaoming',
+      age: 2,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: {'#ffff00': ['b', 'c'], '#ff0000': ['sex', 'age']},
+    },
+    {
+      name: 'xiaoming',
+      age: 3,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 4,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 5,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 6,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 7,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 8,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 9,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 10,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 11,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 12,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+    {
+      name: 'xiaoming',
+      age: 13,
+      sex: 'nan',
+      a: LEVEL[Math.floor(Math.random() * 6)],
+      b: LEVEL[Math.floor(Math.random() * 6)],
+      c: LEVEL[Math.floor(Math.random() * 6)],
+      d: LEVEL[Math.floor(Math.random() * 6)],
+      s: LEVEL[Math.floor(Math.random() * 6)],
+      cc: null,
+    },
+
   ];
 
-
   constructor() {
+    console.log('lch constructor');
   }
 
   /**
@@ -92,10 +264,10 @@ export class LiftCycleHookComponent implements OnInit {
         console.log('onCellDoubleClicked');
         console.log(event);
       },
-      onCellFocused: (event) => {
-        console.log('onCellFocused');
-        console.log(event);
-      },
+      // onCellFocused: (event) => {
+      //   console.log('onCellFocused');
+      //   console.log(event);
+      // },
       onCellMouseOver: (event) => {
         console.log('onCellMouseOver');
         /** 表格内容宽度小于列宽度时添加内容提示 */

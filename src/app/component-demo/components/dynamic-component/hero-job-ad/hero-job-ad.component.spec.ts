@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CdkOverlayComponent } from './cdk-overlay.component';
+import { HeroJobAdComponent } from './hero-job-ad.component';
 
-describe('CdkOverlayComponent', () => {
-  let component: CdkOverlayComponent;
-  let fixture: ComponentFixture<CdkOverlayComponent>;
+describe('HeroJobAdComponent', () => {
+  let component: HeroJobAdComponent;
+  let fixture: ComponentFixture<HeroJobAdComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CdkOverlayComponent ]
+      declarations: [ HeroJobAdComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CdkOverlayComponent);
+    fixture = TestBed.createComponent(HeroJobAdComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

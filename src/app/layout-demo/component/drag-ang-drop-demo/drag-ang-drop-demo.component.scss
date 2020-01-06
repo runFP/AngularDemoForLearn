@@ -1,0 +1,18 @@
+.title, .content {
+  border: 1px solid #ccc;
+}
+
+::ng-deep {
+  .abc {
+    overflow: hidden;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+  }
+
+  .cba{
+    top:0;
+  }
+
+}
