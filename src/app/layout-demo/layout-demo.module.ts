@@ -32,6 +32,7 @@ import {PortalDemoComponent, ExamplePortalComponent} from './component/portal-de
 import {NgZorroAntdModule} from 'ng-zorro-antd';
 import { UnvarnishedTransmissionComponent } from './component/unvarnished-transmission/unvarnished-transmission.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { PickerColorComponent } from './component/overlay-demo/picker-color/picker-color.component';
 
 
 @NgModule({
@@ -46,7 +47,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     DragAngDropDemoComponent,
     PortalDemoComponent,
     ExamplePortalComponent,
-    UnvarnishedTransmissionComponent
+    UnvarnishedTransmissionComponent,
+    PickerColorComponent
   ],
   imports: [
     CommonModule,

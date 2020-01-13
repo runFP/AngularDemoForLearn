@@ -21,22 +21,37 @@ dl, dt, dd {
   padding: 0;
 }
 
-dt{
+dt {
   font-size: 12px;
   font-weight: bold;
   color: #000;
   margin-top: 16px;
-  &:first-child{
+  &:first-child {
     margin-top: 0;
   }
 }
 
-.red{
+.red {
   font-weight: bold;
   color: red;
 }
 
-ul{
+ul {
   list-style: none;
 }
 
+//.color-picker .preset-area {
+//  padding: 4px !important;
+//}
+//
+//.color-picker .preset-area .preset-color {
+//  margin: 2px !important;
+//}
+//
+//.color-picker .button-area{
+//  padding: 0 8px 8px !important;
+//}
+//
+//.color-picker .hex-text .box{
+//  padding-bottom: 0!important;
+//}

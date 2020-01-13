@@ -52,7 +52,16 @@
   </dd>
   <dd>
     选择某列，变更颜色
-    <input [(colorPicker)]="color" [style.background]="color" (colorPickerClose)="pickerClose($event)"/>
+    <input
+      [(colorPicker)]="color"
+      [style.background]="color"
+      [cpOKButton]="true"
+      cpOKButtonText="确定"
+      [cpSaveClickOutside]="false"
+      cpOKButtonClass="ant-btn ant-btn-primary"
+      [cpPresetColors]="['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)','#ff0','#333','#666','#999']"
+      (colorPickerSelect)="pickerClose($event)"
+    />
   </dd>
 </dl>
 
