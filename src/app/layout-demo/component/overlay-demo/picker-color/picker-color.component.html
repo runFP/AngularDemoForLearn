@@ -1,5 +1,9 @@
 <div>
-  <span></span>
+  <span
+    style="width: 20px;height: 20px; display: inline-block;"
+    [ngStyle]="{'background-color': color}"
+    (click)="choose(color)"
+  ></span>
   <button
     cdkOverlayOrigin
     #origin="cdkOverlayOrigin"
@@ -14,6 +18,44 @@
   [cdkConnectedOverlayOpen]="isOpen"
 >
   <div class="color-panel">
-    123123
+    <section>
+      <header>主题颜色</header>
+      <article>
+        <div class="base-colors">
+          <span
+            *ngFor="let c of themeColors"
+            [ngStyle]="{'background-color': c}"
+            (click)="choose(c, $event)"
+            class="color-border"></span>
+        </div>
+        <div class="gradient-colors">
+          <div *ngFor="let gc of gradientColors">
+            <span
+              *ngFor="let c of gc"
+              [ngStyle]="{'background-color': c}"
+              (click)="choose(c, $event)"
+            ></span>
+          </div>
+        </div>
+      </article>
+    </section>
+    <section>
+      <header>标准色</header>
+      <article>
+        <div class="base-colors">
+          <span
+            *ngFor="let c of standardColors"
+            [ngStyle]="{'background-color': c}"
+            (click)="choose(c, $event)"
+            class="color-border"></span>
+        </div>
+      </article>
+    </section>
+    <div class="custom-footer">
+      <ul>
+        <li (click)="choose('#fffff', $event)"><span><span class="no-color"></span></span>无填充颜色</li>
+        <li><span><span class="other-color"></span></span>其他颜色</li>
+      </ul>
+    </div>
   </div>
 </ng-template>

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, Renderer2, TemplateRef, ViewChild} from '@angular/core';
 import {PickerColorService} from './picker-color.service';
 
 @Component({
@@ -9,15 +9,25 @@ import {PickerColorService} from './picker-color.service';
 })
 export class PickerColorComponent implements OnInit {
   /** 主题颜色 */
-  @Input() themeColors: string[] = [];
+  @Input() themeColors: string[] = ['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646'];
 
   /** 标准色 */
-  @Input() standardColors: string[] = [];
+  @Input() standardColors: string[] = ['#c00000', '#ff0000', '#ffc000', '#ffff00', '#92d050', '#00b050', '#00b0f0', '#0070c0', '#002060', '#7030a0'];
 
   /** 外层样式名，用于可自定义样式 */
   @Input() wrapClass: string;
 
   @Input() latestColorsLen: number = 10;
+
+  /** 渐变色阶梯数 */
+  @Input() step = 5;
+
+  @ViewChild('origin', {static: false})
+  origin: TemplateRef<any>;
+
+  gradientColors: string[][] = [];
+  isOpen = false;
+  color = '#fff';
 
   /** 记录最近颜色
    * 1.只保存latestColorsLen个数据
@@ -44,15 +54,35 @@ export class PickerColorComponent implements OnInit {
     return this._lc;
   }
 
-  @ViewChild('origin', {static: false})
-  origin: TemplateRef<any>;
 
-  isOpen = false;
+  constructor(
+    private pickerColorService: PickerColorService,
+    private renderer: Renderer2,
+  ) {
+  }
 
-  constructor() {
+  choose(color: string, e?) {
+    this.color = color;
+    if (e) {
+      this.activeColor(e.target);
+    }
+    this.close();
+    console.log(color);
+    console.log(e);
+  }
+
+  activeColor(el) {
+    this.renderer.addClass(el, 'active');
+  }
+
+  close() {
+    this.isOpen = false;
   }
 
   ngOnInit() {
+    this.themeColors.forEach(c => {
+      this.gradientColors.push(this.pickerColorService.getStepColor(c, this.step));
+    });
   }
 
 }
