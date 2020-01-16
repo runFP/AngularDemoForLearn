@@ -284,6 +284,10 @@ export class SimpleAgGridComponent implements OnInit, AfterViewInit {
     this.ucc.changeCellColor(color).subscribe(data => console.log(data));
   }
 
+  openPickColor() {
+
+  }
+
   onGridReady(params) {
     this.gridApi = params.api;
     this.columnApi = params.columnApi;

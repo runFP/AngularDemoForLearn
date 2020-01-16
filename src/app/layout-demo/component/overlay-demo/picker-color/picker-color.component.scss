@@ -1,3 +1,49 @@
+.pick-button {
+  display: flex;
+  width: 45px;
+  cursor: pointer;
+  &:hover {
+    background-color: #e6ebee;
+  }
+  .set-color-btn {
+    width: 33px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg{
+      width: 80%;
+      height: 80%;
+      fill: currentColor;
+    }
+    &:hover{
+      background-color: #ddd;
+    }
+  }
+  .trigger-pick-color {
+    display: block;
+    width: 12px;
+    position: relative;
+    cursor: pointer;
+    &:after {
+      content: '';
+      position: absolute;
+      display: block;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      height: 0;
+      width: 0;
+      background-color: transparent;
+      border: 3px solid transparent;
+      border-top: 5px solid #a5a5a5;
+    }
+    &:hover{
+      background-color: #ddd;
+    }
+  }
+}
+
 .color-panel {
   padding: 1px;
   border: 1px solid #a7abb0;
@@ -21,6 +67,10 @@
     article {
       line-height: 0;
     }
+    .active {
+      border: 1px solid #f29436 !important;
+      box-shadow: inset #ffe294 0 0 0 1px !important;
+    }
   }
 
   .base-colors {
@@ -33,7 +83,7 @@
       &:last-child {
         margin-right: 0;
       }
-      &:hover {
+      &:hover, &:focus {
         cursor: pointer;
         border: 1px solid #f29436;
         box-shadow: inset #ffe294 0 0 0 1px;
@@ -105,7 +155,7 @@
     }
   }
 
-  .no-color{
+  .no-color {
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -115,18 +165,12 @@
     border-radius: 2px;
     margin-top: 3px;
   }
-  .other-color{
+  .other-color {
     width: 14px;
     height: 14px;
     display: inline-block;
     margin-top: 4px;
     background: url("./images/pc.png");
   }
-
-  .active{
-    border: 1px solid #f29436;
-    box-shadow: inset #ffe294 0 0 0 1px;
-  }
 }
-
 

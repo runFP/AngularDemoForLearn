@@ -1,4 +1,10 @@
-import {Component, Input, OnInit, Renderer2, TemplateRef, ViewChild} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import {PickerColorService} from './picker-color.service';
 
 @Component({
@@ -27,26 +33,26 @@ export class PickerColorComponent implements OnInit {
 
   gradientColors: string[][] = [];
   isOpen = false;
-  color = '#fff';
+  color = this.standardColors[0];
 
   /** 记录最近颜色
    * 1.只保存latestColorsLen个数据
    * 2.若新增数据存在，将位置提到栈顶
    * */
-  _lc: string[] = [];
+  private _lc: string[] = [];
 
   set latestColors(colors: string[]) {
     colors.forEach(color => {
       const idx = this._lc.indexOf(color);
       if (idx !== -1) {
         this._lc.splice(idx, 1);
-        this._lc.unshift(color);
       }
+      this._lc.unshift(color);
+
       /** 保存最新颜色的个数，默认为10个 */
-      if (this._lc.length + 1 > this.latestColorsLen) {
+      if (this._lc.length > this.latestColorsLen) {
         this._lc.pop();
       }
-      this._lc.push(color);
     });
   }
 
@@ -57,23 +63,15 @@ export class PickerColorComponent implements OnInit {
 
   constructor(
     private pickerColorService: PickerColorService,
-    private renderer: Renderer2,
   ) {
   }
 
-  choose(color: string, e?) {
+  choose(color: string) {
     this.color = color;
-    if (e) {
-      this.activeColor(e.target);
-    }
+    this.latestColors = [color];
     this.close();
-    console.log(color);
-    console.log(e);
   }
 
-  activeColor(el) {
-    this.renderer.addClass(el, 'active');
-  }
 
   close() {
     this.isOpen = false;
@@ -84,5 +82,4 @@ export class PickerColorComponent implements OnInit {
       this.gradientColors.push(this.pickerColorService.getStepColor(c, this.step));
     });
   }
-
 }

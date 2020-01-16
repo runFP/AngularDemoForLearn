@@ -51,6 +51,7 @@
     <button (click)="getAllRecord()">getAllRecord</button>
   </dd>
   <dd>
+    <button (click)="openPickColor()">openPickColor</button>
     选择某列，变更颜色
     <input
       [(colorPicker)]="color"
@@ -59,7 +60,6 @@
       cpOKButtonText="确定"
       [cpSaveClickOutside]="false"
       cpOKButtonClass="ant-btn ant-btn-primary"
-      [cpPresetColors]="['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)','#ff0','#333','#666','#999']"
       (colorPickerSelect)="pickerClose($event)"
     />
   </dd>
