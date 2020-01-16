@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {MatHeaderCell} from '@angular/material';
 
 const DOWN = 0;
 const UP = 240;
@@ -116,7 +115,6 @@ export class PickerColorService {
         data[idx.mid].start = data[idx.min].start + 5;
       }
     }
-
 
     return data;
   }

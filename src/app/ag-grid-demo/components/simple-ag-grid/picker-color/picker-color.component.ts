@@ -65,7 +65,6 @@ export class PickerColorComponent implements OnInit {
     return this._lc;
   }
 
-
   constructor(
     private pickerColorService: PickerColorService,
   ) {
