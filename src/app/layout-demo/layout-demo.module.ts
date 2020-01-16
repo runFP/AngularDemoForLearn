@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-
+import { ColorPickerModule } from 'ngx-color-picker';
 // route
 import {LayoutDemoRoutingModule} from './layout-demo-routing.module';
 
@@ -33,7 +33,6 @@ import {NgZorroAntdModule} from 'ng-zorro-antd';
 import { UnvarnishedTransmissionComponent } from './component/unvarnished-transmission/unvarnished-transmission.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { PickerColorComponent } from './component/overlay-demo/picker-color/picker-color.component';
-import { ColorCellDirective } from './component/overlay-demo/picker-color/color-cell.directive';
 
 
 @NgModule({
@@ -50,7 +49,6 @@ import { ColorCellDirective } from './component/overlay-demo/picker-color/color-
     ExamplePortalComponent,
     UnvarnishedTransmissionComponent,
     PickerColorComponent,
-    ColorCellDirective
   ],
   imports: [
     CommonModule,
@@ -64,6 +62,7 @@ import { ColorCellDirective } from './component/overlay-demo/picker-color/color-
     MatDividerModule,
     MyOwnCustomMaterialModule,
     NgZorroAntdModule,
+    ColorPickerModule,
   ],
   entryComponents: [
     ExamplePortalComponent,

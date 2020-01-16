@@ -1,7 +1,7 @@
 import {
-  Component,
+  Component, EventEmitter,
   Input,
-  OnInit,
+  OnInit, Output,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -25,6 +25,8 @@ export class PickerColorComponent implements OnInit {
   @Input() wrapClass: string;
 
   @Input() latestColorsLen = 10;
+
+  @Output() colorPickerSelect: EventEmitter<string> = new EventEmitter<string>();
 
   /** 渐变色阶梯数 */
   @Input() step = 5;
@@ -72,6 +74,7 @@ export class PickerColorComponent implements OnInit {
   choose(color: string = 'transparent'): void {
     this.color = color;
     this.close();
+    this.colorPickerSelect.emit(color);
   }
 
 
@@ -85,6 +88,7 @@ export class PickerColorComponent implements OnInit {
 
   pickerDialogClose(color: string): void {
     this.latestColors = [color];
+    this.choose(color);
     this.close();
   }
 

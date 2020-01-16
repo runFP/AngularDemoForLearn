@@ -1,14 +1,25 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {fromEvent, interval, merge, Observable, of, pipe, range, Subject} from 'rxjs';
 import {map, filter, scan} from 'rxjs/operators';
-import {concatAll, defaultIfEmpty, delay, mergeAll, take, takeUntil, takeWhile, timeInterval} from 'rxjs/internal/operators';
+import {
+  concatAll, debounceTime,
+  defaultIfEmpty,
+  delay,
+  mergeAll,
+  startWith,
+  switchMap,
+  take,
+  takeUntil,
+  takeWhile,
+  timeInterval
+} from 'rxjs/internal/operators';
 
 @Component({
   selector: 'app-observable-demo',
   templateUrl: './observable-demo.component.html',
   styleUrls: ['./observable-demo.component.scss']
 })
-export class ObservableDemoComponent implements OnInit {
+export class ObservableDemoComponent implements OnInit, AfterViewInit {
 
   constructor() {
   }
@@ -95,6 +106,7 @@ export class ObservableDemoComponent implements OnInit {
   }
 
   goOf() {
+    of(of([1, 2, 3]).subscribe(res => console.log('res:' + res))).subscribe(res => console.log(res));
     return of(of([1, 2, 3]).subscribe(res => {
       return of(res);
     }));
@@ -102,5 +114,30 @@ export class ObservableDemoComponent implements OnInit {
 
   getOf() {
     this.goOf().subscribe(res => res.unsubscribe());
+  }
+
+  eventFrom() {
+    const a = true;
+    const rr = fromEvent(document, 'click').pipe(filter(ev => a), switchMap(x => of(x))).subscribe(r => {
+      console.log('r:', r);
+      rr.unsubscribe();
+    });
+  }
+
+  switchMap() {
+    const switched = of(1, 2, 3).pipe(switchMap((x: number) => of(x, x ** 2, x ** 3)));
+    switched.subscribe(x => console.log(x));
+  }
+
+  @ViewChild('abc', {static: false}) abc: ElementRef;
+
+  ngAfterViewInit(): void {
+    const test = true;
+    const open$ = fromEvent(this.abc.nativeElement, 'mouseenter').pipe(filter(() => test),
+      switchMap(enterEvent => fromEvent(document, 'mousemove').pipe(
+        startWith(enterEvent),
+        debounceTime(300),
+        filter(event => this.abc.nativeElement === event['target'])
+      ))).subscribe(x => console.log('!!!!!!!!!!!!!1'));
   }
 }

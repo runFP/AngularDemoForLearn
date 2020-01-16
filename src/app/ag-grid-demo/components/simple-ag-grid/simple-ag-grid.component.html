@@ -54,6 +54,7 @@
     <button (click)="openPickColor()">openPickColor</button>
     选择某列，变更颜色
     <input
+      #cp="ngxColorPicker"
       [(colorPicker)]="color"
       [style.background]="color"
       [cpOKButton]="true"
@@ -63,6 +64,7 @@
       (colorPickerSelect)="pickerClose($event)"
     />
   </dd>
+  <dd><picker-color (colorPickerSelect)="pickerClose($event)"></picker-color></dd>
 </dl>
 
 

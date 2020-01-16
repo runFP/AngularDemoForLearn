@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 import {RichSelectCellEditorComponent} from './rich-select-cell-editor/rich-select-cell-editor.component';
 import {ViewportScroller} from '@angular/common';
 import {UpdateColorCellDirective} from '../lift-cycle-hook/update-color-cell/update-color-cell.directive';
+import {ColorPickerDirective} from 'ngx-color-picker/dist/lib/color-picker.directive';
 
 interface ObjectType {
   [key: string]: any;
@@ -21,6 +22,7 @@ interface ObjectType {
 })
 export class SimpleAgGridComponent implements OnInit, AfterViewInit {
   @ViewChild('agGrid', {static: false}) agGrid: AgGridAngular;
+  @ViewChild('cp', {static: false}) cp: ColorPickerDirective;
 
   /** 获取列变更颜色指令实例 */
   @ViewChild(UpdateColorCellDirective, {static: false}) ucc;
@@ -285,7 +287,9 @@ export class SimpleAgGridComponent implements OnInit, AfterViewInit {
   }
 
   openPickColor() {
-
+    this.cp.openDialog();
+    console.log('!!!!!1');
+    console.log(this.cp);
   }
 
   onGridReady(params) {

@@ -23,10 +23,11 @@ import {CellEditComponent} from './components/simple-ag-grid/cellEditerPopup';
 import {NgZorroAntdModule} from 'ng-zorro-antd';
 import {OverlayModule} from '@angular/cdk/overlay';
 import {AngularFilterComponent} from './components/simple-ag-grid/angular-filter/angular-filter.component';
-import { RichSelectCellEditorComponent } from './components/simple-ag-grid/rich-select-cell-editor/rich-select-cell-editor.component';
-import { RestoreScrollDirective } from './components/lift-cycle-hook/restore-scroll.directive';
-import { UpdateColorCellDirective } from './components/lift-cycle-hook/update-color-cell/update-color-cell.directive';
-import { ColorPickerModule } from 'ngx-color-picker';
+import {RichSelectCellEditorComponent} from './components/simple-ag-grid/rich-select-cell-editor/rich-select-cell-editor.component';
+import {RestoreScrollDirective} from './components/lift-cycle-hook/restore-scroll.directive';
+import {UpdateColorCellDirective} from './components/lift-cycle-hook/update-color-cell/update-color-cell.directive';
+import {ColorPickerModule} from 'ngx-color-picker';
+import {PickerColorComponent} from './components/simple-ag-grid/picker-color/picker-color.component';
 
 const agGridWorkWithForm = [
   AgGridModule.withComponents([FormCellComponent, CellEditComponent, AngularFilterComponent]),
@@ -49,6 +50,7 @@ const agGridWorkWithForm = [
     RichSelectCellEditorComponent,
     RestoreScrollDirective,
     UpdateColorCellDirective,
+    PickerColorComponent,
   ],
   imports: [
     OverlayModule,
