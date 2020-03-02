@@ -7,13 +7,15 @@ import {CDKStepperDemoComponent} from './component/cdkstepper-demo/cdkstepper-de
 import {OverlayDemoComponent} from './component/overlay-demo/overlay-demo.component';
 import {DragAngDropDemoComponent} from './component/drag-ang-drop-demo/drag-ang-drop-demo.component';
 import {PortalDemoComponent} from './component/portal-demo/portal-demo.component';
+import {NgDragAndDropComponent} from './component/ng-drag-and-drop/ng-drag-and-drop.component';
 
 export const childRoutes: Routes = [
   {path: 'lfrd', component: LeftFixRightDynamicComponent},
   {path: 'cdkstepper', component: CDKStepperDemoComponent},
   {path: 'overlay', component: OverlayDemoComponent},
   {path: 'dragdrop', component: DragAngDropDemoComponent},
-  {path: 'portal', component: PortalDemoComponent}
+  {path: 'portal', component: PortalDemoComponent},
+  {path: 'dragAndDrop', component: NgDragAndDropComponent}
 ];
 
 export const routes: Routes = [
@@ -31,6 +33,7 @@ export const names = [
       {name: '自定义overlay'},
       {name: '拖放(modal,div...)'},
       {name: 'portal'},
+      {name: '自定义拖动层'},
     ]
   }
 ];

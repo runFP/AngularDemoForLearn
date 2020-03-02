@@ -1,7 +1,6 @@
 import {Component, ElementRef, EventEmitter, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {DragDrop, DragRef} from '@angular/cdk/drag-drop';
 import {NzModalComponent, NzModalRef, NzModalService} from 'ng-zorro-antd';
-import {ConnectionPositionPair} from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-drag-ang-drop-demo',

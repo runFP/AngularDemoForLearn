@@ -215,6 +215,10 @@ export class SimpleAgGridComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     console.log('Y轴滚动到300', this.viewportScroller);
     this.viewportScroller.scrollToPosition([0, 300]);
+    setTimeout(() => {
+      this.columnDefs.push({field: 'dd', headerName: 'dd'});
+      this.gridApi.setColumnDefs(this.columnDefs);
+    }, 2000);
   }
 
   /**
