@@ -52,7 +52,7 @@ export class NgDragAndDropComponent implements OnInit {
 
       const dragRef = this.dr.createDrag(ele);
       dragRef.moved.subscribe(e => {
-        dragRefs.forEach(dr => console.log(dr.getFreeDragPosition()));
+        dragRefs.forEach(dr => console.log(dr));
         console.log(e);
       });
 
