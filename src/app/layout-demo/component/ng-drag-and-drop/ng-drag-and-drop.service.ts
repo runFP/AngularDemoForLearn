@@ -42,8 +42,8 @@ export class NgDragAndDropService {
 
   public getTransform(ele, numberType = false) {
     const reg = /translate3d[^\)]*\)/g;
-    const pixelReg = /\d+px/g;
-    const pixelNumReg = /\d+(?=px)/g;
+    const pixelReg = /-?\d+px/g;
+    const pixelNumReg = /-?\d+(?=px)/g;
     const transform = ele.style.transform;
 
     /**
@@ -51,7 +51,6 @@ export class NgDragAndDropService {
      * 分别为初始定位和拖动后定位
      */
     const transformArray = transform.match(reg);
-
     return transformArray.map(str => str.match(numberType ? pixelNumReg : pixelReg).map(i => numberType ? Number(i) : i));
   }
 
@@ -72,6 +71,45 @@ export class NgDragAndDropService {
     return dom;
   }
 
+  public boundaryHit(point: BoundaryPoint, delta, elementInf: ElementInf[]) {
+    elementInf.forEach((inf, i) => {
+      const rang = inf.rang;
+      Object.values(point).forEach(p => {
+        if ((p.x > rang.x.start && p.x < rang.x.end) && (p.y > rang.y.start && p.y < rang.y.end)) {
+          console.log('in:' + i);
+        }
+      });
+    });
+    /*    if (delta.x === 1) {
+          console.log('right');
+
+        } else if (delta.x === -1) {
+          console.log('left');
+
+        }
+        if (delta.y === 1) {
+          console.log('down');
+
+        } else if (delta.y === -1) {
+          console.log('up');
+
+        }*/
+  }
+
+  public getBoundaryPoint(element: HTMLElement): BoundaryPoint {
+    const transform = this.getTransform(element, true)[0];
+    const point = {x: transform[0], y: transform[1]};
+    const width = element.offsetWidth;
+    const height = element.offsetHeight;
+    return {
+      p1: {x: point.x, y: point.y},
+      p2: {x: point.x + width, y: point.y},
+      p3: {x: point.x + width, y: point.y + height},
+      p4: {x: point.x, y: point.y + height},
+    };
+
+  }
+
 }
 
 export interface ElementInf {
@@ -82,5 +120,17 @@ export interface ElementInf {
   rang: { x: { start: number, end: number }, y: { start: number, end: number } };
   middlePoint: { x: number; y: number };
   element: HTMLElement;
+}
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export interface BoundaryPoint {
+  p1: Point;
+  p2: Point;
+  p3: Point;
+  p4: Point;
 }
 

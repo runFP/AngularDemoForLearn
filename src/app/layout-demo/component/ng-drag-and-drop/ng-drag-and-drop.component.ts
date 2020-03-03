@@ -1,6 +1,6 @@
 import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
 import {DragDrop, DragRef, DragRefConfig} from '@angular/cdk/drag-drop';
-import {ElementInf, NgDragAndDropService} from './ng-drag-and-drop.service';
+import {BoundaryPoint, ElementInf, NgDragAndDropService} from './ng-drag-and-drop.service';
 import {DOCUMENT} from '@angular/common';
 
 @Component({
@@ -13,7 +13,7 @@ export class NgDragAndDropComponent implements OnInit {
 
   private boundary: HTMLElement;
   private _document: Document;
-  private elementPositions: ElementInf[];
+  private elementInf: ElementInf[];
 
   constructor(
     @Inject(DOCUMENT) _document: any,
@@ -36,8 +36,8 @@ export class NgDragAndDropComponent implements OnInit {
 
   createDrag(children: HTMLCollection): DragRef[] {
     const dragRefs: DragRef[] = [];
-    this.elementPositions = this.dnd.collectElementPosition(children);
-    console.log(this.elementPositions);
+    this.elementInf = this.dnd.collectElementPosition(children);
+    console.log(this.elementInf);
     for (let i = 0, ii = children.length; i < ii; i++) {
       const ele: HTMLElement = <HTMLElement>children[i];
       const shadowDom = this.dnd.createShadowElement(ele);
@@ -50,17 +50,8 @@ export class NgDragAndDropComponent implements OnInit {
       });
 
       dragRef.moved.subscribe(e => {
-        console.log(e);
-        if (e.delta.x === 1) {
-          console.log('right');
-        } else if (e.delta.x === -1) {
-          console.log('left');
-        }
-        if (e.delta.y === 1) {
-          console.log('down');
-        } else if (e.delta.y === -1) {
-          console.log('up');
-        }
+        const boundaryPoint = this.dnd.getBoundaryPoint(e.source.getRootElement());
+        this.dnd.boundaryHit(boundaryPoint, e.delta, this.elementInf);
       });
 
       dragRef.ended.subscribe(e => {
