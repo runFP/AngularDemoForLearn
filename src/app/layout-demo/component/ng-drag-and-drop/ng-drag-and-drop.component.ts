@@ -1,19 +1,26 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
 import {DragDrop, DragRef, DragRefConfig} from '@angular/cdk/drag-drop';
+import {ElementInf, NgDragAndDropService} from './ng-drag-and-drop.service';
+import {DOCUMENT} from '@angular/common';
 
 @Component({
   selector: 'app-ng-drag-and-drop',
   templateUrl: './ng-drag-and-drop.component.html',
-  styleUrls: ['./ng-drag-and-drop.component.scss']
+  styleUrls: ['./ng-drag-and-drop.component.scss'],
+  providers: [NgDragAndDropService],
 })
 export class NgDragAndDropComponent implements OnInit {
 
   private boundary: HTMLElement;
+  private _document: Document;
+  private elementPositions: ElementInf[];
 
   constructor(
+    @Inject(DOCUMENT) _document: any,
     private dr: DragDrop,
     private el: ElementRef,
-    private rendener: Renderer2,
+    private renderer: Renderer2,
+    private dnd: NgDragAndDropService,
   ) {
     console.log(dr);
   }
@@ -27,49 +34,44 @@ export class NgDragAndDropComponent implements OnInit {
     const dragRefs = this.createDrag(dragBox);
   }
 
-  createShadowElement(ele: HTMLElement): HTMLElement {
-    const reg = /\d+px/g;
-    const height = ele.offsetHeight;
-    const width = ele.offsetWidth;
-    const transform = ele.style.transform.match(reg);
-    const cssText = [
-      'background:red',
-      `width:${width}px`,
-      `height:${height}px`,
-      `transform:translate3d(${transform.join(',')})`,
-      'position:absolute',
-    ].join(';') + ';';
-    const dom = document.createElement('div');
-    dom.style.cssText = cssText;
-    return dom;
-  }
-
   createDrag(children: HTMLCollection): DragRef[] {
     const dragRefs: DragRef[] = [];
+    this.elementPositions = this.dnd.collectElementPosition(children);
+    console.log(this.elementPositions);
     for (let i = 0, ii = children.length; i < ii; i++) {
       const ele: HTMLElement = <HTMLElement>children[i];
-      const shadowDom = this.createShadowElement(ele);
+      const shadowDom = this.dnd.createShadowElement(ele);
 
       const dragRef = this.dr.createDrag(ele);
-      dragRef.moved.subscribe(e => {
-        dragRefs.forEach(dr => console.log(dr));
-        console.log(e);
-      });
-
       dragRef.started.subscribe(e => {
         console.log('before:');
-        console.log(e);
         shadowDom.style.transform = ele.style.transform;
-        this.rendener.appendChild(this.boundary, shadowDom);
+        this.renderer.appendChild(this.boundary, shadowDom);
+      });
+
+      dragRef.moved.subscribe(e => {
+        console.log(e);
+        if (e.delta.x === 1) {
+          console.log('right');
+        } else if (e.delta.x === -1) {
+          console.log('left');
+        }
+        if (e.delta.y === 1) {
+          console.log('down');
+        } else if (e.delta.y === -1) {
+          console.log('up');
+        }
       });
 
       dragRef.ended.subscribe(e => {
-        this.rendener.removeChild(this.boundary, shadowDom, false);
+        this.renderer.removeChild(this.boundary, shadowDom, false);
       });
 
       dragRefs.push(dragRef);
     }
     return dragRefs;
   }
-
 }
+
+
+
