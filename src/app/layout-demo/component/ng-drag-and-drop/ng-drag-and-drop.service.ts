@@ -1,7 +1,9 @@
 import {Inject, Injectable} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
+import {DNDContainerService, ElementInf} from './dndcontainer.service';
+import {getTransform} from './dnd-utils';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class NgDragAndDropService {
   private _document: Document;
 
@@ -11,49 +13,11 @@ export class NgDragAndDropService {
     this._document = _document;
   }
 
-  /** 收集元素的位置信息，每次拖动启发或者触发元素位置对换需要重新计算 */
-  public collectElementPosition(children: HTMLCollection): ElementInf[] {
-    const elementPosition: ElementInf[] = [];
-    for (let i = 0, ii = children.length; i < ii; i++) {
-      const ele: HTMLElement = <HTMLElement>children[i];
-      const transformArray = this.getTransform(ele, true);
-      const position = transformArray[0];
-      const originPosition = transformArray.length === 2 ? transformArray[1] : position;
-      const width = ele.offsetWidth;
-      const height = ele.offsetHeight;
-      elementPosition.push({
-        position: {x: position[0], y: position[1]},
-        originPosition: {x: originPosition[0], y: originPosition[1]},
-        width,
-        height,
-        rang: {
-          x: {start: position[0], end: position[0] + width},
-          y: {start: position[1], end: position[1] + height}
-        },
-        middlePoint: {
-          x: Math.round((position[0] + width) / 2),
-          y: Math.round((position[1] + height) / 2)
-        },
-        element: ele,
-      });
-    }
-    return elementPosition;
-  }
-
-  public getTransform(ele, numberType = false) {
-    const reg = /translate3d[^\)]*\)/g;
-    const pixelReg = /-?\d+px/g;
-    const pixelNumReg = /-?\d+(?=px)/g;
-    const transform = ele.style.transform;
-
-    /**
-     * 元素拖动后会包含2组translate3d信息（拖动前只有一组）
-     * 分别为初始定位和拖动后定位
-     */
-    const transformArray = transform.match(reg);
-    return transformArray.map(str => str.match(numberType ? pixelNumReg : pixelReg).map(i => numberType ? Number(i) : i));
-  }
-
+  /**
+   * 为元素创建占位元素
+   * @param {HTMLElement} ele
+   * @return {HTMLElement}
+   */
   public createShadowElement(ele: HTMLElement): HTMLElement {
     const reg = /\d+px/g;
     const height = ele.offsetHeight;
@@ -71,33 +35,73 @@ export class NgDragAndDropService {
     return dom;
   }
 
-  public boundaryHit(point: BoundaryPoint, delta, elementInf: ElementInf[]) {
+  /**
+   *  检测是否碰撞
+   * @param {BoundaryPoint} point 移动源4个角位置信息
+   * @param {HTMLElement} dragEle 移动源
+   * @param {ElementInf[]} elementInf 容器元素集合
+   * @return {BoundaryInf}
+   */
+  public boundaryHit(point: BoundaryPoint, dragEle: HTMLElement, elementInf: ElementInf[]): BoundaryInf {
+    const boundaryElements = [];
+    const areas = [];
+    let bestBoundaryElement = null;
     elementInf.forEach((inf, i) => {
+      if (dragEle === inf.element) return;
       const rang = inf.rang;
-      Object.values(point).forEach(p => {
+      Object.values(point).forEach((p, pi) => {
         if ((p.x > rang.x.start && p.x < rang.x.end) && (p.y > rang.y.start && p.y < rang.y.end)) {
-          console.log('in:' + i);
+          boundaryElements.push(inf);
+
+          const areaInf = this.getArea(p, pi, inf);
+          // 只有碰撞面积大于被碰撞源的4/1才认定此次碰撞有效
+          if (areaInf.area > Math.floor(inf.width * inf.height / 4)) {
+            areas.push(areaInf);
+          }
         }
       });
     });
-    /*    if (delta.x === 1) {
-          console.log('right');
 
-        } else if (delta.x === -1) {
-          console.log('left');
 
-        }
-        if (delta.y === 1) {
-          console.log('down');
+    if (areas.length > 0) {
+      /** 通过计算最优碰撞元素来筛选出真正需要交互的碰撞元素*/
+      const max = Math.max(...areas.map(area => area.area));
+      bestBoundaryElement = areas.find(area => area.area === max).inf;
+    }
 
-        } else if (delta.y === -1) {
-          console.log('up');
+    return {
+      boundary: boundaryElements.length === 0 ? false : true,
+      elements: boundaryElements,
+      bestBoundaryElement: bestBoundaryElement,
+    };
+  }
 
-        }*/
+  private getArea(p, i, inf) {
+    let x = 0;
+    let y = 0;
+    switch (i + 1) {
+      case 1:
+        x = Math.abs(p.x - inf.rang.x.end);
+        y = Math.abs(p.y - inf.rang.y.end);
+        break;
+      case 2:
+        x = Math.abs(p.x - inf.rang.x.start);
+        y = Math.abs(p.y - inf.rang.y.end);
+        break;
+      case 3:
+        x = Math.abs(p.x - inf.rang.x.start);
+        y = Math.abs(p.y - inf.rang.y.start);
+        break;
+      case 4:
+        x = Math.abs(p.x - inf.rang.x.end);
+        y = Math.abs(p.y - inf.rang.y.start);
+        break;
+    }
+    return {area: Math.floor(x * y), inf};
   }
 
   public getBoundaryPoint(element: HTMLElement): BoundaryPoint {
-    const transform = this.getTransform(element, true)[0];
+    const transform = getTransform(element, true)[0];
     const point = {x: transform[0], y: transform[1]};
     const width = element.offsetWidth;
     const height = element.offsetHeight;
@@ -112,15 +116,15 @@ export class NgDragAndDropService {
 
 }
 
-export interface ElementInf {
-  position: { x: number, y: number };
-  originPosition: { x: number, y: number };
-  width: number;
-  height: number;
-  rang: { x: { start: number, end: number }, y: { start: number, end: number } };
-  middlePoint: { x: number; y: number };
-  element: HTMLElement;
+export interface BoundaryInf {
+  // 是否碰撞
+  boundary: boolean;
+  // 碰撞的所有元素
+  elements: ElementInf[];
+  // 碰撞的最优元素(与移动源碰撞面积最大的元素)
+  bestBoundaryElement: ElementInf;
 }
+
 
 export interface Point {
   x: number;
