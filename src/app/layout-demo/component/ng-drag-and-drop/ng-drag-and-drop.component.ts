@@ -1,8 +1,8 @@
 import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
-import {DragDrop, DragRef} from '@angular/cdk/drag-drop';
 import {NgDragAndDropService} from './ng-drag-and-drop.service';
 import {DOCUMENT} from '@angular/common';
 import {DNDContainerService, ElementInf} from './dndcontainer.service';
+import {getPosition, getTransformByPosition} from './dnd-utils';
 
 @Component({
   selector: 'app-ng-drag-and-drop',
@@ -15,23 +15,22 @@ export class NgDragAndDropComponent implements OnInit {
   private _document: Document;
   private children: HTMLCollection;
   private elementInf: ElementInf[];
+  private lastBoundaryELement;
 
   constructor(
     @Inject(DOCUMENT) _document: any,
-    private dr: DragDrop,
     private el: ElementRef,
     private renderer: Renderer2,
     private dnd: NgDragAndDropService,
-    private dndcontiner: DNDContainerService
+    private dndcontainer: DNDContainerService
   ) {
-    console.log(dr);
   }
 
   ngOnInit() {
     this.boundary = this.el.nativeElement.querySelector('.example-boundary');
     this.children = this.boundary.children;
-    this.elementInf = this.dndcontiner.collectElementPosition(this.children);
-    this.renderer.setStyle(this.boundary, 'height', `${this.dndcontiner.getContainerHeight()}px`);
+    this.elementInf = this.dndcontainer.collectElementPosition(this.children);
+    this.renderer.setStyle(this.boundary, 'height', `${this.dndcontainer.getContainerHeight()}px`);
     console.log(this.elementInf);
   }
 
@@ -39,44 +38,86 @@ export class NgDragAndDropComponent implements OnInit {
     const dragRefs = this.createDrag(this.children);
   }
 
-  createDrag(children: HTMLCollection): DragRef[] {
-    const dragRefs: DragRef[] = [];
-    for (let i = 0, ii = children.length; i < ii; i++) {
-      const ele: HTMLElement = <HTMLElement>children[i];
-      const shadowDom = this.dnd.createShadowElement(ele);
+  getPlace() {
+    console.log(this.dndcontainer.getPlaceElement());
+  }
 
-      const dragRef = this.dr.createDrag(ele);
-      dragRef.withBoundaryElement(this.boundary);
+  showCollection() {
+    console.log(this.dndcontainer.elementInfCollection);
+  }
 
-      dragRef.started.subscribe(e => {
-        console.log('before:');
-        shadowDom.style.transform = ele.style.transform;
-        this.renderer.appendChild(this.boundary, shadowDom);
-      });
+  createDrag(children: HTMLCollection): void {
+    let moveFlag = false;
+    let moveTarget;
+    let oldPosition;
+    let newPosition;
+    let distance;
+    let shadowElementInf;
 
-      dragRef.moved.subscribe(e => {
-        const dragElement = e.source.getRootElement();
-        const boundaryPoint = this.dnd.getBoundaryPoint(dragElement);
-        const boundaryInf = this.dnd.boundaryHit(boundaryPoint, dragElement, this.elementInf);
-        if (!boundaryInf.boundary) {
-          /** 无任何碰撞*/
+    /**
+     * 阻止浏览器自带事件，当拖动时
+     * 创建占位层
+     * 记录其实坐标
+     */
+    this.boundary.addEventListener('mousedown', event => {
+      event.preventDefault();
+      moveTarget = event.target;
+      if (moveTarget.style.transform === '') return;
+      moveFlag = true;
+      oldPosition = {x: event.pageX, y: event.pageY};
+      shadowElementInf = this.dndcontainer.createPlaceDom(moveTarget);
+      this.renderer.appendChild(this.boundary, shadowElementInf.element);
+      console.log('mousedown');
+    });
 
-        } else {
-          /** 碰撞*/
-          if (boundaryInf.bestBoundaryElement !== null) {
-            const bestDE = boundaryInf.bestBoundaryElement.element;
-            shadowDom.style.transform = bestDE.style.transform;
-          }
+    /**
+     *
+     */
+    this.boundary.addEventListener('mousemove', event => {
+      if (!moveFlag) return;
+      newPosition = {x: event.pageX, y: event.pageY};
+      distance = {x: newPosition.x - oldPosition.x, y: newPosition.y - oldPosition.y};
+      oldPosition = newPosition;
+      const targetElementPosition = getPosition(moveTarget);
+      if (targetElementPosition !== null) {
+        targetElementPosition.x += distance.x;
+        targetElementPosition.y += distance.y;
+        moveTarget.style.transform = getTransformByPosition(targetElementPosition);
+      }
+
+      const dragElementInf = this.dndcontainer.getElementInfByElement(moveTarget);
+      const boundaryPoint = this.dnd.getBoundaryPoint(moveTarget);
+      const boundaryInf = this.dnd.boundaryHit(boundaryPoint, moveTarget, this.dndcontainer.getElementInfCollection());
+      if (!boundaryInf.boundary) {
+        /** 无任何碰撞*/
+
+      } else {
+        /** 碰撞: 存在最优碰撞元素且不是上一次的最优碰撞元素*/
+        if (boundaryInf.bestBoundaryElement !== null && this.lastBoundaryELement !== boundaryInf.bestBoundaryElement.element) {
+          const bestDEInf = boundaryInf.bestBoundaryElement;
+          this.lastBoundaryELement = bestDEInf.element;
+          /**
+           * 刷新容器内部元素
+           * 刷新占位层
+           * 刷新容器内部元素
+           */
+          this.dndcontainer.refreshElementsPositionBefore(dragElementInf);
+          this.dndcontainer.refreshPlace(bestDEInf, dragElementInf);
+          this.dndcontainer.refreshElementsPositionAfter(dragElementInf);
         }
-      });
+      }
 
-      dragRef.ended.subscribe(e => {
-        this.renderer.removeChild(this.boundary, shadowDom, false);
-      });
-
-      dragRefs.push(dragRef);
-    }
-    return dragRefs;
+    });
+    this.boundary.addEventListener('mouseup', event => {
+      if (moveFlag) {
+        moveFlag = false;
+        moveTarget.style.transform = getTransformByPosition(shadowElementInf.position);
+        const dragElementInf = this.dndcontainer.getElementInfByElement(moveTarget);
+        this.dndcontainer.updateElementCollection(dragElementInf, shadowElementInf.position);
+        this.renderer.removeChild(this.boundary, shadowElementInf.element, false);
+        console.log('mouseup');
+      }
+    });
   }
 }
 

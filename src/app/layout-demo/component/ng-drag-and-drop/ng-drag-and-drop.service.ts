@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
-import {DNDContainerService, ElementInf} from './dndcontainer.service';
-import {getTransform} from './dnd-utils';
+import {ElementInf} from './dndcontainer.service';
+import {getPosition} from './dnd-utils';
 
 @Injectable({providedIn: 'root'})
 export class NgDragAndDropService {
@@ -11,28 +11,6 @@ export class NgDragAndDropService {
     @Inject(DOCUMENT) _document: any,
   ) {
     this._document = _document;
-  }
-
-  /**
-   * 为元素创建占位元素
-   * @param {HTMLElement} ele
-   * @return {HTMLElement}
-   */
-  public createShadowElement(ele: HTMLElement): HTMLElement {
-    const reg = /\d+px/g;
-    const height = ele.offsetHeight;
-    const width = ele.offsetWidth;
-    const transform = ele.style.transform.match(reg);
-    const cssText = [
-      'background:red',
-      `width:${width}px`,
-      `height:${height}px`,
-      `transform:translate3d(${transform.join(',')})`,
-      'position:absolute',
-    ].join(';') + ';';
-    const dom = this._document.createElement('div');
-    dom.style.cssText = cssText;
-    return dom;
   }
 
   /**
@@ -52,10 +30,9 @@ export class NgDragAndDropService {
       Object.values(point).forEach((p, pi) => {
         if ((p.x > rang.x.start && p.x < rang.x.end) && (p.y > rang.y.start && p.y < rang.y.end)) {
           boundaryElements.push(inf);
-
           const areaInf = this.getArea(p, pi, inf);
           // 只有碰撞面积大于被碰撞源的4/1才认定此次碰撞有效
-          if (areaInf.area > Math.floor(inf.width * inf.height / 4)) {
+          if (areaInf.overHalf && areaInf.area > Math.floor(inf.width * inf.height / 4)) {
             areas.push(areaInf);
           }
         }
@@ -79,6 +56,7 @@ export class NgDragAndDropService {
   private getArea(p, i, inf) {
     let x = 0;
     let y = 0;
+    let overHalf = false;
     switch (i + 1) {
       case 1:
         x = Math.abs(p.x - inf.rang.x.end);
@@ -97,12 +75,14 @@ export class NgDragAndDropService {
         y = Math.abs(p.y - inf.rang.y.start);
         break;
     }
-    return {area: Math.floor(x * y), inf};
+    if (x > Math.floor(inf.width / 2) && y > Math.floor(inf.height / 2)) {
+      overHalf = true;
+    }
+    return {area: Math.floor(x * y), overHalf, inf};
   }
 
   public getBoundaryPoint(element: HTMLElement): BoundaryPoint {
-    const transform = getTransform(element, true)[0];
-    const point = {x: transform[0], y: transform[1]};
+    const point = getPosition(element);
     const width = element.offsetWidth;
     const height = element.offsetHeight;
     return {
