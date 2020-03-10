@@ -6,7 +6,6 @@ import {createShadowElement, getPosition, getTransformByPosition} from './dnd-ut
 })
 export class DNDContainerService {
   private containerHeight: number;
-  private elementInf: ElementInf[];
   private placeElementInf;
   private static OFFSET_X = 8;
   private static OFFSET_Y = 10;
@@ -79,6 +78,8 @@ export class DNDContainerService {
       && inf.position.y > reInf.position.y);
     belowElements.sort((a, b) => a.position.y - b.position.y);
 
+
+
     belowElements.forEach(ele => {
       /**
        * 找出该元素的X范围内的所有上层元素，排除拖动元素
@@ -105,9 +106,31 @@ export class DNDContainerService {
         (inf.position.x <= reInf.position.x && inf.rang.x.end >= reInf.rang.x.end)
       )
       && inf.rang.y.end >= reInf.position.y);
-    belowElements.sort((a, b) => a.position.y - b.position.y);
+    /**
+     * 下层元素中如有宽度范围超过拖动元素，需要把这些元素涉及到的下层元素也添加进来
+     * */
+    const overWidthElements = belowElements.filter(inf => inf.width > reInf.width);
+    if (overWidthElements.length > 0) {
+      overWidthElements.sort((a, b) => a.position.y - b.position.y);
+      overWidthElements.forEach((oeInf, i) => {
+        const overWidthBelowElements = excludeDragElementInf.filter(inf =>
+          belowElements.findIndex(beInf => beInf.element === inf.element) === -1
+          && (
+            (inf.position.x >= oeInf.position.x && inf.position.x <= oeInf.rang.x.end) ||
+            (inf.rang.x.end >= oeInf.position.x && inf.rang.x.end <= oeInf.rang.x.end) ||
+            (inf.position.x <= oeInf.position.x && inf.rang.x.end >= oeInf.rang.x.end)
+          )
+          && inf.position.y >= oeInf.position.y
+          && (i + 1 >= overWidthElements.length ? true : inf.position.y < overWidthElements[i + 1].position.y)
+        );
+
+        belowElements.push(...overWidthBelowElements);
+      });
+    }
     /** 需加上占位层信息确保原来同一水平的元素也被检索到*/
     excludeDragElementInf.push(reInf);
+    belowElements.sort((a, b) => a.position.y - b.position.y);
+
 
     belowElements.forEach(ele => {
       const position = this.getBelowRangElementMaxPosition(ele, excludeDragElementInf);
@@ -191,13 +214,14 @@ export class DNDContainerService {
         (inf.rang.x.end >= ele.position.x && inf.rang.x.end <= ele.rang.x.end) ||
         (inf.position.x <= ele.position.x && inf.rang.x.end >= ele.rang.x.end)
       )
-      && inf.position.y < ele.position.y);
+      && inf.position.y < ele.position.y
+    );
 
     let position;
     if (aboveElements.length === 0) {
       position = {x: ele.position.x, y: 0};
     } else {
-      aboveElements.sort((a, b) => b.position.y - a.position.y);
+      aboveElements.sort((a, b) => b.rang.y.end - a.rang.y.end);
       position = {x: ele.position.x, y: aboveElements[0].rang.y.end + DNDContainerService.OFFSET_Y};
     }
     return position;
@@ -216,13 +240,15 @@ export class DNDContainerService {
         (inf.rang.x.end >= ele.position.x && inf.rang.x.end <= ele.rang.x.end) ||
         (inf.position.x <= ele.position.x && inf.rang.x.end >= ele.rang.x.end)
       )
-      && inf.position.y <= ele.rang.y.end);
+      && inf.position.y <= ele.rang.y.end
+      && inf.element !== ele.element
+    );
 
     let position;
     if (belowElements.length === 0) {
       position = {x: ele.position.x, y: 0};
     } else {
-      belowElements.sort((a, b) => b.position.y - a.position.y);
+      belowElements.sort((a, b) => b.rang.y.end - a.rang.y.end);
       position = {x: ele.position.x, y: belowElements[0].rang.y.end + DNDContainerService.OFFSET_Y};
     }
     return position;
@@ -243,8 +269,4 @@ export interface ElementInf {
   // 元素是否处于位置变更状态
   changed?: boolean;
   element: HTMLElement;
-}
-
-export interface AboveInf extends ElementInf {
-  aboveElement: ElementInf[];
 }

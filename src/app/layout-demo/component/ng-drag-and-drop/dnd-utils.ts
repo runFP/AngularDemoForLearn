@@ -53,6 +53,7 @@ export function createShadowElement(ele: HTMLElement): HTMLElement {
     'z-index:-1',
   ].join(';') + ';';
   const dom = document.createElement('div');
+  dom.className = 'placeDom';
   dom.style.cssText = cssText;
   return dom;
 }

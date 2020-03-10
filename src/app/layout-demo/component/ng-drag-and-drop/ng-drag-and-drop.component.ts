@@ -115,6 +115,8 @@ export class NgDragAndDropComponent implements OnInit {
         const dragElementInf = this.dndcontainer.getElementInfByElement(moveTarget);
         this.dndcontainer.updateElementCollection(dragElementInf, shadowElementInf.position);
         this.renderer.removeChild(this.boundary, shadowElementInf.element, false);
+        const oldPlaceDom = this._document.querySelectorAll('.placeDom');
+        oldPlaceDom.forEach(dom => dom.remove());
         console.log('mouseup');
       }
     });
