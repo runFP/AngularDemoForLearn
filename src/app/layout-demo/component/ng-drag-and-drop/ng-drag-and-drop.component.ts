@@ -1,8 +1,8 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {NgDragAndDropService, Point} from './ng-drag-and-drop.service';
-import {DNDContainerService, ElementInf} from './dndcontainer.service';
+import {DNDContainerService} from './dndcontainer.service';
 import {getPosition, getTransformByPosition} from './dnd-utils';
-import {Observable, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {debounceTime} from 'rxjs/internal/operators';
 
 @Component({
@@ -32,6 +32,7 @@ export class NgDragAndDropComponent implements OnInit {
   }
 
   ngOnInit() {
+    /** 防抖 60毫秒*/
     this.moveSubject.pipe(debounceTime(60)).subscribe(e => this._moveCalculate(e));
   }
 
