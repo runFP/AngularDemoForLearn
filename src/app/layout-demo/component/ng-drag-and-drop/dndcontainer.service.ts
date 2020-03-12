@@ -1,18 +1,39 @@
 import {Injectable} from '@angular/core';
-import {createShadowElement, getPosition, getTransformByPosition} from './dnd-utils';
+import {createPlaceElement, getMinFromObject, getPosition, getTransformByPosition} from './dnd-utils';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DNDContainerService {
   private containerHeight: number;
-  private placeElementInf;
+  private containerHeightUpdate = false;
+  private placeElementInf: ElementInf | null = null;
   private static OFFSET_X = 8;
   private static OFFSET_Y = 10;
+  private elementNum = 4;
+  private elementWidth = 0;
+  private init_complete = false;
+  xPosition = {};
 
   elementInfCollection: ElementInf[] = [];
 
   constructor() {
+  }
+
+  init(children: HTMLCollection) {
+    this.collectElementPosition(children);
+    this.recordX();
+    this.init_complete = true;
+  }
+
+  recordX() {
+    this.elementWidth = Math.floor((1000 - (this.elementNum - 1) * DNDContainerService.OFFSET_X) / this.elementNum);
+    for (let i = 0, ii = this.elementNum; i < ii; i++) {
+      this.xPosition[i] = {
+        start: i * (this.elementWidth + DNDContainerService.OFFSET_X),
+        end: i * (this.elementWidth + DNDContainerService.OFFSET_X) + this.elementWidth,
+      };
+    }
   }
 
   /**
@@ -27,14 +48,13 @@ export class DNDContainerService {
       const eleInf = this.createElementInf(ele);
       elementPosition.push(eleInf);
     }
-
-    this.calculateContainerHeight(elementPosition);
     this.elementInfCollection = elementPosition;
+    this.calculateContainerHeight();
     return elementPosition;
   }
 
-  createElementInf(element: HTMLElement): ElementInf {
-    const position = getPosition(element);
+  createElementInf(element: HTMLElement, pos?): ElementInf {
+    const position = pos || getPosition(element);
     // const originPosition = getOriginPosition(element);
     const width = element.offsetWidth || Number(element.style.width.replace('px', ''));
     const height = element.offsetHeight || Number(element.style.height.replace('px', ''));
@@ -62,6 +82,25 @@ export class DNDContainerService {
     return this.elementInfCollection.find(ele => ele.element === element);
   }
 
+  refreshPlacePositionFake(x: number, xpKey: string, moveTarget) {
+    const absPoint = {};
+    const targetElementPosition = getPosition(moveTarget);
+    const excludeDragElementInf = this.elementInfCollection.filter(inf => inf.element !== moveTarget);
+    for (const key in this.xPosition) {
+      absPoint[key] = (Math.abs(x - this.xPosition[key][xpKey]));
+    }
+    const colX = this.xPosition[getMinFromObject(absPoint).index].start;
+    const pp = {
+      x: colX,
+      y: targetElementPosition.y,
+    };
+    const fakeElementInf = this.createElementInf(moveTarget, pp);
+    const position = this.getBelowElementMaxPosition(fakeElementInf, excludeDragElementInf);
+    const newReInf = this.updateElementInf(this.placeElementInf, position);
+    newReInf.element.style.transform = getTransformByPosition(newReInf.position);
+    this.placeElementInf = newReInf;
+  }
+
   /**
    * 占位层更新前执行位置更新
    * @param {ElementInf} dragElementInf
@@ -77,8 +116,6 @@ export class DNDContainerService {
       )
       && inf.position.y > reInf.position.y);
     belowElements.sort((a, b) => a.position.y - b.position.y);
-
-
 
     belowElements.forEach(ele => {
       /**
@@ -149,7 +186,7 @@ export class DNDContainerService {
     return elementInf;
   }
 
-  public updateElementCollection(elementInf: ElementInf, position: { x: number, y: number }) {
+  updateElementCollection(elementInf: ElementInf, position: { x: number, y: number }) {
     const newElementInf = this.updateElementInf(elementInf, position);
     for (let i = 0, ii = this.elementInfCollection.length; i < ii; i++) {
       if (this.elementInfCollection[i].element === newElementInf.element) {
@@ -164,41 +201,50 @@ export class DNDContainerService {
    * 计算容器高度
    * @param {ElementInf[]} eleInf
    */
-  calculateContainerHeight(eleInf: ElementInf[]) {
-    let max = eleInf[0].rang.y.end;
-    eleInf.forEach(inf => {
+  calculateContainerHeight(dragElementInf?: ElementInf) {
+    let elementInfCollection = this.elementInfCollection;
+    if (dragElementInf) {
+      elementInfCollection = this.elementInfCollection.filter(inf => inf.element !== dragElementInf.element);
+      elementInfCollection.push(this.placeElementInf);
+    }
+
+    let max = elementInfCollection[0].rang.y.end;
+    elementInfCollection.forEach(inf => {
       if (inf.rang.y.end > max) max = inf.rang.y.end;
     });
-    this.containerHeight = max;
+    if (this.containerHeight !== max) {
+      this.containerHeightUpdate = true;
+      this.containerHeight = max;
+    } else {
+      this.containerHeightUpdate = false;
+    }
   }
 
   getContainerHeight(): number {
     return this.containerHeight;
   }
 
+  getContainerHeightUpdate(): boolean {
+    return this.containerHeightUpdate;
+  }
+
   createPlaceDom(element: HTMLElement): ElementInf {
-    const placeElement = createShadowElement(element);
+    const placeElement = createPlaceElement(element);
     this.placeElementInf = this.createElementInf(placeElement);
     return this.placeElementInf;
   }
 
-  refreshPlace(elementInf: ElementInf, dragElementInf: ElementInf) {
-    /**
-     * 更新占位层位置
-     * 遍历占位符上方元素
-     * 找出rang.y.end最大元素,重新校准占位层位置
-     */
-    const newReInf = this.updateElementInf(this.placeElementInf, elementInf.position);
-    const excludeDragElementInf = this.elementInfCollection.filter(inf => inf.element !== dragElementInf.element);
-    const position = this.getBelowElementMaxPosition(newReInf, excludeDragElementInf);
-    this.updateElementCollection(newReInf, position);
-
-    newReInf.element.style.transform = getTransformByPosition(newReInf.position);
-    this.placeElementInf = newReInf;
-  }
-
   getPlaceElement(): ElementInf {
     return this.placeElementInf;
+  }
+
+  clear() {
+    this.containerHeightUpdate = false;
+    this.elementWidth = 0;
+    this.xPosition = {};
+    this.elementInfCollection = [];
+    this.placeElementInf = null;
+    this.init_complete = false;
   }
 
   /**
