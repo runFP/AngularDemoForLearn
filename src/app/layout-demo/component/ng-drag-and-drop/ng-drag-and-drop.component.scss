@@ -1,13 +1,13 @@
 
 .example-boundary {
   width: 1000px;
-  //height: 1000px;
   max-width: 100%;
-  border: dotted #ccc 2px;
+  //border: dotted #ccc 2px;
+  box-sizing: border-box;
 }
 
 .example-box{
-  width: 244px;
+  width: 211px;
   height: 200px;
   border: solid 1px #ccc;
   background-color: #3b3b3b;

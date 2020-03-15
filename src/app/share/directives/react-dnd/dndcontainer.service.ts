@@ -1,38 +1,80 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Input} from '@angular/core';
 import {createPlaceElement, getMinFromObject, getPosition, getTransformByPosition} from './dnd-utils';
+import {Point} from './ng-drag-and-drop.service';
+import {Padding} from './react-dnd.directive';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DNDContainerService {
   private containerHeight: number;
+  private containerInf = null;
   private containerHeightUpdate = false;
   private placeElementInf: ElementInf | null = null;
-  private static OFFSET_X = 8;
-  private static OFFSET_Y = 10;
   private elementNum = 4;
   private elementWidth = 0;
   private init_complete = false;
-  xPosition = {};
+  private gutter;
+  private fontSize = 0;
 
+  xPosition = {};
   elementInfCollection: ElementInf[] = [];
 
   constructor() {
   }
 
-  init(children: HTMLCollection) {
+  init(children: HTMLCollection, fontSize: number, containerInf: ContainerInf) {
+    this.fontSize = fontSize;
+    this.gutter = containerInf.gutter;
+    if (fontSize !== 0) {
+      children = this.elementTransformRem2px(children);
+    }
+    this.containerInf = containerInf;
     this.collectElementPosition(children);
-    this.recordX();
+    this.recordX(containerInf);
+    console.log(containerInf.width);
+    console.log(this.xPosition);
+    console.log(this.elementWidth);
     this.init_complete = true;
   }
 
-  recordX() {
-    this.elementWidth = Math.floor((1000 - (this.elementNum - 1) * DNDContainerService.OFFSET_X) / this.elementNum);
+  private elementTransformRem2px(children: HTMLCollection): HTMLCollection {
+    for (let i = 0, ii = children.length; i < ii; i++) {
+      const ele: HTMLElement = <HTMLElement>children[i];
+      const position = getPosition(ele);
+      const rem2PxPosition = this.rem2px(position);
+      ele.style.transform = getTransformByPosition(rem2PxPosition);
+    }
+    return children;
+  }
+
+  private rem2px(position: Point): Point {
+    position.x = position.x * this.fontSize;
+    position.y = position.y * this.fontSize;
+    return position;
+  }
+
+  recordX(containerInf: ContainerInf) {
+    const rate = containerInf.width / containerInf.designSize;
+    const padding = containerInf.padding;
+    const gutter = containerInf.gutter;
+    const width = containerInf.width;
+    const col = containerInf.col;
+    const totalPadding = typeof padding === 'number' ? padding * 2 : padding.right + padding.left;
+    const totalGutter = typeof gutter === 'number' ? gutter * 2 : gutter.right + gutter.left;
+    this.elementWidth = Math.ceil((width - (totalPadding + totalGutter * col) * rate) / col);
+
+    console.log(rate);
+
     for (let i = 0, ii = this.elementNum; i < ii; i++) {
-      this.xPosition[i] = {
-        start: i * (this.elementWidth + DNDContainerService.OFFSET_X),
-        end: i * (this.elementWidth + DNDContainerService.OFFSET_X) + this.elementWidth,
-      };
+      const x = {start: 0, end: 0};
+      if (typeof gutter === 'number') {
+        x.start = gutter * rate + (this.elementWidth + gutter * 2 * rate) * i;
+      } else {
+        x.start = gutter.left * rate + (this.elementWidth + (gutter.left + gutter.right) * rate) * i;
+      }
+      x.end = x.start + this.elementWidth;
+      this.xPosition[i] = x;
     }
   }
 
@@ -54,10 +96,11 @@ export class DNDContainerService {
   }
 
   createElementInf(element: HTMLElement, pos?): ElementInf {
+    const unitReg = /(px|rem)/g;
     const position = pos || getPosition(element);
     // const originPosition = getOriginPosition(element);
-    const width = element.offsetWidth || Number(element.style.width.replace('px', ''));
-    const height = element.offsetHeight || Number(element.style.height.replace('px', ''));
+    const width = element.offsetWidth || Number(element.style.width.replace(unitReg, ''));
+    const height = element.offsetHeight || Number(element.style.height.replace(unitReg, ''));
     return {
       position: {x: position.x, y: position.y},
       width,
@@ -74,6 +117,21 @@ export class DNDContainerService {
     };
   }
 
+
+  getParentElement(element: HTMLElement): HTMLElement | null {
+    let index = this.elementInfCollection.findIndex(dndElementInf => dndElementInf.element === element);
+    while (index === -1) {
+      if (element === document.body) {
+        index = null;
+        element = null;
+        break;
+      }
+      element = element.parentElement;
+      index = this.elementInfCollection.findIndex(dndElementInf => dndElementInf.element === element);
+    }
+    return element;
+  }
+
   getElementInfCollection(): ElementInf[] {
     return this.elementInfCollection;
   }
@@ -87,7 +145,9 @@ export class DNDContainerService {
     const targetElementPosition = getPosition(moveTarget);
     const excludeDragElementInf = this.elementInfCollection.filter(inf => inf.element !== moveTarget);
     for (const key in this.xPosition) {
-      absPoint[key] = (Math.abs(x - this.xPosition[key][xpKey]));
+      if (this.xPosition.hasOwnProperty(key)) {
+        absPoint[key] = (Math.abs(x - this.xPosition[key][xpKey]));
+      }
     }
     const colX = this.xPosition[getMinFromObject(absPoint).index].start;
     const pp = {
@@ -95,6 +155,9 @@ export class DNDContainerService {
       y: targetElementPosition.y,
     };
     const fakeElementInf = this.createElementInf(moveTarget, pp);
+    if (pp.x + fakeElementInf.width > this.containerInf.width) {
+      return;
+    }
     const position = this.getBelowElementMaxPosition(fakeElementInf, excludeDragElementInf);
     const newReInf = this.updateElementInf(this.placeElementInf, position);
     newReInf.element.style.transform = getTransformByPosition(newReInf.position);
@@ -210,7 +273,10 @@ export class DNDContainerService {
 
     let max = elementInfCollection[0].rang.y.end;
     elementInfCollection.forEach(inf => {
-      if (inf.rang.y.end > max) max = inf.rang.y.end;
+      if (inf.rang.y.end > max) {
+        max = inf.rang.y.end;
+      }
+      ;
     });
     if (this.containerHeight !== max) {
       this.containerHeightUpdate = true;
@@ -268,7 +334,7 @@ export class DNDContainerService {
       position = {x: ele.position.x, y: 0};
     } else {
       aboveElements.sort((a, b) => b.rang.y.end - a.rang.y.end);
-      position = {x: ele.position.x, y: aboveElements[0].rang.y.end + DNDContainerService.OFFSET_Y};
+      position = {x: ele.position.x, y: aboveElements[0].rang.y.end + this.gutter * 2};
     }
     return position;
   }
@@ -295,7 +361,7 @@ export class DNDContainerService {
       position = {x: ele.position.x, y: 0};
     } else {
       belowElements.sort((a, b) => b.rang.y.end - a.rang.y.end);
-      position = {x: ele.position.x, y: belowElements[0].rang.y.end + DNDContainerService.OFFSET_Y};
+      position = {x: ele.position.x, y: belowElements[0].rang.y.end + this.gutter * 2};
     }
     return position;
   }
@@ -315,4 +381,12 @@ export interface ElementInf {
   // 元素是否处于位置变更状态
   changed?: boolean;
   element: HTMLElement;
+}
+
+export interface ContainerInf {
+  width: number;
+  col: number;
+  padding: number | Padding;
+  gutter: number | Padding;
+  designSize: number;
 }

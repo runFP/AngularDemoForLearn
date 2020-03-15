@@ -1,17 +1,28 @@
-<button (click)="activeCustom()">custom</button>
-<button (click)="destroyDrag()">destroyDrag</button>
-<button (click)="showCollection()">showCollection</button>
-<button (click)="getPlace()">getPlace</button>
-<div class="example-boundary" style="position: relative;">
-  <div class="example-box" style="transform: translate3d(0px,0px,0); position: absolute;">1</div>
-  <div class="example-box" style="transform: translate3d(252px,0px,0); position: absolute;">2</div>
-  <div class="example-box" style="transform: translate3d(252px,201px,0); position: absolute;">3</div>
-  <div class="example-box" style="transform: translate3d(0px,201px,0); position: absolute;">4</div>
-  <div class="example-box" style="transform: translate3d(0px,402px,0); position: absolute;">5</div>
-  <div class="example-box" style="transform: translate3d(0px,603px,0); position: absolute;">6</div>
-  <div class="example-box" style="transform: translate3d(0px,804px,0); position: absolute; width: 400px;">7</div>
-  <div class="example-box" style="transform: translate3d(504px,0px,0); position: absolute;">8</div>
-  <div class="example-box" style="transform: translate3d(756px,0px,0); position: absolute;">9</div>
-  <div class="example-box" style="transform: translate3d(504px,201px,0); position: absolute; height: 250px;">10</div>
+元素拖放指令demo
+
+说明：
+<ul>
+  <li>页面布局需要使用translate</li>
+  <li>容器内补丁默认22</li>
+  <li>槽值默认14</li>
+  <li>设计尺寸 1920</li>
+  <li>元素宽度 = （设计尺寸 - 22 * 2 - 14*2 * 列数） / 列数</li>
+  <li>元素X坐标 = 14 + (14 * 2 + 元素宽度) * i - 1  i.start=0; </li>
+</ul>
+
+<button (click)="activeDragAndDrop()">custom</button>
+<button (click)="destroyDragAndDrOP()">destroyDrag</button>
+<div class="example-boundary" style="position: relative; padding: 22px;" appReactDnd #dnd="dnd" [designSize]="1000">
+  <div class="example-box" style="transform: translate3d(14px,0px,0); position: absolute;">1</div>
+  <div class="example-box" style="transform: translate3d(253px,0px,0); position: absolute;">2</div>
+  <div class="example-box" style="transform: translate3d(253px,228px,0); position: absolute;">3</div>
+  <div class="example-box" style="transform: translate3d(14px,228px,0); position: absolute;">4</div>
+  <div class="example-box" style="transform: translate3d(14px,456px,0); position: absolute;">5</div>
+  <div class="example-box" style="transform: translate3d(14px,684px,0); position: absolute;">6</div>
+  <div class="example-box" style="transform: translate3d(14px,912px,0); position: absolute; width: 400px;">7</div>
+  <div class="example-box" style="transform: translate3d(492px,0px,0); position: absolute;">8</div>
+  <div class="example-box" style="transform: translate3d(731px,0px,0); position: absolute;">9</div>
+  <div class="example-box" style="transform: translate3d(492px,228px,0); position: absolute; height: 250px;">10</div>
+  <div class="example-box" style="transform: translate3d(14px,228px,0); position: absolute;  width: 800px; height: 250px;">11</div>
 </div>
 

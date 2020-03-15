@@ -1,7 +1,7 @@
 export function getTransform(ele, numberType = false) {
   const reg = /translate3d[^\)]*\)/g;
-  const pixelReg = /-?\d+px/g;
-  const pixelNumReg = /-?\d+(?=px)/g;
+  const pixelReg = /-?\d+\.?\d*(px|rem)/g;
+  const pixelNumReg = /-?\d+\.?\d*(?=px|rem)/g;
   const transform = ele.style.transform;
 
   /**
@@ -9,7 +9,9 @@ export function getTransform(ele, numberType = false) {
    * 分别为初始定位和拖动后定位
    */
   const transformArray = transform.match(reg);
-  if (transformArray === null) return null;
+  if (transformArray === null) {
+    return null;
+  }
   return transformArray.map(str => str.match(numberType ? pixelNumReg : pixelReg).map(i => numberType ? Number(i) : i));
 }
 
@@ -19,7 +21,9 @@ export function getTransformByPosition(position: { x: number, y: number }): stri
 
 export function getPosition(ele: HTMLElement): { x: number, y: number } {
   const transform = getTransform(ele, true);
-  if (transform === null) return null;
+  if (transform === null) {
+    return null;
+  }
   return {
     x: transform[0][0],
     y: transform[0][1],
@@ -40,7 +44,7 @@ export function getOriginPosition(ele: HTMLElement): { x: number, y: number } {
  * @return {HTMLElement}
  */
 export function createPlaceElement(ele: HTMLElement): HTMLElement {
-  const reg = /-?\d+px/g;
+  const reg = /-?\d+\.?\d*px/g;
   const height = ele.offsetHeight;
   const width = ele.offsetWidth;
   const transform = ele.style.transform.match(reg);

@@ -34,6 +34,7 @@ import { UnvarnishedTransmissionComponent } from './component/unvarnished-transm
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { PickerColorComponent } from './component/overlay-demo/picker-color/picker-color.component';
 import { NgDragAndDropComponent } from './component/ng-drag-and-drop/ng-drag-and-drop.component';
+import {ShareModule} from '../share/share.module';
 
 
 @NgModule({
@@ -65,6 +66,7 @@ import { NgDragAndDropComponent } from './component/ng-drag-and-drop/ng-drag-and
     MyOwnCustomMaterialModule,
     NgZorroAntdModule,
     ColorPickerModule,
+    ShareModule,
   ],
   entryComponents: [
     ExamplePortalComponent,
