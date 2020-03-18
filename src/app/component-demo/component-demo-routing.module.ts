@@ -13,6 +13,7 @@ import {DynamicComponentComponent} from './components/dynamic-component/dynamic-
 import {DomSanitizerDemoComponent} from './components/dom-sanitizer-demo/dom-sanitizer-demo.component';
 import {CreateDynamicModuleAndComponentComponent} from './components/create-dynamic-module-and-component/create-dynamic-module-and-component.component';
 import {TlistDemoComponent} from './components/create-dynamic-module-and-component/tlist-demo/tlist-demo.component';
+import {DataCreateViewComponent} from './components/data-create-view/data-create-view.component';
 
 export const childRoutes: Routes = [
   {path: 'template', component: NgTemplateComponent},
@@ -26,6 +27,7 @@ export const childRoutes: Routes = [
   {path: 'sanitizer', component: DomSanitizerDemoComponent}, // 插入templateRef
   {path: 'createModuleComponentDynamic', component: CreateDynamicModuleAndComponentComponent}, // 动态创建组件和模块
   {path: 'text', component: TlistDemoComponent}, // 动态创建组件和模块
+  {path: 'dataCrateView', component: DataCreateViewComponent}, // 数据创建视图，根据后台传过来的组件名字和配置更进阶的动态创建组件
 ];
 
 export const routes: Routes = [
@@ -49,6 +51,7 @@ export const names = [
       {name: '动态加载模板'},
       {name: '动态创建模块组件'},
       {name: 'text'},
+      {name: '数据创建视图'},
     ]
   }
 ];

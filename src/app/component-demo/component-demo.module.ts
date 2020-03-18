@@ -30,6 +30,8 @@ import { DomSanitizerDemoComponent } from './components/dom-sanitizer-demo/dom-s
 import { CreateDynamicModuleAndComponentComponent } from './components/create-dynamic-module-and-component/create-dynamic-module-and-component.component';
 import { TextdynamicComponent } from './components/create-dynamic-module-and-component/textdynamic/textdynamic.component';
 import { TlistDemoComponent } from './components/create-dynamic-module-and-component/tlist-demo/tlist-demo.component';
+import { DataCreateViewComponent } from './components/data-create-view/data-create-view.component';
+import { InsertContainerDirective } from './components/data-create-view/insert-container.directive';
 
 @NgModule({
   declarations: [
@@ -54,7 +56,9 @@ import { TlistDemoComponent } from './components/create-dynamic-module-and-compo
     DomSanitizerDemoComponent,
     CreateDynamicModuleAndComponentComponent,
     TextdynamicComponent,
-    TlistDemoComponent
+    TlistDemoComponent,
+    DataCreateViewComponent,
+    InsertContainerDirective
   ],
   imports: [
     CommonModule,

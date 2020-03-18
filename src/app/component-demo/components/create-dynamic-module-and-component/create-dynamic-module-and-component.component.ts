@@ -40,7 +40,7 @@ export class CreateDynamicModuleAndComponentComponent implements OnInit, AfterVi
     }
 
     const module = this.compile.compileModuleAndAllComponentsSync(TemporaryModule);
-    const factory = module.componentFactories.find(component => component.componentType === TemporaryComponent);
+    const factory = module.componentFactories.find(component => {console.log(component); return component.componentType.name === 'TemporaryComponent'});
 
     this.viewContainer.createComponent(factory);
 
