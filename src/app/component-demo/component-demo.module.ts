@@ -26,12 +26,17 @@ import {HeroJobAdComponent} from './components/dynamic-component/hero-job-ad/her
 import {HeroProfileComponent} from './components/dynamic-component/hero-profile/hero-profile.component';
 import {AdBannerComponent} from './components/dynamic-component/ad-banner/ad-banner.component';
 import {AdService} from './components/dynamic-component/ad-service.service';
-import { DomSanitizerDemoComponent } from './components/dom-sanitizer-demo/dom-sanitizer-demo.component';
-import { CreateDynamicModuleAndComponentComponent } from './components/create-dynamic-module-and-component/create-dynamic-module-and-component.component';
-import { TextdynamicComponent } from './components/create-dynamic-module-and-component/textdynamic/textdynamic.component';
-import { TlistDemoComponent } from './components/create-dynamic-module-and-component/tlist-demo/tlist-demo.component';
-import { DataCreateViewComponent } from './components/data-create-view/data-create-view.component';
-import { InsertContainerDirective } from './components/data-create-view/insert-container.directive';
+import {DomSanitizerDemoComponent} from './components/dom-sanitizer-demo/dom-sanitizer-demo.component';
+import {CreateDynamicModuleAndComponentComponent} from './components/create-dynamic-module-and-component/create-dynamic-module-and-component.component';
+import {TextdynamicComponent} from './components/create-dynamic-module-and-component/textdynamic/textdynamic.component';
+import {TlistDemoComponent} from './components/create-dynamic-module-and-component/tlist-demo/tlist-demo.component';
+import {DataCreateViewComponent} from './components/data-create-view/data-create-view.component';
+import {WillBeCreateComponent} from './components/data-create-view/will-be-create/will-be-create.component';
+import {NameMapComponent, RegisterNMC} from './NameMapComponent';
+
+const registerComponents = [WillBeCreateComponent];
+const nmc = new NameMapComponent(registerComponents);
+RegisterNMC.setNmc('component-demo', nmc);
 
 @NgModule({
   declarations: [
@@ -58,7 +63,7 @@ import { InsertContainerDirective } from './components/data-create-view/insert-c
     TextdynamicComponent,
     TlistDemoComponent,
     DataCreateViewComponent,
-    InsertContainerDirective
+    WillBeCreateComponent
   ],
   imports: [
     CommonModule,
@@ -67,7 +72,7 @@ import { InsertContainerDirective } from './components/data-create-view/insert-c
     ShareModule
   ],
   providers: [PopupService, AdService],
-  entryComponents: [MyPopupComponent, HeroJobAdComponent, HeroProfileComponent],
+  entryComponents: [MyPopupComponent, HeroJobAdComponent, HeroProfileComponent, WillBeCreateComponent],
 })
 export class ComponentDemoModule {
 }

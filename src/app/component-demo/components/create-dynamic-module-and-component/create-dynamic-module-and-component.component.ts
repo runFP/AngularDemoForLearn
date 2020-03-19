@@ -1,5 +1,10 @@
 import {AfterViewInit, Compiler, Component, NgModule, OnInit, ViewContainerRef} from '@angular/core';
 
+@Component({selector: 'abc'})
+class Class {
+
+}
+
 @Component({
   selector: 'app-create-dynamic-module-and-component',
   templateUrl: './create-dynamic-module-and-component.component.html',
@@ -9,10 +14,19 @@ export class CreateDynamicModuleAndComponentComponent implements OnInit, AfterVi
 
   dynamicTmp = `<div><span (click)="show()">show</span></div>`;
 
-  constructor(private compile: Compiler, private viewContainer: ViewContainerRef) {
+  test<T>(c: { new(...args: any[]): T }): T {
+    console.log(c);
+    return new c();
+  }
+
+  constructor(
+    private compile: Compiler,
+    private viewContainer: ViewContainerRef,
+  ) {
   }
 
   ngOnInit() {
+    this.test<Class>(Class);
   }
 
   ngAfterViewInit(): void {
@@ -40,7 +54,10 @@ export class CreateDynamicModuleAndComponentComponent implements OnInit, AfterVi
     }
 
     const module = this.compile.compileModuleAndAllComponentsSync(TemporaryModule);
-    const factory = module.componentFactories.find(component => {console.log(component); return component.componentType.name === 'TemporaryComponent'});
+    const factory = module.componentFactories.find(component => {
+      console.log(component);
+      return component.componentType.name === 'TemporaryComponent';
+    });
 
     this.viewContainer.createComponent(factory);
 

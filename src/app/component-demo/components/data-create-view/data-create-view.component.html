@@ -1,2 +1,13 @@
-<p>data-create-view works!</p>
-<div></div>
+<p>
+  data-create-view works!
+  数据创建视图
+</p>
+<ul>
+  <li>自定义一个NameMapComponent对象用来保存组件类和名字映射</li>
+  <li>自定义一个静态类根据模块名字来保存上面NameMapComponent实例</li>
+  <li>在ngModule中使用对象记录组件，然后声明(declaration)组件和登入组件entryComponent</li>
+  <li>创建NameMapComponent实例使用RegisterNMC使其和模块名映射</li>
+  <li>在组建通过模块名获取对应的nmc，然后使用nmc根据组件名获取对应的组件</li>
+</ul>
+
+<div #insert style="position: relative;"></div>
