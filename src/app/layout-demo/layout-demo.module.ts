@@ -35,6 +35,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { PickerColorComponent } from './component/overlay-demo/picker-color/picker-color.component';
 import { NgDragAndDropComponent } from './component/ng-drag-and-drop/ng-drag-and-drop.component';
 import {ShareModule} from '../share/share.module';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 
 @NgModule({
@@ -67,6 +68,7 @@ import {ShareModule} from '../share/share.module';
     NgZorroAntdModule,
     ColorPickerModule,
     ShareModule,
+    MatGridListModule,
   ],
   entryComponents: [
     ExamplePortalComponent,

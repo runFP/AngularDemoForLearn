@@ -105,7 +105,6 @@ export interface BoundaryInf {
   bestBoundaryElement: ElementInf;
 }
 
-
 export interface Point {
   x: number;
   y: number;

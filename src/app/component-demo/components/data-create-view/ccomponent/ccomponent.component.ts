@@ -1,11 +1,11 @@
 import {Component, HostBinding, Input, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'app-will-be-create',
-  templateUrl: './will-be-create.component.html',
-  styleUrls: ['./will-be-create.component.scss']
+  selector: 'app-ccomponent',
+  templateUrl: './ccomponent.component.html',
+  styleUrls: ['./ccomponent.component.scss']
 })
-export class WillBeCreateComponent implements OnInit {
+export class CComponentComponent implements OnInit {
   @Input() options: any;
   @Input() name = 'componentName';
 

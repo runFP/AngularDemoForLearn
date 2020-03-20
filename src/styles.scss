@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import '~@angular/material/theming';
 @import '~@angular/cdk/overlay-prebuilt.css';
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
@@ -38,4 +39,54 @@ dt {
 
 ul {
   list-style: none;
+}
+
+h2 {
+  font-weight: bold;
+  padding: 8px;
+  font-size: 16px;
+}
+
+p {
+  font-size: 14px;
+  line-height: 28px;
+  color: rgba(0, 0, 0, .87);
+}
+
+.description {
+  border: 1px dashed rgba(0, 0, 0, .2);
+  padding: 16px;
+  color: #666;
+}
+
+.des-important {
+  background-color: #999;
+  color: #e2fd12;
+}
+
+.title {
+  font-size: 14px;
+  color: #333;
+}
+
+.center {
+  text-align: center;
+}
+
+.step {
+  ul {
+    list-style: none;
+    padding: 0 16px;
+    list-style: inherit;
+  }
+
+  li {
+    padding-bottom: 4px;
+  }
+}
+
+.button-row{
+  button,a{
+    margin-right: 8px;
+  }
 }

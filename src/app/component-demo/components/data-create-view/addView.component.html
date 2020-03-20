@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>新增指标视图</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>指标名称</mat-label>
+    <mat-select [(value)]="value">
+      <mat-option *ngFor="let option of options" [value]="option.value">{{option.label}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">取消</button>
+  <button mat-button cdkFocusInitial [mat-dialog-close]="value">确定</button>
+</div>

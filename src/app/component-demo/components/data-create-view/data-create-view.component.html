@@ -1,13 +1,52 @@
-<p>
-  data-create-view works!
-  数据创建视图
+<h2>
+  数据视图互转
+</h2>
+<p class="description">
+  本页面分别模拟：<br>
+  1.数据创建视图(模拟后台传入数据，前台根据数据在指定的容器内呈现指定的组件，组件数据，组件样式)<br>
+  2.视图创建数据(前台对容器内的组件进行修改，包括组件数量（增删），组件的样式和组件数据，然后转成对应数据)
 </p>
-<ul>
-  <li>自定义一个NameMapComponent对象用来保存组件类和名字映射</li>
-  <li>自定义一个静态类根据模块名字来保存上面NameMapComponent实例</li>
-  <li>在ngModule中使用对象记录组件，然后声明(declaration)组件和登入组件entryComponent</li>
-  <li>创建NameMapComponent实例使用RegisterNMC使其和模块名映射</li>
-  <li>在组建通过模块名获取对应的nmc，然后使用nmc根据组件名获取对应的组件</li>
-</ul>
-
-<div #insert style="position: relative;"></div>
+<div style="background-color: #f7f7f7; margin: 8px 0;">
+<mat-grid-list cols="2" rowHeight="300">
+  <mat-grid-tile>
+    <div class="step">
+      <div class="title center">数据转视图流程</div>
+      <ul>
+        <li>自定义一个<span class="des-important">NameMapComponent</span>对象用来保存组件类和名字映射</li>
+        <li>自定义一个静态类根据模块名字来保存上面NameMapComponent实例</li>
+        <li>在ngModule中使用对象记录组件，然后声明(declaration)组件和登入组件entryComponent</li>
+        <li>创建NameMapComponent实例使用RegisterNMC使其和模块名映射</li>
+        <li>在组建通过模块名获取对应的nmc，然后使用nmc根据组件名获取对应的组件</li>
+        <li>使用<span class="des-important">ComponentFactoryResolve</span>来创建组件工厂</li>
+        <li>传入组件工厂到ViewContainerRef.createComponent方法创建视图，该方法返回一个<span class="des-important">componentRef</span></li>
+        <li>对ComponentRef中的实例的数据和样式属性直接赋值</li>
+      </ul>
+    </div>
+  </mat-grid-tile>
+  <mat-grid-tile>
+    <div class="step">
+      <div class="title center">视图转数据流程</div>
+      <ul>
+        <li>自定义一个<span class="des-important">NameMapComponent</span>对象用来保存组件类和名字映射</li>
+        <li>自定义一个静态类根据模块名字来保存上面NameMapComponent实例</li>
+        <li>在ngModule中使用对象记录组件，然后声明(declaration)组件和登入组件entryComponent</li>
+        <li>创建NameMapComponent实例使用RegisterNMC使其和模块名映射</li>
+        <li>在组建通过模块名获取对应的nmc，然后使用nmc根据组件名获取对应的组件</li>
+        <li>使用<span class="des-important">ComponentFactoryResolve</span>来创建组件工厂</li>
+        <li>传入组件工厂到ViewContainerRef.createComponent方法创建视图，该方法返回一个<span class="des-important">componentRef</span></li>
+        <li>对ComponentRef中的实例的数据和样式属性直接赋值</li>
+      </ul>
+    </div>
+  </mat-grid-tile>
+</mat-grid-list>
+</div>
+<div class="button-row" style="margin-bottom: 24px;">
+  <button mat-stroked-button (click)="data2view()" color="primary">数据转为视图</button>
+  <button mat-stroked-button (click)="view2data()">视图转为数据</button>
+  <button mat-stroked-button (click)="activeDnd()">激活Dnd</button>
+  <button mat-stroked-button (click)="addNewView()" *ngIf="actived">增加新的视图</button>
+  <button mat-stroked-button (click)="destroyDnd()">结束Dnd</button>
+</div>
+<div style="position: relative; width: 1000px; box-sizing: border-box;" #dnd="dnd" appReactDnd [designSize]="1000">
+  <ng-template #insert></ng-template>
+</div>

@@ -54,6 +54,10 @@ export class DNDContainerService {
     return position;
   }
 
+  /**
+   * 记录每列的起始x
+   * @param {ContainerInf} containerInf
+   */
   recordX(containerInf: ContainerInf) {
     const rate = containerInf.width / containerInf.designSize;
     const padding = containerInf.padding;
@@ -117,7 +121,26 @@ export class DNDContainerService {
     };
   }
 
+  /**
+   *
+   * @param {HTMLElement} element
+   * @return {string} 返回transform
+   */
+  addElement(element: HTMLElement): string {
+    const pos = {x: this.xPosition[0].start, y: 0};
+    const newElementInf = this.createElementInf(element, pos);
+    this.placeElementInf = newElementInf;
+    this.elementInfCollection.push(newElementInf);
+    this.refreshElementsPositionBefore(newElementInf);
+    this.refreshElementsPositionAfter(newElementInf);
+    return getTransformByPosition(pos);
+  }
 
+  /**
+   * 确保拖动时操作的元素是容器内部元素
+   * @param {HTMLElement} element mouseEvent.target
+   * @return {HTMLElement | null} 容器内部元素或者null
+   */
   getParentElement(element: HTMLElement): HTMLElement | null {
     let index = this.elementInfCollection.findIndex(dndElementInf => dndElementInf.element === element);
     while (index === -1) {
@@ -140,6 +163,12 @@ export class DNDContainerService {
     return this.elementInfCollection.find(ele => ele.element === element);
   }
 
+  /**
+   * 刷新占位层的位置（通过先创建一个虚假的元素信息，来计算占位层的真实位置）
+   * @param {number} x
+   * @param {string} xpKey
+   * @param moveTarget
+   */
   refreshPlacePositionFake(x: number, xpKey: string, moveTarget) {
     const absPoint = {};
     const targetElementPosition = getPosition(moveTarget);
@@ -179,8 +208,16 @@ export class DNDContainerService {
       )
       && inf.position.y > reInf.position.y);
     belowElements.sort((a, b) => a.position.y - b.position.y);
+    /**
+     * 下层元素中如有宽度范围超过拖动元素，需要把这些元素涉及到的下层元素也添加进来
+     */
+    /**
+     * 下层元素中如有宽度范围超过拖动元素，需要把这些元素涉及到的下层元素也添加进来
+     */
+    const fullBlowElements = this.getOverWidthBelowElementRelativeElement(belowElements, excludeDragElementInf, reInf);
+    fullBlowElements.sort((a, b) => a.position.y - b.position.y);
 
-    belowElements.forEach(ele => {
+    fullBlowElements.forEach(ele => {
       /**
        * 找出该元素的X范围内的所有上层元素，排除拖动元素
        * 选出上层元素rang.y.end最大的元素
@@ -208,8 +245,24 @@ export class DNDContainerService {
       && inf.rang.y.end >= reInf.position.y);
     /**
      * 下层元素中如有宽度范围超过拖动元素，需要把这些元素涉及到的下层元素也添加进来
-     * */
-    const overWidthElements = belowElements.filter(inf => inf.width > reInf.width);
+     */
+    const fullBlowElements = this.getOverWidthBelowElementRelativeElement(belowElements, excludeDragElementInf, reInf);
+
+    /**
+     * 需加上占位层信息确保原来同一水平的元素也被检索到
+     */
+    excludeDragElementInf.push(reInf);
+    fullBlowElements.sort((a, b) => a.position.y - b.position.y);
+
+
+    fullBlowElements.forEach(ele => {
+      const position = this.getBelowRangElementMaxPosition(ele, excludeDragElementInf);
+      this.updateElementCollection(ele, position);
+    });
+  }
+
+  private getOverWidthBelowElementRelativeElement(belowElements: ElementInf[], excludeDragElementInf: ElementInf[], replaceElement: ElementInf): ElementInf[] {
+    const overWidthElements = belowElements.filter(inf => inf.width > replaceElement.width);
     if (overWidthElements.length > 0) {
       overWidthElements.sort((a, b) => a.position.y - b.position.y);
       overWidthElements.forEach((oeInf, i) => {
@@ -227,15 +280,8 @@ export class DNDContainerService {
         belowElements.push(...overWidthBelowElements);
       });
     }
-    /** 需加上占位层信息确保原来同一水平的元素也被检索到*/
-    excludeDragElementInf.push(reInf);
-    belowElements.sort((a, b) => a.position.y - b.position.y);
 
-
-    belowElements.forEach(ele => {
-      const position = this.getBelowRangElementMaxPosition(ele, excludeDragElementInf);
-      this.updateElementCollection(ele, position);
-    });
+    return belowElements;
   }
 
   private updateElementInf(elementInf: ElementInf, position: { x: number, y: number }): ElementInf {
@@ -271,12 +317,11 @@ export class DNDContainerService {
       elementInfCollection.push(this.placeElementInf);
     }
 
-    let max = elementInfCollection[0].rang.y.end;
+    let max = elementInfCollection[0] ? elementInfCollection[0].rang.y.end : 0;
     elementInfCollection.forEach(inf => {
       if (inf.rang.y.end > max) {
         max = inf.rang.y.end;
       }
-      ;
     });
     if (this.containerHeight !== max) {
       this.containerHeightUpdate = true;

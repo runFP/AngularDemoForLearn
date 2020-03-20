@@ -1,17 +1,71 @@
-元素拖放指令demo
+<h2>
+  元素拖放指令
+</h2>
 
-说明：
-<ul>
-  <li>页面布局需要使用translate</li>
-  <li>容器内补丁默认22</li>
-  <li>槽值默认14</li>
-  <li>设计尺寸 1920</li>
-  <li>元素宽度 = （设计尺寸 - 22 * 2 - 14*2 * 列数） / 列数</li>
-  <li>元素X坐标 = 14 + (14 * 2 + 元素宽度) * i - 1  i.start=0; </li>
-</ul>
+<div class="step">
+  <div class="title">相关说明：</div>
+  <ul>
+    <li>页面布局需要使用translate</li>
+    <li>容器内补丁默认22</li>
+    <li>槽值默认14</li>
+    <li>容器和内部元素 box-sizing: border-box;</li>
+    <li>设计尺寸(容器设计稿的宽度) 1920</li>
+    <li>元素宽度 = （设计尺寸 - 22 * 2 - 14*2 * 列数） / 列数</li>
+    <li>元素X坐标 = 14 + (14 * 2 + 元素宽度) * i; i起始值 = 0</li>
+    <li>元素的列宽 = 元素宽度 * (i+1) + 槽值 * 2 * i; i起始值 = 0</li>
+  </ul>
+</div>
 
-<button (click)="activeDragAndDrop()">custom</button>
-<button (click)="destroyDragAndDrOP()">destroyDrag</button>
+<div>
+  <div style="background-color: #f7f7f7; margin: 8px 0;">
+    <mat-form-field class="example-full-width">
+      <mat-label>元素宽度</mat-label>
+      <input matInput [(ngModel)]="containerWidth">
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <mat-label>容器内补丁</mat-label>
+      <input matInput [(ngModel)]="padding">
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <mat-label>槽值</mat-label>
+      <input matInput [(ngModel)]="gutter">
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <mat-label>列数</mat-label>
+      <input matInput [(ngModel)]="col">
+    </mat-form-field>
+    <button mat-stroked-button (click)="calculate()" style="vertical-align: super; margin-left: 8px;">计算</button>
+  </div>
+  <mat-grid-list cols="2" rowHeight="300">
+    <mat-grid-tile>
+      <div class="step">
+        <div class="title center">translateX</div>
+        <ul>
+          <li *ngFor="let x of translateXs;let i = index;">
+            第{{i+1}}的translateX:{{x}}
+          </li>
+        </ul>
+      </div>
+    </mat-grid-tile>
+    <mat-grid-tile>
+      <div class="step">
+        <div class="title center">列宽</div>
+        <ul>
+          <li *ngFor="let w of colWidths;let i = index;">
+            {{i+1}}列的width:{{w}}
+          </li>
+        </ul>
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
+
+
+<div class="button-row" style="margin-bottom: 24px;">
+  <button mat-stroked-button (click)="activeDragAndDrop()" color="primary">activeDND</button>
+  <button mat-stroked-button (click)="destroyDragAndDrOP()">destroyDND</button>
+</div>
+
 <div class="example-boundary" style="position: relative; padding: 22px;" appReactDnd #dnd="dnd" [designSize]="1000">
   <div class="example-box" style="transform: translate3d(14px,0px,0); position: absolute;">1</div>
   <div class="example-box" style="transform: translate3d(253px,0px,0); position: absolute;">2</div>

@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 
 import {HomeComponent} from './home/home.component';
@@ -30,11 +29,24 @@ import {DomSanitizerDemoComponent} from './components/dom-sanitizer-demo/dom-san
 import {CreateDynamicModuleAndComponentComponent} from './components/create-dynamic-module-and-component/create-dynamic-module-and-component.component';
 import {TextdynamicComponent} from './components/create-dynamic-module-and-component/textdynamic/textdynamic.component';
 import {TlistDemoComponent} from './components/create-dynamic-module-and-component/tlist-demo/tlist-demo.component';
-import {DataCreateViewComponent} from './components/data-create-view/data-create-view.component';
+import {AddViewComponent, DataCreateViewComponent} from './components/data-create-view/data-create-view.component';
 import {WillBeCreateComponent} from './components/data-create-view/will-be-create/will-be-create.component';
 import {NameMapComponent, RegisterNMC} from './NameMapComponent';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatDialogModule} from '@angular/material/dialog';
+import { AComponentComponent } from './components/data-create-view/acomponent/acomponent.component';
+import { BComponentComponent } from './components/data-create-view/bcomponent/bcomponent.component';
+import { CComponentComponent } from './components/data-create-view/ccomponent/ccomponent.component';
 
-const registerComponents = [WillBeCreateComponent];
+/**
+ *  组件视图互转demo的记录组件操作
+ */
+const registerComponents = [
+  WillBeCreateComponent,
+  AComponentComponent,
+  BComponentComponent,
+  CComponentComponent,
+];
 const nmc = new NameMapComponent(registerComponents);
 RegisterNMC.setNmc('component-demo', nmc);
 
@@ -63,16 +75,22 @@ RegisterNMC.setNmc('component-demo', nmc);
     TextdynamicComponent,
     TlistDemoComponent,
     DataCreateViewComponent,
-    WillBeCreateComponent
+    WillBeCreateComponent,
+    AddViewComponent,
+    AComponentComponent,
+    BComponentComponent,
+    CComponentComponent,
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     DemoComponentRoutingModule,
-    ShareModule
+    ShareModule,
+    MatGridListModule,
+    MatDialogModule,
   ],
   providers: [PopupService, AdService],
-  entryComponents: [MyPopupComponent, HeroJobAdComponent, HeroProfileComponent, WillBeCreateComponent],
+  entryComponents: [MyPopupComponent, HeroJobAdComponent, HeroProfileComponent, AddViewComponent, ...registerComponents],
 })
 export class ComponentDemoModule {
 }

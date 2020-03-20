@@ -4,7 +4,6 @@ import {FormsModule} from '@angular/forms';
 import {RoutesModule} from './routes/routes.module';
 import {HttpClientModule} from '@angular/common/http';
 
-import {JitCompiler} from '@angular/compiler';
 
 
 
@@ -14,11 +13,9 @@ import 'ag-grid-enterprise';
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MyOwnCustomMaterialModule} from './my-own-custom-material/my-own-custom-material-module';
 import {LayoutModule} from './layout/layout.module';
 
 /** ng-zorro */
-import { AppRoutingModule } from './app-routing.module';
 import { IconsProviderModule } from './icons-provider.module';
 import { NgZorroAntdModule, NZ_I18N, zh_CN } from 'ng-zorro-antd';
 import { registerLocaleData } from '@angular/common';
@@ -41,7 +38,6 @@ registerLocaleData(zh);
     BrowserAnimationsModule,
     AgGridModule.withComponents([]),
     LayoutModule,
-    // AppRoutingModule,
     IconsProviderModule,
     NgZorroAntdModule,
   ],

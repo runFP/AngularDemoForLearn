@@ -57,6 +57,9 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * 激活拖放功能
+   */
   activeDnd(): void {
     this.boundary = this.el.nativeElement;
     this.containerWidth = this.boundary.clientWidth;
@@ -70,6 +73,23 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     });
     this.createDrag();
     console.log(this.dndcontainer.getElementInfCollection());
+  }
+
+  /**
+   * 禁用拖放功能并初始化
+   */
+  destroyDnd(): void {
+    this.boundary.removeEventListener('mousedown', this._downHandler);
+    this.boundary.removeEventListener('mousemove', this._moveHandler);
+    this.boundary.removeEventListener('mouseup', this._upHandler);
+    this.dndcontainer.clear();
+  }
+
+  addElement(element: HTMLElement): string {
+   return this.dndcontainer.addElement(element);
+  }
+
+  deleteElement(element: HTMLElement): void {
   }
 
   private _pointerDown(event: MouseEvent): void {
@@ -114,6 +134,12 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     this.moveSubject.next({target, delta});
   }
 
+  /**
+   * 鼠标移动时计算占位层位置，各元素的位置偏移
+   * 有防抖操作提高性能
+   * @param e
+   * @private
+   */
   private _moveCalculate(e) {
     const dragElementInf = this.dndcontainer.getElementInfByElement(e.target);
 
@@ -156,19 +182,15 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     this.renderer.removeChild(this.boundary, placeInf.element);
   }
 
+  /**
+   * 为容器添加事件监听
+   */
   private createDrag(): void {
     this.boundary.addEventListener('mousedown', this._downHandler);
     this.boundary.addEventListener('mousemove', this._moveHandler);
     this.boundary.addEventListener('mouseup', this._upHandler);
   }
 
-
-  destroyDrag(): void {
-    this.boundary.removeEventListener('mousedown', this._downHandler);
-    this.boundary.removeEventListener('mousemove', this._moveHandler);
-    this.boundary.removeEventListener('mouseup', this._upHandler);
-    this.dndcontainer.clear();
-  }
 }
 
 export interface Padding {

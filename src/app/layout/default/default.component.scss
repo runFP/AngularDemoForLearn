@@ -1,6 +1,10 @@
+:host{
+  width: 100%;
+}
 .out-warp{
   display: flex;
   >section{
+    padding: 24px;
     flex: 1;
   }
 }
