@@ -97,7 +97,6 @@ export class DataCreateViewComponent implements OnInit {
        * 激活dnd模式要添加删除按钮
        */
       cmpRef.instance.addDelBtn(this.insert, this.dnd);
-      console.log(this.insert.indexOf(cmpRef.hostView));
     });
   }
 

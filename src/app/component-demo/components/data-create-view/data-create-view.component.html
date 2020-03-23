@@ -29,14 +29,9 @@
     <div class="step">
       <div class="title center">视图转数据流程</div>
       <ul>
-        <li>自定义一个<span class="des-important">NameMapComponent</span>对象用来保存组件类和名字映射</li>
-        <li>自定义一个静态类根据模块名字来保存上面NameMapComponent实例</li>
-        <li>在ngModule中使用对象记录组件，然后声明(declaration)组件和登入组件entryComponent</li>
-        <li>创建NameMapComponent实例使用RegisterNMC使其和模块名映射</li>
-        <li>在组建通过模块名获取对应的nmc，然后使用nmc根据组件名获取对应的组件</li>
-        <li>使用<span class="des-important">ComponentFactoryResolve</span>来创建组件工厂</li>
-        <li>传入组件工厂到ViewContainerRef.createComponent方法创建视图，该方法返回一个<span class="des-important">componentRef</span></li>
-        <li>对ComponentRef中的实例的数据和样式属性直接赋值</li>
+        <li>通过<span class="des-important">ViewContainerRef</span>的length属性和get(index)方法来遍历并获得容器内存在的视图ViewRef</li>
+        <li>ViewRef中有一个叫做<span class="des-important">_view:LView</span>的属性，LView根据创建参数（组件或者嵌套视图）来关联对应的参数</li>
+        <li>通过_view获取组件实例，并调用自定义的方法来获取需要的数据</li>
       </ul>
     </div>
   </mat-grid-tile>
