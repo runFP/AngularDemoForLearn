@@ -2,6 +2,7 @@ import {Injectable, Input} from '@angular/core';
 import {createPlaceElement, getMinFromObject, getPosition, getTransformByPosition} from './dnd-utils';
 import {Point} from './ng-drag-and-drop.service';
 import {Padding} from './react-dnd.directive';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,9 +33,6 @@ export class DNDContainerService {
     this.containerInf = containerInf;
     this.collectElementPosition(children);
     this.recordX(containerInf);
-    console.log(containerInf.width);
-    console.log(this.xPosition);
-    console.log(this.elementWidth);
     this.init_complete = true;
   }
 
@@ -67,8 +65,6 @@ export class DNDContainerService {
     const totalPadding = typeof padding === 'number' ? padding * 2 : padding.right + padding.left;
     const totalGutter = typeof gutter === 'number' ? gutter * 2 : gutter.right + gutter.left;
     this.elementWidth = Math.ceil((width - (totalPadding + totalGutter * col) * rate) / col);
-
-    console.log(rate);
 
     for (let i = 0, ii = this.elementNum; i < ii; i++) {
       const x = {start: 0, end: 0};
@@ -134,6 +130,15 @@ export class DNDContainerService {
     this.refreshElementsPositionBefore(newElementInf);
     this.refreshElementsPositionAfter(newElementInf);
     return getTransformByPosition(pos);
+  }
+
+  removeElement(element: HTMLElement) {
+    const index = this.elementInfCollection.findIndex(elementInf => elementInf.element === element);
+    if (index !== -1) {
+      const delElementInf = this.elementInfCollection[index];
+      this.elementInfCollection.splice(index, 1);
+      this.refreshElementsPositionBefore(delElementInf);
+    }
   }
 
   /**

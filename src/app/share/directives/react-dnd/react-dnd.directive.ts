@@ -1,7 +1,7 @@
-import {AfterViewInit, Directive, ElementRef, Inject, Input, OnInit, Renderer2} from '@angular/core';
+import {AfterViewInit, Directive, ElementRef, Inject, Input, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {NgDragAndDropService, Point} from './ng-drag-and-drop.service';
 import {DNDContainerService} from './dndcontainer.service';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {getPosition, getTransformByPosition} from './dnd-utils';
 import {DOCUMENT} from '@angular/common';
 import {debounceTime} from 'rxjs/internal/operators';
@@ -10,7 +10,7 @@ import {debounceTime} from 'rxjs/internal/operators';
   selector: '[appReactDnd]',
   exportAs: 'dnd',
 })
-export class ReactDndDirective implements OnInit, AfterViewInit {
+export class ReactDndDirective implements OnInit, OnDestroy, AfterViewInit {
 
   /** 容器内补丁*/
   @Input() padding: number | Padding = 22;
@@ -72,7 +72,6 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
       designSize: this.designSize,
     });
     this.createDrag();
-    console.log(this.dndcontainer.getElementInfCollection());
   }
 
   /**
@@ -82,14 +81,16 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     this.boundary.removeEventListener('mousedown', this._downHandler);
     this.boundary.removeEventListener('mousemove', this._moveHandler);
     this.boundary.removeEventListener('mouseup', this._upHandler);
+    this.boundary.removeEventListener('mouseleave', this._upHandler);
     this.dndcontainer.clear();
   }
 
   addElement(element: HTMLElement): string {
-   return this.dndcontainer.addElement(element);
+    return this.dndcontainer.addElement(element);
   }
 
-  deleteElement(element: HTMLElement): void {
+  removeElement(element: HTMLElement): void {
+    this.dndcontainer.removeElement(element);
   }
 
   private _pointerDown(event: MouseEvent): void {
@@ -98,7 +99,7 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
       return;
     }
     const target = this.dndcontainer.getParentElement(<HTMLElement>event.target) as HTMLElement;
-    if (target.style.transform === '') {
+    if (!target || target.style.transform === '') {
       return;
     }
     this.moveTarget = target;
@@ -180,6 +181,7 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     this.dndcontainer.updateElementCollection(dragElementInf, placeInf.position);
 
     this.renderer.removeChild(this.boundary, placeInf.element);
+    this.moveTarget = null;
   }
 
   /**
@@ -189,6 +191,11 @@ export class ReactDndDirective implements OnInit, AfterViewInit {
     this.boundary.addEventListener('mousedown', this._downHandler);
     this.boundary.addEventListener('mousemove', this._moveHandler);
     this.boundary.addEventListener('mouseup', this._upHandler);
+    this.boundary.addEventListener('mouseleave', this._upHandler);
+  }
+
+  ngOnDestroy(): void {
+    this.moveSubject.unsubscribe();
   }
 
 }
@@ -199,3 +206,4 @@ export interface Padding {
   bottom: number;
   left: number;
 }
+

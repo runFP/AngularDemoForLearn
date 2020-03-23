@@ -2,9 +2,11 @@
   数据视图互转
 </h2>
 <p class="description">
-  本页面分别模拟：<br>
+  本页面分别模拟：（本页面融合了<span class="des-important">布局/自定义拖动层</span>的<span class="des-important">appReactDnd</span>指令来模拟自定义编辑页面功能）<br>
   1.数据创建视图(模拟后台传入数据，前台根据数据在指定的容器内呈现指定的组件，组件数据，组件样式)<br>
-  2.视图创建数据(前台对容器内的组件进行修改，包括组件数量（增删），组件的样式和组件数据，然后转成对应数据)
+  2.视图创建数据(前台对容器内的组件进行修改，包括组件数量（增删），组件的样式和组件数据，然后转成对应数据)<br>
+  3.前端动态选择数据并创建视图，默认插入到顶端第一列<br>
+  4.获取前端组件的视图并转为数据
 </p>
 <div style="background-color: #f7f7f7; margin: 8px 0;">
 <mat-grid-list cols="2" rowHeight="300">
@@ -40,6 +42,7 @@
   </mat-grid-tile>
 </mat-grid-list>
 </div>
+不能在激活Dnd后再点击数据转为视图，因为这是模拟一开始后台数据过来创建视图的过程，Dnd模式需要插入视图
 <div class="button-row" style="margin-bottom: 24px;">
   <button mat-stroked-button (click)="data2view()" color="primary">数据转为视图</button>
   <button mat-stroked-button (click)="view2data()">视图转为数据</button>
