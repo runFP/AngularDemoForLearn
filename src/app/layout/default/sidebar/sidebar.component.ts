@@ -14,6 +14,7 @@ import {
 import {routes as layoutRoutes, childRoutes as layoutCRoutes, names as layoutNames} from '../../../layout-demo/layout-demo-routing.module';
 import {routes as errorRoutes, childRoutes as errorCRoutes, names as errorNames} from '../../../error/error-routing.module';
 import {routes as rxjsRoutes, childRoutes as rxjsCRoutes, names as rxjsNames} from '../../../rxjs/rxjs-routing.module';
+import {routes as routerRoutes, childRoutes as routerCRoutes, names as routerNames} from '../../../router/router-routing.module';
 
 let menus = [
   {path: agRoutes, children: agCRoutes, names: agNames},
@@ -22,6 +23,7 @@ let menus = [
   {path: layoutRoutes, children: layoutCRoutes, names: layoutNames},
   {path: rxjsRoutes, children: rxjsCRoutes, names: rxjsNames},
   {path: errorRoutes, children: errorCRoutes, names: errorNames},
+  {path: routerRoutes, children: routerCRoutes, names: routerNames},
 ];
 
 menus = processMenu(menus);

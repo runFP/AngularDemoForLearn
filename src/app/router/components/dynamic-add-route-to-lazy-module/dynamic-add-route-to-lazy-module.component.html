@@ -1,0 +1,32 @@
+<h2>动态添加路由</h2>
+<div class="step">
+  <div class="title">相关说明：</div>
+  <ul>
+    <li>原理：通过<span class="des-important">直接修改router.config</span>中的children或者routes</li>
+    <li>懒加载模块中有一个专有的属性<span class="des-important">_loadedConfig</span>,该属性在路由事件RoutesRecognized后才可见</li>
+    <li>调用路由的<span class="des-important">resetConfig</span>也可以重新刷新路由配置</li>
+  </ul>
+</div>
+
+<div>
+  <p>
+    <mat-form-field>
+      <mat-label>路由名称</mat-label>
+      <input matInput [(ngModel)]="name">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>路由路径</mat-label>
+      <input matInput [(ngModel)]="path">
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="addDynamicRoute('router')">增加</button>
+  </p>
+</div>
+
+<div>
+  <ul>
+    <li *ngFor="let route of routes" style="margin-bottom: 8px">
+      <button mat-stroked-button routerLink="/router/{{route.path}}">{{route.name}}</button>
+    </li>
+  </ul>
+</div>
+

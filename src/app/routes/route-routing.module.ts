@@ -53,6 +53,7 @@ const routes: Routes = [
       {path: '', loadChildren: () => import('../rxjs/rxjs.module').then(m => m.RXjsModule)},
       {path: '', loadChildren: () => import('../layout-demo/layout-demo.module').then(m => m.LayoutDemoModule)},
       {path: '', loadChildren: () => import('../error/error.module').then(m => m.ErrorModule)},
+      {path: '', loadChildren: () => import('../router/router.module').then(m => m.RouterModule)},
     ],
   },
   /** 通配符要放在最后面*/

@@ -29,6 +29,7 @@ export class DataCreateViewComponent implements OnInit {
     {name: 'WillBeCreateComponent', options: '123', pos: '0,100', form: 'A指标'},
     {name: 'WillBeCreateComponent', options: '321', pos: '0,200', form: 'B指标'},
     {name: 'WillBeCreateComponent', options: '666', pos: '100,300', form: 'C指标'},
+    {name: 'ACComponent', options: '666', pos: '100,300', form: 'C指标'},
   ];
 
   constructor(
@@ -92,7 +93,6 @@ export class DataCreateViewComponent implements OnInit {
       cmpRef.instance.form = result.label;
       cmpRef.instance.transform = this.dnd.addElement(cmpRef.location.nativeElement);
       cmpRef.instance.cmpRef = cmpRef;
-
       /**
        * 激活dnd模式要添加删除按钮
        */

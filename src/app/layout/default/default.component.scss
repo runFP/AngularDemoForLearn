@@ -1,10 +1,16 @@
 :host{
   width: 100%;
+  height: 100%;
 }
 .out-warp{
   display: flex;
+  height: 100%;
   >section{
     padding: 24px;
     flex: 1;
   }
+}
+
+section{
+  overflow-y: auto;
 }

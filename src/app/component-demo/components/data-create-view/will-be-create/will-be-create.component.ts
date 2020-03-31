@@ -42,7 +42,7 @@ export class WillBeCreateComponent {
     return {
       name: this.name,
       form: this.form,
-      transform: getPosition(this.elementRef.nativeElement),
+      pos: getPosition(this.elementRef.nativeElement),
     };
   }
 
