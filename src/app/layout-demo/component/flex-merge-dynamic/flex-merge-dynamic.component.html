@@ -1,0 +1,10 @@
+<mat-form-field class="example-full-width">
+  <mat-label>行数</mat-label>
+  <input matInput [(ngModel)]="row">
+</mat-form-field>
+<mat-form-field class="example-full-width">
+  <mat-label>列数</mat-label>
+  <input matInput [(ngModel)]="column">
+</mat-form-field>
+<button mat-stroked-button (click)="create()" style="vertical-align: super; margin-left: 8px;">创建</button>
+<div flexMergeDynamic></div>

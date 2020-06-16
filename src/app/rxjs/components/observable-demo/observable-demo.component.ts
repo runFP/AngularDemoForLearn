@@ -124,6 +124,11 @@ export class ObservableDemoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /**
+   *
+   * switchMap = map+打平操作
+   * 映射操作后（假如产生的不是值而是observable，如果是值，直接调用map即刻）将所有的生成的observable投射到一个observable后，打平
+   */
   switchMap() {
     const switched = of(1, 2, 3).pipe(switchMap((x: number) => of(x, x ** 2, x ** 3)));
     switched.subscribe(x => console.log(x));

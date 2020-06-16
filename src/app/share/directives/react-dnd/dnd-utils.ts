@@ -54,7 +54,6 @@ export function createPlaceElement(ele: HTMLElement): HTMLElement {
     `height:${height}px`,
     `transform:translate3d(${transform.join(',')})`,
     'position:absolute',
-    'z-index:-1',
   ].join(';') + ';';
   const dom = document.createElement('div');
   dom.className = 'placeDom';

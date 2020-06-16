@@ -1,6 +1,6 @@
 import {AfterViewInit, Directive, ElementRef, Inject, Input, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {NgDragAndDropService, Point} from './ng-drag-and-drop.service';
-import {DNDContainerService} from './dndcontainer.service';
+import {DNDContainerService, ElementInf} from './dndcontainer.service';
 import {Observable, Subject} from 'rxjs';
 import {getPosition, getTransformByPosition} from './dnd-utils';
 import {DOCUMENT} from '@angular/common';
@@ -86,11 +86,25 @@ export class ReactDndDirective implements OnInit, OnDestroy, AfterViewInit {
   }
 
   addElement(element: HTMLElement): string {
-    return this.dndcontainer.addElement(element);
+    const transform = this.dndcontainer.addElement(element);
+    this.resetContainerHeight();
+    return transform;
   }
 
   removeElement(element: HTMLElement): void {
     this.dndcontainer.removeElement(element);
+    this.resetContainerHeight();
+  }
+
+  /**
+   * 重设容器高度
+   * @param {ElementInf} dragElementInf
+   */
+  resetContainerHeight(dragElementInf?: ElementInf): void {
+    this.dndcontainer.calculateContainerHeight(dragElementInf);
+    if (this.dndcontainer.getContainerHeightUpdate()) {
+      this.renderer.setStyle(this.boundary, 'height', `${this.dndcontainer.getContainerHeight()}px`);
+    }
   }
 
   private _pointerDown(event: MouseEvent): void {
@@ -162,10 +176,7 @@ export class ReactDndDirective implements OnInit, OnDestroy, AfterViewInit {
     this.dndcontainer.refreshElementsPositionAfter(dragElementInf);
 
     /** 重新计算容器高度 */
-    this.dndcontainer.calculateContainerHeight(dragElementInf);
-    if (this.dndcontainer.getContainerHeightUpdate()) {
-      this.renderer.setStyle(this.boundary, 'height', `${this.dndcontainer.getContainerHeight()}px`);
-    }
+    this.resetContainerHeight(dragElementInf);
   }
 
   private _pointUp(event: MouseEvent): void {

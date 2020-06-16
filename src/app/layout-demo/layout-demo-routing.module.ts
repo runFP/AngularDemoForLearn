@@ -8,6 +8,7 @@ import {OverlayDemoComponent} from './component/overlay-demo/overlay-demo.compon
 import {DragAngDropDemoComponent} from './component/drag-ang-drop-demo/drag-ang-drop-demo.component';
 import {PortalDemoComponent} from './component/portal-demo/portal-demo.component';
 import {NgDragAndDropComponent} from './component/ng-drag-and-drop/ng-drag-and-drop.component';
+import {FlexMergeDynamicComponent} from './component/flex-merge-dynamic/flex-merge-dynamic.component';
 
 export const childRoutes: Routes = [
   {path: 'lfrd', component: LeftFixRightDynamicComponent},
@@ -15,7 +16,8 @@ export const childRoutes: Routes = [
   {path: 'overlay', component: OverlayDemoComponent},
   {path: 'dragdrop', component: DragAngDropDemoComponent},
   {path: 'portal', component: PortalDemoComponent},
-  {path: 'dragAndDrop', component: NgDragAndDropComponent}
+  {path: 'dragAndDrop', component: NgDragAndDropComponent},
+  {path: 'flexMergeDynamic', component: FlexMergeDynamicComponent}
 ];
 
 export const routes: Routes = [
@@ -34,6 +36,7 @@ export const names = [
       {name: '拖放(modal,div...)'},
       {name: 'portal'},
       {name: '自定义拖动层'},
+      {name: '动态合并flex布局'},
     ]
   }
 ];

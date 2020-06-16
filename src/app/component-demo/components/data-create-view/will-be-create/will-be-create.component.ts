@@ -53,8 +53,17 @@ export class WillBeCreateComponent {
    */
   addDelBtn(viewContainerRef: ViewContainerRef, dnd: ReactDndDirective): void {
     this.delBtn = this.renderer.createElement('a');
-    const aText = this.renderer.createText('删除');
-
+    const cssText = [
+      'position: absolute',
+      'top: 0',
+      'right: 16px',
+      'background-color:#1890ff',
+      'color:#fff',
+      'padding: 0 4px',
+      'line-height: 18px',
+    ].join(';') + ';';
+    this.delBtn.style.cssText = cssText;
+    const aText = this.renderer.createText('X');
     /**
      * 删除按钮逻辑
      */

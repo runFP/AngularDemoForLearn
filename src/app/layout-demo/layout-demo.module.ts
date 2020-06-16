@@ -36,6 +36,9 @@ import { PickerColorComponent } from './component/overlay-demo/picker-color/pick
 import { NgDragAndDropComponent } from './component/ng-drag-and-drop/ng-drag-and-drop.component';
 import {ShareModule} from '../share/share.module';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { FlexMergeDynamicComponent } from './component/flex-merge-dynamic/flex-merge-dynamic.component';
+import { FlexMergeDynamicDirective } from './component/flex-merge-dynamic/flex-merge-dynamic.directive';
+import { CellComponent } from './component/flex-merge-dynamic/cell/cell.component';
 
 
 @NgModule({
@@ -53,6 +56,9 @@ import {MatGridListModule} from '@angular/material/grid-list';
     UnvarnishedTransmissionComponent,
     PickerColorComponent,
     NgDragAndDropComponent,
+    FlexMergeDynamicComponent,
+    FlexMergeDynamicDirective,
+    CellComponent,
   ],
   imports: [
     CommonModule,

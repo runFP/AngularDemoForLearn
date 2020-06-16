@@ -29,7 +29,7 @@ export class DataCreateViewComponent implements OnInit {
     {name: 'WillBeCreateComponent', options: '123', pos: '0,100', form: 'A指标'},
     {name: 'WillBeCreateComponent', options: '321', pos: '0,200', form: 'B指标'},
     {name: 'WillBeCreateComponent', options: '666', pos: '100,300', form: 'C指标'},
-    {name: 'ACComponent', options: '666', pos: '100,300', form: 'C指标'},
+    {name: 'AComponentComponent', options: '666', pos: '100,300', form: 'C指标'},
   ];
 
   constructor(
@@ -55,10 +55,12 @@ export class DataCreateViewComponent implements OnInit {
     this.insert.clear();
 
     of(this.remoteData).subscribe(data => {
+      this.dnd.activeDnd();
       data.forEach(d => {
         const cmp = this.nmc.getComponent(d.name);
         const cmpFactory = this.resolve.resolveComponentFactory(cmp);
         const cmpRef = this.insert.createComponent(cmpFactory);
+        this.dnd.addElement(cmpRef.location.nativeElement);
 
         cmpRef.instance.options = d.options;
         cmpRef.instance.name = d.name;
@@ -67,6 +69,8 @@ export class DataCreateViewComponent implements OnInit {
         cmpRef.instance.transform = `translate3d(${pos[0]}px,${pos[1]}px,0)`;
         cmpRef.instance.cmpRef = cmpRef;
       });
+      this.dnd.resetContainerHeight();
+      this.dnd.destroyDnd();
     });
   }
 

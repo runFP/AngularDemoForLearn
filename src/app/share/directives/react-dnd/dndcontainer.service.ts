@@ -1,8 +1,7 @@
-import {Injectable, Input} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {createPlaceElement, getMinFromObject, getPosition, getTransformByPosition} from './dnd-utils';
 import {Point} from './ng-drag-and-drop.service';
 import {Padding} from './react-dnd.directive';
-import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +27,11 @@ export class DNDContainerService {
     this.fontSize = fontSize;
     this.gutter = containerInf.gutter;
     if (fontSize !== 0) {
-      children = this.elementTransformRem2px(children);
+      const reg = /px|rem/;
+      const result = children[0] && (children[0] as any).style.transform.match(reg);
+      if (result && result[0] === 'rem') {
+        children = this.elementTransformRem2px(children);
+      }
     }
     this.containerInf = containerInf;
     this.collectElementPosition(children);
