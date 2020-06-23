@@ -7,4 +7,7 @@
   <input matInput [(ngModel)]="column">
 </mat-form-field>
 <button mat-stroked-button (click)="create()" style="vertical-align: super; margin-left: 8px;">创建</button>
-<div flexMergeDynamic></div>
+<button mat-stroked-button (click)="showTreeNode()" style="vertical-align: super; margin-left: 8px;">show</button>
+<div flexMergeDynamic style="height: 500px; position: relative;">
+  <ng-container #container></ng-container>
+</div>

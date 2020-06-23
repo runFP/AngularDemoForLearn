@@ -39,6 +39,9 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import { FlexMergeDynamicComponent } from './component/flex-merge-dynamic/flex-merge-dynamic.component';
 import { FlexMergeDynamicDirective } from './component/flex-merge-dynamic/flex-merge-dynamic.directive';
 import { CellComponent } from './component/flex-merge-dynamic/cell/cell.component';
+import { ContainerCellComponent } from './component/flex-merge-dynamic/container-cell/container-cell.component';
+import { RootCellComponent } from './component/flex-merge-dynamic/root-cell/root-cell.component';
+import {SelectedRangeComponent} from './component/flex-merge-dynamic/selected-range/selected-range.component';
 
 
 @NgModule({
@@ -59,6 +62,9 @@ import { CellComponent } from './component/flex-merge-dynamic/cell/cell.componen
     FlexMergeDynamicComponent,
     FlexMergeDynamicDirective,
     CellComponent,
+    ContainerCellComponent,
+    RootCellComponent,
+    SelectedRangeComponent,
   ],
   imports: [
     CommonModule,
@@ -78,7 +84,11 @@ import { CellComponent } from './component/flex-merge-dynamic/cell/cell.componen
   ],
   entryComponents: [
     ExamplePortalComponent,
-    ModalComponent
+    ModalComponent,
+    RootCellComponent,
+    ContainerCellComponent,
+    SelectedRangeComponent,
+    CellComponent,
   ],
 })
 export class LayoutDemoModule {
