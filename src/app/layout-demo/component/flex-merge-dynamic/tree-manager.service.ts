@@ -152,6 +152,23 @@ export class TreeNode {
   }
 
   /**
+   * 节点被选中时所处的位置
+   * 横向:左/右
+   * 纵向:上/下
+   */
+  selectPosition(point) {
+    const {x, y, width, height} = this.nodeRef.instance.getDomRect();
+    if (
+      (point.p1.x >= x && point.p1.x <= x + width) &&
+      (point.p1.y >= y && point.p1.y <= y + height) || (point.p1.y <= y && point.p4.y >= y + height) || (point.p4.y >= y && point.p4.y <= y + height)
+    ) {
+        console.log(this);
+        console.log('left');
+    }
+
+  }
+
+  /**
    * 清空子元素
    */
   removeChildren(): void {

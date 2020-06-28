@@ -114,6 +114,7 @@ export class FlexMergeDynamicDirective {
 
     this.FMDService.removeSelectStatus(this.selectNodes);
     this.selectNodes = this.FMDService.getSelectTreeNode(selectRangBoundaryPoint);
+    this.FMDService.getSelectTreeNodePosition(selectRangBoundaryPoint);
     this.FMDService.setSelectStatus(this.selectNodes, '#eaeaea');
 
     this.oldPosition = newPosition;

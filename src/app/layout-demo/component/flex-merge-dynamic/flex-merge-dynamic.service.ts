@@ -71,7 +71,7 @@ export class FlexMergeDynamicService {
       multiLine = true;
     }
 
-    this.createObjForNodes(otherNode, multiLine);
+    this.createObjForNodes(otherNode, groupNode, multiLine);
     console.log('groupNode:', groupNode);
     console.log('otherNode:', otherNode);
   }
@@ -96,10 +96,11 @@ export class FlexMergeDynamicService {
    * @param {Map<TreeNode, TreeNode[]>} nodes
    * @param {boolean} multiLine 是否跨行
    */
-  createObjForNodes(nodes: Map<TreeNode, TreeNode[]>, multiLine: boolean) {
+  createObjForNodes(otherNode: Map<TreeNode, TreeNode[]>, groupNode: Map<TreeNode, TreeNode[]>, multiLine: boolean) {
     const children = [];
+    let tmpNode = [];
     // 收集剩余节点，将其作为剩余节点的容器的子节点
-    nodes.forEach((otherNodes: TreeNode[], pNode: TreeNode) => {
+    otherNode.forEach((otherNodes: TreeNode[], pNode: TreeNode) => {
       if (otherNodes.length > 1) {
         const otherParentNodeObj = {num: 1, children: []};
         otherNodes.forEach(node => {
@@ -129,11 +130,22 @@ export class FlexMergeDynamicService {
       }
     });
 
+    // 合并节点和共同节点需要排序
+
     // 根创建节点对象
     const rootObj = {num: 1, name: 'rootObj', children: []};
 
+    // 收集变更节点距离根节点最近的父节点的排序
+    const sortCommonNode = [];
+    groupNode.forEach((childrenNode, pNode) => {
+      sortCommonNode.push(pNode.getParentNodeByLevel().id);
+    });
+
+    // 找出变更节点距离根节点最近的父节点的序号，用来在生成新节点时确定插入的位置
+    const sortCommon = Math.min.apply(null, sortCommonNode.sort());
+
     // 剩余节点的容器节点与合并节点共同的容器节点
-    const commonContainerObj = {num: 1, name: 'commonContainerObj', children: []};
+    const commonContainerObj = {num: 1, name: 'commonContainerObj', children: [], order: sortCommon};
 
     // 处理剩余节点，剩余节点的容器节点对象,大于0说明还有剩余，需要加载,仅当跨行时，才需要一个额外节点来包含这些剩余节点
     if (children.length > 0 && multiLine) {
@@ -147,19 +159,23 @@ export class FlexMergeDynamicService {
     // 处理合并节点
     const mergeNodeObj = {num: 1, name: 'mergeNodeObj'};
     commonContainerObj.children.push(mergeNodeObj);
-    rootObj.children.push(commonContainerObj);
+    tmpNode.push(commonContainerObj);
 
     // 处理未改动的节点
-    const immutableNode = this.getImmutableNode(nodes);
+    const immutableNode = this.getImmutableNode(otherNode);
 
     if (immutableNode.length > 0) {
       const immutableNodeObj = this.recurseCreateObj(immutableNode, 'immutableNodeObj');
-      rootObj.children = rootObj.children.concat(immutableNodeObj);
+      tmpNode = tmpNode.concat(immutableNodeObj);
       console.log('immutableNodeObj:', immutableNodeObj);
     }
 
+    tmpNode.sort((aNode, bNode) => aNode.order - bNode.order);
+    rootObj.children = rootObj.children.concat(tmpNode);
+
     console.log('commonContainerObj:', commonContainerObj);
     console.log('rootObj:', rootObj);
+    console.log('tmpNode:', tmpNode);
   }
 
   /**
@@ -226,6 +242,12 @@ export class FlexMergeDynamicService {
     return selectNodes;
   }
 
+  getSelectTreeNodePosition(point) {
+    this.tree.traverseLRN((node: TreeNode) => {
+      node.selectPosition(point);
+    });
+  }
+
   /**
    * 设置节点对应实例状态
    */
@@ -270,5 +292,13 @@ export class FlexMergeDynamicService {
       otherNode.set(pNode, pNode.getOtherNodes(groupNodes));
     });
     return otherNode;
+  }
+
+  /**
+   * 获取横向纵向节点
+   */
+  getHorizonVerticalNode() {
+    const horizon = {left: [], right: []};
+    const vertical = {top: [], bottom: []};
   }
 }
