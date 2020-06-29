@@ -156,16 +156,40 @@ export class TreeNode {
    * 横向:左/右
    * 纵向:上/下
    */
-  selectPosition(point) {
+  selectPosition(point): string | boolean {
     const {x, y, width, height} = this.nodeRef.instance.getDomRect();
+    let left = 0;
+    let top = 0;
+    if (this.id === 'root') return;
+
+    // 左
     if (
       (point.p1.x >= x && point.p1.x <= x + width) &&
-      (point.p1.y >= y && point.p1.y <= y + height) || (point.p1.y <= y && point.p4.y >= y + height) || (point.p4.y >= y && point.p4.y <= y + height)
+      (
+        (point.p1.y >= y && point.p1.y <= y + height) || (point.p1.y <= y && point.p4.y >= y + height) || (point.p4.y >= y && point.p4.y <= y + height)
+      )
     ) {
-        console.log(this);
-        console.log('left');
+      left = 1;
     }
 
+    // 上
+    if (
+      (point.p1.y >= y && point.p1.y <= y + height) &&
+      (
+        (point.p1.x >= x && point.p1.x <= x + width) || (point.p2.x >= x && point.p2.x <= x + width) || (point.p1.x <= x && point.p2.x >= x + width)
+      )
+    ) {
+      top = 1;
+    }
+    if (left && top) {
+      return 'lt';
+    } else if (left) {
+      return 'l';
+    } else if (top) {
+      return 't';
+    } else {
+      return false;
+    }
   }
 
   /**

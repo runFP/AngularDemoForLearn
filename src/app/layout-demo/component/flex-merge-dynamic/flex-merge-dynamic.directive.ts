@@ -25,6 +25,8 @@ export class FlexMergeDynamicDirective {
   /** 开始鼠标拖动合并事件 */
   private _isDrag = false;
 
+  private selectRangBoundaryPoint: { p1: { x: number, y: number }, p2: { x: number, y: number }, p3: { x: number, y: number }, p4: { x: number, y: number } };
+
 
   private _downHandler = this._mouseDown.bind(this);
   private _moveHandler = this._mouseMove.bind(this);
@@ -111,10 +113,10 @@ export class FlexMergeDynamicDirective {
       x: this.downPosition.x,
       y: this.downPosition.y
     }, newPosition, delta);
+    this.selectRangBoundaryPoint = selectRangBoundaryPoint;
 
     this.FMDService.removeSelectStatus(this.selectNodes);
     this.selectNodes = this.FMDService.getSelectTreeNode(selectRangBoundaryPoint);
-    this.FMDService.getSelectTreeNodePosition(selectRangBoundaryPoint);
     this.FMDService.setSelectStatus(this.selectNodes, '#eaeaea');
 
     this.oldPosition = newPosition;
@@ -140,6 +142,8 @@ export class FlexMergeDynamicDirective {
     /**
      * 合并操作
      */
+    const nodePosition = this.FMDService.getSelectTreeNodePosition(this.selectRangBoundaryPoint);
+    console.log(nodePosition);
     this.FMDService.merger(this.selectNodes);
   }
 

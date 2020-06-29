@@ -61,10 +61,16 @@ export class FlexMergeDynamicService {
    */
   merger(nodes: TreeNode[]): void {
     let multiLine = false;
+
     // 按照相同的父容器分组node
     const groupNode = this.groupSelectNodeByParent(nodes);
+
+    // 判断合并节点的位置是处于父节点的2边还是中间位置，2边可以把合并节点以外的所有剩余节点纳入1个父节点，中间需要把隔开的2边剩余节点独立分别纳入独立的父节点
+    const groupNodePositionInParent = this.processGroupNodePositionInParent(groupNode);
+
+
     // 除去每个父容器中被选择中的剩余的node
-    const otherNode = this.otherNodeByParent(groupNode);
+    const otherNode = this.otherNodeByParent(groupNodePositionInParent);
 
     // 可通过父节点数量来判断是否跨行
     if (groupNode.size > 1) {
@@ -74,8 +80,37 @@ export class FlexMergeDynamicService {
     this.createObjForNodes(otherNode, groupNode, multiLine);
     console.log('groupNode:', groupNode);
     console.log('otherNode:', otherNode);
+    console.log('groupNodePositionInParent:', groupNodePositionInParent);
   }
 
+  private processGroupNodePositionInParent(groupNode: Map<TreeNode, TreeNode[]>): Map<TreeNode, GroupNodePositionInParent> {
+    const processData: Map<TreeNode, GroupNodePositionInParent> = new Map<TreeNode, GroupNodePositionInParent>();
+
+    groupNode.forEach((childNode: TreeNode[], pNode: TreeNode) => {
+      let isAll = false;
+      let isBorder = false;
+      let isMiddle = false;
+      let min = 0;
+      let max = 0;
+      if (pNode.children.length === childNode.length) {
+        isAll = true;
+      } else {
+        const sortId = childNode.map(node => Number(String(node.id).split('-').splice(-1)[0]));
+        min = Math.min.apply(null, sortId);
+        max = Math.max.apply(null, sortId);
+        if (min === 0 || max === pNode.children.length - 1) {
+          isBorder = true;
+        } else {
+          isMiddle = true;
+        }
+
+      }
+      const data = {children: childNode, isAll, isBorder, isMiddle, min, max};
+      processData.set(pNode, data);
+    });
+
+    return processData;
+  }
 
   /**
    * 生成创建节点对象，有5种创建节点对象，
@@ -96,7 +131,7 @@ export class FlexMergeDynamicService {
    * @param {Map<TreeNode, TreeNode[]>} nodes
    * @param {boolean} multiLine 是否跨行
    */
-  createObjForNodes(otherNode: Map<TreeNode, TreeNode[]>, groupNode: Map<TreeNode, TreeNode[]>, multiLine: boolean) {
+  private createObjForNodes(otherNode: Map<TreeNode, TreeNode[]>, groupNode: Map<TreeNode, TreeNode[]>, multiLine: boolean) {
     const children = [];
     let tmpNode = [];
     // 收集剩余节点，将其作为剩余节点的容器的子节点
@@ -183,7 +218,7 @@ export class FlexMergeDynamicService {
    * @param {TreeNode[]} nodes
    * @return {any[]}
    */
-  recurseCreateObj(nodes: TreeNode[], name: string) {
+  private recurseCreateObj(nodes: TreeNode[], name: string) {
     const createNodeObj = [];
     nodes.forEach(node => {
       const obj = {num: 1, name, children: [], order: node.id};
@@ -207,7 +242,7 @@ export class FlexMergeDynamicService {
    * @param {Map<TreeNode, TreeNode[]>} groupNodes
    * @return {TreeNode[]}
    */
-  getImmutableNode(groupNodes: Map<TreeNode, TreeNode[]>): TreeNode[] {
+  private getImmutableNode(groupNodes: Map<TreeNode, TreeNode[]>): TreeNode[] {
     const immutableNodes: TreeNode[] = this.tree.children.filter(node => {
       let isMatch = true;
 
@@ -242,10 +277,21 @@ export class FlexMergeDynamicService {
     return selectNodes;
   }
 
-  getSelectTreeNodePosition(point) {
+  getSelectTreeNodePosition(point): { left: any[], top: any[] } {
+    const position = {left: [], top: []};
     this.tree.traverseLRN((node: TreeNode) => {
-      node.selectPosition(point);
+      const type = node.selectPosition(point);
+      if (type === 'lt') {
+        position.left.push(node);
+        position.top.push(node);
+      } else if (type === 'l') {
+        position.left.push(node);
+      } else if (type === 't') {
+        position.top.push(node);
+      }
     });
+
+    return position;
   }
 
   /**
@@ -286,12 +332,24 @@ export class FlexMergeDynamicService {
   /**
    * 筛选出指定nodes，父元素中余下的nodes
    */
-  otherNodeByParent(nodes: Map<TreeNode, TreeNode[]>): Map<TreeNode, TreeNode[]> {
-    const otherNode = new Map<TreeNode, TreeNode[]>();
-    nodes.forEach((groupNodes: TreeNode[], pNode: TreeNode) => {
-      otherNode.set(pNode, pNode.getOtherNodes(groupNodes));
+  otherNodeByParent(nodes: Map<TreeNode, GroupNodePositionInParent>) {
+    nodes.forEach((gn: GroupNodePositionInParent, pNode: TreeNode) => {
+      if (gn.isAll) {
+
+      } else if (gn.isBorder) {
+        const otherNode = new Map<TreeNode, TreeNode[]>();
+        otherNode.set(pNode, pNode.getOtherNodes(gn.children));
+      } else if (gn.isMiddle) {
+      }
+
     });
-    return otherNode;
+
+
+    /* const otherNode = new Map<TreeNode, TreeNode[]>();
+     nodes.forEach((groupNodes: TreeNode[], pNode: TreeNode) => {
+       otherNode.set(pNode, pNode.getOtherNodes(groupNodes));
+     });
+     return otherNode;*/
   }
 
   /**
@@ -302,3 +360,14 @@ export class FlexMergeDynamicService {
     const vertical = {top: [], bottom: []};
   }
 }
+
+// 合并节点的详细信息
+export interface GroupNodePositionInParent {
+  children: TreeNode[];
+  isAll: boolean; // 合并节点的父节点的子节点是否全部被纳入合并
+  isBorder: boolean; // 合并节点处于2边位置
+  isMiddle: boolean; // 合并节点处于中间位置
+  min: number; // 合并节点的最小id，仅当isMiddle为true时有用，用来判断前面兄弟节点的结束位置
+  max: number; // 合并节点的最大id，仅当isMiddle为true时有用，用来判断后面兄弟节点的起始位置
+}
+
