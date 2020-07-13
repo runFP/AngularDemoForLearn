@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, ElementRef, HostBinding, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 
 @Component({
   selector: 'app-root-cell',
@@ -7,6 +7,10 @@ import {Component, ElementRef, OnInit, ViewChild, ViewContainerRef} from '@angul
 })
 export class RootCellComponent implements OnInit {
   @ViewChild('embeddedContainer', {static: true, read: ViewContainerRef}) embeddedVcr: ViewContainerRef;
+
+  @Input()
+  @HostBinding('style.flex-direction')
+  flexDirection: string;
 
   isCell = false;
 

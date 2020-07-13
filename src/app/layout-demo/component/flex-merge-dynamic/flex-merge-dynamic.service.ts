@@ -19,6 +19,7 @@ export class FlexMergeDynamicService {
     rootVcr.clear();
 
     this.tree = this.treeManager.createTree(row, col);
+    console.log('tree:', this.tree);
 
     this.tree.traverseNLR((node: TreeNode) => {
       let nodeRef;
@@ -37,8 +38,6 @@ export class FlexMergeDynamicService {
       node.nodeRef = nodeRef;
     });
 
-
-    console.log('tree:', this.tree);
 
     return this.tree;
   }
@@ -60,22 +59,27 @@ export class FlexMergeDynamicService {
    * @param {TreeNode[]} nodes
    */
   merger(nodes: TreeNode[]): void {
+    // 是否跨节点
     let multiLine = false;
 
     // 按照相同的父容器分组node
     const groupNode = this.groupSelectNodeByParent(nodes);
 
-    // 判断合并节点的位置是处于父节点的2边还是中间位置，2边可以把合并节点以外的所有剩余节点纳入1个父节点，中间需要把隔开的2边剩余节点独立分别纳入独立的父节点
-    const groupNodePositionInParent = this.processGroupNodePositionInParent(groupNode);
 
+    groupNode.forEach((children, pNode) => {
+      // pNode
+    });
 
     // 除去每个父容器中被选择中的剩余的node
-    const otherNode = this.otherNodeByParent(groupNodePositionInParent);
+    const otherNode = this.otherNodeByParent(groupNode);
 
-    // 可通过父节点数量来判断是否跨行
+    // 可通过父节点数量来判断是否跨节点
     if (groupNode.size > 1) {
       multiLine = true;
     }
+
+    // 判断合并节点的位置,是处于父节点的2边还是中间位置，2边可以把合并节点以外的所有剩余节点纳入1个父节点，中间需要把隔开的2边剩余节点独立分别纳入独立的父节点
+    const groupNodePositionInParent = this.processGroupNodePositionInParent(groupNode);
 
     this.createObjForNodes(otherNode, groupNode, multiLine);
     console.log('groupNode:', groupNode);
@@ -332,24 +336,24 @@ export class FlexMergeDynamicService {
   /**
    * 筛选出指定nodes，父元素中余下的nodes
    */
-  otherNodeByParent(nodes: Map<TreeNode, GroupNodePositionInParent>) {
-    nodes.forEach((gn: GroupNodePositionInParent, pNode: TreeNode) => {
-      if (gn.isAll) {
+  otherNodeByParent(nodes: Map<TreeNode, TreeNode[]>): Map<TreeNode, TreeNode[]> {
+    // nodes.forEach((gn: GroupNodePositionInParent, pNode: TreeNode) => {
+    //   if (gn.isAll) {
+    //
+    //   } else if (gn.isBorder) {
+    //     const otherNode = new Map<TreeNode, TreeNode[]>();
+    //     otherNode.set(pNode, pNode.getOtherNodes(gn.children));
+    //   } else if (gn.isMiddle) {
+    //   }
+    //
+    // });
 
-      } else if (gn.isBorder) {
-        const otherNode = new Map<TreeNode, TreeNode[]>();
-        otherNode.set(pNode, pNode.getOtherNodes(gn.children));
-      } else if (gn.isMiddle) {
-      }
-
+    // 递归遍历父节点，收集剩余元素
+    const otherNode = new Map<TreeNode, TreeNode[]>();
+    nodes.forEach((groupNodes: TreeNode[], pNode: TreeNode) => {
+      otherNode.set(pNode, pNode.getOtherNodes(groupNodes));
     });
-
-
-    /* const otherNode = new Map<TreeNode, TreeNode[]>();
-     nodes.forEach((groupNodes: TreeNode[], pNode: TreeNode) => {
-       otherNode.set(pNode, pNode.getOtherNodes(groupNodes));
-     });
-     return otherNode;*/
+    return otherNode;
   }
 
   /**

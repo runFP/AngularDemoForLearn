@@ -8,6 +8,7 @@ export class TreeManagerService {
 
   createTree(row: number, column: number): TreeNode {
     const tree = new TreeNode('root', null);
+    tree.flexDirection = 'column';
 
     for (let r = 0; r < row; r++) {
       const rNode = new TreeNode(r, tree);
@@ -40,7 +41,24 @@ export class TreeManagerService {
         sort.set(pNode, [c]);
       }
     });
+
+    const level = this.getAllNodeLevelFromRoot(sort);
+
     return sort;
+  }
+
+  getAllNodeLevelFromRoot(node: Map<TreeNode, TreeNode[]>) {
+    const level = [];
+    node.forEach((childrenNode: TreeNode[], pNode: TreeNode) => {
+      level.push(pNode.levelFromRoot());
+    });
+    return level;
+  }
+
+  rescurseNodeByParent(node: Map<TreeNode, TreeNode[]>) {
+    node.forEach((childrenNode: TreeNode[], pNode: TreeNode) => {
+      console.log(pNode.levelFromRoot());
+    });
   }
 
 }
@@ -103,6 +121,7 @@ export class TreeNode {
     let node: TreeNode = this;
     let level = 0;
 
+
     while (node.id !== 'root') {
       level++;
       node = node.pNode;
@@ -110,6 +129,34 @@ export class TreeNode {
 
     return level;
   }
+
+  /**
+   * 获取每一个父节点
+   * @return {TreeNode[]}
+   */
+  getEveryParent(): TreeNode[] {
+    let node: TreeNode = this;
+    const parentNodes: TreeNode[] = [];
+
+    while (node.id !== 'root') {
+      node = node.pNode;
+      parentNodes.push(node);
+    }
+
+    return parentNodes;
+  }
+
+  getCommonParentNode(nodes: TreeNode[]): TreeNode {
+    let node: TreeNode = this;
+    while (node.id !== 'root') {
+      if (nodes.some(n => n === node)) {
+        return node;
+      }
+      node = node.pNode;
+    }
+    return node;
+  }
+
 
   /**
    *  指定参数获取距离该节点的对应父节点，1对应直接父节点，2对应父节点的父节点，...一次类推，但级数大于root时，直接返回距离最接近root的父级节点
@@ -201,14 +248,56 @@ export class TreeNode {
 
   /**
    * 获取除了选中的cell后剩余的cell
+   * 必须其以及其子节点均没被选中才算是剩余节点
    * @param {TreeNode[]} selectCell
    * @return {TreeNode[]}
    */
   getOtherNodes(selectCell: TreeNode[]): TreeNode[] {
-    return this.children.filter(c => {
-      return !selectCell.some(se => c === se);
+    // return this.children.filter(c => {
+    //   return !selectCell.some(se => c === se);
+    // });
+    const otherNodes = [];
+    this.children.forEach(c => {
+      this.recurseChildren(c, node => {
+        if (!selectCell.some(se => node === se)) {
+          otherNodes.push(c);
+        }
+      });
     });
+
+    return otherNodes;
   }
 
+  /**
+   * 递归到最小节点(即没有子节点)
+   * @param node
+   * @param callback
+   */
+  recurseChildren(node, callback) {
+    if (node.children && node.children.length > 0) {
+      this.recurseChildren(node, callback);
+    } else {
+      callback(node);
+    }
+  }
+
+  /**
+   * 寻找与指定节点最近的共同父元素
+   * @param {TreeNode} node
+   */
+  findMinComomParentNode(node: TreeNode): TreeNode {
+    const levelOfNode = this.levelFromRoot();
+    const levelOfFindNode = node.levelFromRoot();
+    let findNodeEveryParent = [];
+    let nodeEveryParent = [];
+
+    if (levelOfNode > levelOfFindNode) {
+      findNodeEveryParent = node.getEveryParent();
+      return this.getCommonParentNode(findNodeEveryParent);
+    } else {
+      nodeEveryParent = this.getEveryParent();
+      return node.getCommonParentNode(nodeEveryParent);
+    }
+  }
 }
 
