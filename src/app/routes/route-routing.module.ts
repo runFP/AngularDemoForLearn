@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 import {DefaultComponent} from '../layout/default/default.component';
-import {RXjsModule} from '../rxjs/rxjs.module';
 
 /**
  * 路由加载的几种方法
@@ -54,6 +53,7 @@ const routes: Routes = [
       {path: '', loadChildren: () => import('../layout-demo/layout-demo.module').then(m => m.LayoutDemoModule)},
       {path: '', loadChildren: () => import('../error/error.module').then(m => m.ErrorModule)},
       {path: '', loadChildren: () => import('../router/router.module').then(m => m.RouterModule)},
+      {path: '', loadChildren: () => import('../three/three.module').then(m => m.ThreeModule)},
     ],
   },
   /** 通配符要放在最后面*/

@@ -15,6 +15,7 @@ import {routes as layoutRoutes, childRoutes as layoutCRoutes, names as layoutNam
 import {routes as errorRoutes, childRoutes as errorCRoutes, names as errorNames} from '../../../error/error-routing.module';
 import {routes as rxjsRoutes, childRoutes as rxjsCRoutes, names as rxjsNames} from '../../../rxjs/rxjs-routing.module';
 import {routes as routerRoutes, childRoutes as routerCRoutes, names as routerNames} from '../../../router/router-routing.module';
+import {routes as threeRoutes, childRoutes as threeCRoutes, names as threeNames} from '../../../three/three-routing.module';
 
 let menus = [
   {path: agRoutes, children: agCRoutes, names: agNames},
@@ -24,6 +25,7 @@ let menus = [
   {path: rxjsRoutes, children: rxjsCRoutes, names: rxjsNames},
   {path: errorRoutes, children: errorCRoutes, names: errorNames},
   {path: routerRoutes, children: routerCRoutes, names: routerNames},
+  {path: threeRoutes, children: threeCRoutes, names: threeNames},
 ];
 
 menus = processMenu(menus);
