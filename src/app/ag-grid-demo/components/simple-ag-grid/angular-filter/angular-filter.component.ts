@@ -14,7 +14,8 @@ export class AngularFilterComponent implements AgFilterComponent, AfterViewInit 
 
   @ViewChild('filterInput', {read: ViewContainerRef, static: false}) filterInput;
 
-
+  // 重新载入数据时，需要刷新状态
+  refresh = false;
   text = '';
   filterItems: FilterItem[] = [];
 
@@ -29,7 +30,6 @@ export class AngularFilterComponent implements AgFilterComponent, AfterViewInit 
   get filterWords() {
     return this._filterWords;
   }
-
 
   constructor() {
   }
@@ -57,9 +57,15 @@ export class AngularFilterComponent implements AgFilterComponent, AfterViewInit 
     return this.text !== null && this.text !== undefined;
   }
 
+  /**
+   * 执行过滤操作，filterChangedCallback执行会调用此方法
+   * @param params
+   */
   doesFilterPass(params: IDoesFilterPassParams): boolean {
-    const columnValue = this.valueGetter(params.node).toString().toLowerCase();
-    return !!this.filterWords.some(fw => columnValue.indexOf(fw) !== -1);
+    if (this.refresh) return true;
+    if (this.filterWords[0] === null) return false;
+    const columnValue = (this.valueGetter(params.node) + '').toLowerCase();
+    return this.filterWords.some(fw => columnValue.indexOf(fw) !== -1);
   }
 
   onChange(newValue) {
@@ -83,28 +89,47 @@ export class AngularFilterComponent implements AgFilterComponent, AfterViewInit 
 
     /** 获取存在Row的Id */
     this.params.api.forEachNodeAfterFilter(r => {
-      filterRowIndex.push(this.params.api.getValue(this.params.column, r).toString().toLowerCase());
+      filterRowIndex.push((this.params.api.getValue(this.params.column, r) + '').toLowerCase());
     });
     filterRowIndex = this.unduplicated(filterRowIndex);
 
+    let evalFn = null;
+    if (this.params.colDef.valueFormatter) {
+      const valueFormatter = this.params.colDef.valueFormatter;
+      if (typeof valueFormatter === 'string') {
+        evalFn = new Function(
+          'params',
+          'value',
+          `return ${(valueFormatter as string).replace(
+            'ctx',
+            'params.context',
+          )}`,
+        );
+      }
+    }
+
     /** 遍历所有行，初始checkbox信息 */
     this.params.api.forEachNode(r => {
-      const label = this.params.api.getValue(this.params.column, r);
-      if (unduplicatedTmp.indexOf(label) !== -1) {
+      const value = (this.params.api.getValue(this.params.column, r) + '');
+      let label = void 0;
+      if (unduplicatedTmp.indexOf(value) !== -1) {
         return;
       }
-      unduplicatedTmp.push(label);
-
+      unduplicatedTmp.push(value);
+      if (evalFn) {
+        label = evalFn(this.params, value);
+      }
       rows.push({
+        value,
         label,
-        checked: (filterRowIndex.indexOf(label.toString().toLowerCase()) !== -1),
+        checked: (filterRowIndex.indexOf(value.toLowerCase()) !== -1),
       });
     });
 
     /** 过滤出根据条件存在的行 */
     rows.forEach(r => {
-      if (this.filterWords.some(fw => r.label.toLowerCase().indexOf(fw) !== -1)) {
-        filterRowColumnValues.push({label: r.label, value: r.label, checked: r.checked});
+      if (this.filterWords.some(fw => r.value.toLowerCase().indexOf(fw) !== -1)) {
+        filterRowColumnValues.push({label: r.label || r.value, value: r.value, checked: r.checked});
       }
     });
 
@@ -137,26 +162,45 @@ export class AngularFilterComponent implements AgFilterComponent, AfterViewInit 
   }
 
   flatFn() {
-    return this.filterItems.filter(r => r.checked).map(r => r.label.toLowerCase());
+    return this.filterItems.filter(r => r.checked).map(r => r.value.toLowerCase());
   }
 
   afterGuiAttached(params?: IAfterGuiAttachedParams): void {
+    console.log('afterGuiAttached');
   }
 
   getFrameworkComponentInstance(): any {
+    console.log('getFrameworkComponentInstance');
   }
 
   getModel(): any {
+    console.log('getModel');
   }
 
   getModelAsString(model: any): string {
+    console.log('getModelAsString');
     return '';
   }
 
+  /**
+   * 刷新filterState
+   */
+  refreshState(): void {
+    this.refresh = true;
+    this.allChecked = true;
+    this.params.filterChangedCallback();
+    this.filterItems = this.getFilterItems();
+    this.refresh = false;
+  }
+
   onNewRowsLoaded(): void {
+    console.log('onNewRowsLoaded');
+    setTimeout(() => this.refreshState());
+
   }
 
   setModel(model: any): void {
+    console.log(model);
   }
 
 }

@@ -5,7 +5,7 @@ import {
   PerspectiveCamera,
   BoxGeometry,
   MeshBasicMaterial,
-  Mesh,
+  Mesh, Vector3, Geometry, LineBasicMaterial, Line,
 } from 'three';
 
 @Component({
@@ -44,7 +44,8 @@ export class ThreeFirstDemoComponent implements OnInit {
     this.renderer.setSize(this.htmlScene.nativeElement.offsetHeight, this.htmlScene.nativeElement.offsetWidth);
     this.renderer2.appendChild(this.htmlScene.nativeElement, this.renderer.domElement);
 
-    this.render();
+    // this.render();
+    this.render2();
   }
 
   render() {
@@ -52,6 +53,18 @@ export class ThreeFirstDemoComponent implements OnInit {
     this.cube.rotation.x += 0.01;
     this.cube.rotation.y += 0.01;
     this.renderer.render(this.scene, this.camera);
+  }
+
+  render2() {
+    const geometry = new Geometry();
+    const material = new LineBasicMaterial( { color: 0x0000ff } );
+    geometry.vertices.push(new Vector3(-10, 0, 0));
+    geometry.vertices.push(new Vector3(0, 10, 0));
+    geometry.vertices.push(new Vector3(10, 0, 0));
+    const line = new Line( geometry, material );
+    this.scene.add( line );
+    this.camera.position.set( 0, 0, 100 );
+    this.renderer.render( this.scene, this.camera );
   }
 
 }

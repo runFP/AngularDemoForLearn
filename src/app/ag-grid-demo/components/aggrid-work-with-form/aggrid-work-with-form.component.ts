@@ -1,19 +1,36 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Column, ColumnApi, GridApi, GridOptions, RowNode, ColDef} from 'ag-grid-community';
+import {ColDef, Column, ColumnApi, GridApi, GridOptions, RowNode} from 'ag-grid-community';
 import {AgFormCellComponent} from './ag-form-cell/ag-form-cell.component';
 
 
 @Component({
   selector: 'app-aggrid-work-with-form',
   templateUrl: './aggrid-work-with-form.component.html',
-  styleUrls: ['./aggrid-work-with-form.component.scss']
+  styleUrls: ['./aggrid-work-with-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AggridWorkWithFormComponent implements OnInit {
   gridApi: GridApi;
   gridColumnApi: ColumnApi;
   agFormGroup: FormGroup;
   validatedRule: { [key: string]: { rule: any, tips: any } } = {};
+  items: { [key: string]: any } = {xiaoming: {name: 'xiaoming', age: 18}, daming: {name: 'daming', age: 18}};
+  arr = [{name: 'a', age: 18}, {name: 'b', age: 17}];
+  i = 0;
+  brr = [1, 2, 3];
+
+  change() {
+    // const item = this.arr.slice(0, 1)[0];
+    // item.name = 'abc';
+    // const newItem = [item, ...this.arr.slice(1)];
+
+    this.arr[0].name = 'abc';
+    // this.arr = [...this.arr, {name: 'abc', age: 16}];
+    // this.arr = [...this.arr];
+    // this.arr.push({name: 'abc', age: 16});
+    // this.brr[1] = 5;
+  }
 
   frameworkComponents: { [p: string]: { new(): any } } = {
     textRender: AgFormCellComponent,
