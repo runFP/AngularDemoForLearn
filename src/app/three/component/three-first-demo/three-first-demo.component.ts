@@ -31,7 +31,9 @@ export class ThreeFirstDemoComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.refreshOctahedronGeometry();
+    this.scene = new THREE.Scene();
+    this.refreshOctahedronGeometry(this.scene);
+    this.helper();
     // this.scene = new Scene();
     // this.camera = new PerspectiveCamera(this.fov, window.innerWidth / window.innerHeight, 0.1, 1000);
     // this.renderer = new WebGLRenderer({antialias: true});
@@ -108,6 +110,15 @@ export class ThreeFirstDemoComponent implements OnInit {
 
   }
 
+  helper(): void {
+    const helper = new THREE.GridHelper(2000, 100);
+    const helpMaterial = new THREE.Material();
+    // helper.position.y = - 199;
+    helpMaterial.opacity = 0.25;
+    helpMaterial.transparent = true;
+    this.scene.add(helper);
+  }
+
   // render() {
   //   requestAnimationFrame(() => this.render());
   //   this.cube.rotation.x += 0.01;
@@ -139,17 +150,15 @@ export class ThreeFirstDemoComponent implements OnInit {
     this.renderer.render(this.scene, this.camera);
   }*/
 
-/*  refresh() {
-    // this.camera.fov = this.fov;
-    this.camera.position.set(this.x, this.y, this.z);
-    this.renderer.render(this.scene, this.camera);
-    this.camera.lookAt(new Vector3(0, 0, 0));
-  }*/
+  /*  refresh() {
+      // this.camera.fov = this.fov;
+      this.camera.position.set(this.x, this.y, this.z);
+      this.renderer.render(this.scene, this.camera);
+      this.camera.lookAt(new Vector3(0, 0, 0));
+    }*/
 
-  refreshOctahedronGeometry() {
-
+  refreshOctahedronGeometry(scene: THREE.Scene) {
 // Create a scene which will hold all our meshes to be rendered
-    const scene = new THREE.Scene();
 
 // Create and position a camera
     const camera = new THREE.PerspectiveCamera(
@@ -209,7 +218,8 @@ export class ThreeFirstDemoComponent implements OnInit {
       new THREE.MeshStandardMaterial({
         color: 0xff0051,
         metalness: 0,
-        roughness: 0.8
+        roughness: 0.8,
+        flatShading: true,
       })
     );
     shapeOne.position.y += 10;
@@ -223,7 +233,8 @@ export class ThreeFirstDemoComponent implements OnInit {
       new THREE.MeshStandardMaterial({
         color: 0x47689b,
         metalness: 0,
-        roughness: 0.8
+        roughness: 0.8,
+        flatShading: true,
       })
     );
     shapeTwo.position.y += 5;
