@@ -1,7 +1,9 @@
 import {Component, OnInit,} from '@angular/core';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
-import {Mesh} from 'three';
+import {FontLoader, Group, Mesh, MeshPhongMaterial, TextGeometry} from 'three';
+import {MaterialCreator, MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
+import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 
 @Component({
   selector: 'app-three-first-demo',
@@ -14,6 +16,13 @@ export class ThreeFirstDemoComponent implements OnInit {
   camera = null;
   controls = null;
   shapes = [];
+
+  manager = new THREE.LoadingManager(() => {
+    console.log('load all');
+  });
+
+  x = 0;
+  font = null;
 
   constructor() {
   }
@@ -33,15 +42,68 @@ export class ThreeFirstDemoComponent implements OnInit {
     pointLight.shadow.mapSize.height = 1024;
     this.scene.add(pointLight);
 
-    const shape1 = this.createShape(10, 1, 'blue');
-    const shape2 = this.createShape(5, 3, 'red', 10, 10);
-    const shape3 = this.createShape(8, 2, 'pink', 25, 10);
-    this.scene.add(shape1);
-    this.scene.add(shape2);
-    this.scene.add(shape3);
+    this.manager.onProgress = (item, loaded, total) => {
+      console.log(item);
+      console.log(loaded);
+      console.log(total);
+    };
 
-    this.shapes.push(...[shape1, shape2, shape3]);
+    // const shape1 = this.createShape(10, 1, 'blue');
+    // const shape2 = this.createShape(5, 3, 'red', 10, 10);
+    // const shape3 = this.createShape(8, 2, 'pink', 25, 10);
+    // this.scene.add(shape1);
+    // this.scene.add(shape2);
+    // this.scene.add(shape3);
+    // this.shapes.push(...[shape1, shape2, shape3]);
+    // this.mtlLoader.load('/assets/modal/temperatureControl/temperatureControl.mtl', (mtl) => {
+    //   console.log(mtl);
+    //   this.objLoader.load('/assets/modal/temperatureControl/temperatureControl.obj', (object3d) => {
+    //     console.log(object3d);
+    //     object3d.scale.set(10, 10, 10);
+    //     this.scene.add(object3d);
+    //   });
+    // });
 
+
+    const paths = [
+      {mtlPath: '/assets/modal/roller/上料机-静态.mtl', objPath: '/assets/modal/roller/上料机-静态.obj'},
+      {mtlPath: '/assets/modal/roller/整体围栏.mtl', objPath: '/assets/modal/roller/整体围栏.obj'},
+      {mtlPath: '/assets/modal/roller/上料机-上下移动.mtl', objPath: '/assets/modal/roller/上料机-上下移动.obj'},
+      {mtlPath: '/assets/modal/roller/上料机-左右平移.mtl', objPath: '/assets/modal/roller/上料机-左右平移.obj'},
+      {mtlPath: '/assets/modal/roller/上料机-静态.mtl', objPath: '/assets/modal/roller/上料机-静态.obj'},
+      {mtlPath: '/assets/modal/roller/倍速线.mtl', objPath: '/assets/modal/roller/倍速线.obj'},
+      {mtlPath: '/assets/modal/roller/升降机.mtl', objPath: '/assets/modal/roller/升降机.obj'},
+      {mtlPath: '/assets/modal/roller/大冲床.mtl', objPath: '/assets/modal/roller/大冲床.obj'},
+      {mtlPath: '/assets/modal/roller/大冲床-动态.mtl', objPath: '/assets/modal/roller/大冲床-动态.obj'},
+      {mtlPath: '/assets/modal/roller/小冲床-动.mtl', objPath: '/assets/modal/roller/小冲床-动.obj'},
+      {mtlPath: '/assets/modal/roller/小移栽机-上下.mtl', objPath: '/assets/modal/roller/小移栽机-上下.obj'},
+      {mtlPath: '/assets/modal/roller/小移栽机-夹具.mtl', objPath: '/assets/modal/roller/小移栽机-夹具.obj'},
+      {mtlPath: '/assets/modal/roller/小移栽机-杆子.mtl', objPath: '/assets/modal/roller/小移栽机-杆子.obj'},
+      {mtlPath: '/assets/modal/roller/小移栽机-横梁.mtl', objPath: '/assets/modal/roller/小移栽机-横梁.obj'},
+      {mtlPath: '/assets/modal/roller/小车.mtl', objPath: '/assets/modal/roller/小车.obj'},
+      {mtlPath: '/assets/modal/roller/抓手.mtl', objPath: '/assets/modal/roller/抓手.obj'},
+      {mtlPath: '/assets/modal/roller/报警灯.mtl', objPath: '/assets/modal/roller/报警灯.obj'},
+      {mtlPath: '/assets/modal/roller/整体夹具.mtl', objPath: '/assets/modal/roller/整体夹具.obj'},
+      {mtlPath: '/assets/modal/roller/移栽机-上下.mtl', objPath: '/assets/modal/roller/移栽机-上下.obj'},
+      {mtlPath: '/assets/modal/roller/移栽机-夹具.mtl', objPath: '/assets/modal/roller/移栽机-夹具.obj'},
+      {mtlPath: '/assets/modal/roller/移栽机-平移杆.mtl', objPath: '/assets/modal/roller/移栽机-平移杆.obj'},
+      {mtlPath: '/assets/modal/roller/移栽机-底座.mtl', objPath: '/assets/modal/roller/移栽机-底座.obj'},
+      {mtlPath: '/assets/modal/roller/输送带-上下动.mtl', objPath: '/assets/modal/roller/输送带-上下动.obj'},
+      {mtlPath: '/assets/modal/roller/输送带-底座.mtl', objPath: '/assets/modal/roller/输送带-底座.obj'},
+      {mtlPath: '/assets/modal/roller/铆接线-贴字.mtl', objPath: '/assets/modal/roller/铆接线-贴字.obj'},
+    ];
+    new Promise(resolve => {
+      const loader = new FontLoader();
+      loader.load('/assets/fonts/Microsoft YaHei_Regular.json', font => {
+        this.font = font;
+        resolve(null);
+      });
+    }).then(() => {
+      paths.forEach(item => this.loadMtlObj(item.objPath, item.mtlPath));
+    });
+
+
+    // 阴影
     const shadowMaterial = new THREE.ShadowMaterial();
     shadowMaterial.opacity = 0.5;
     const groundMesh = new THREE.Mesh(
@@ -54,7 +116,7 @@ export class ThreeFirstDemoComponent implements OnInit {
 
     this.renderer.render(this.scene, this.camera);
 
-    this.updatePosition();
+    // this.updatePosition();
   }
 
   updatePosition() {
@@ -62,11 +124,36 @@ export class ThreeFirstDemoComponent implements OnInit {
     this.shapes.forEach(shape => {
       const rotationSpeed = Math.random() * 0.02 + 0.005;
       const rotationPosition = rotationSpeed + shape.rotation.y;
-      console.log(rotationPosition);
       shape.rotation.y = rotationPosition;
     });
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(() => this.updatePosition());
+  }
+
+  loadMtlObj(objPath, mtlPath) {
+    const text = objPath.split('.')[0].replace(/[\/\w]+/g, '');
+    const mtl = new MTLLoader();
+    const obj = new OBJLoader();
+    mtl.load(mtlPath, (m: MaterialCreator) => {
+      obj.setMaterials(m).load(objPath, (o: Group) => {
+        console.log(o);
+        // const textGeometry = new TextGeometry(text, {
+        //   font: this.font, size: 6, height: 1,
+        //   curveSegments: 12,
+        // });
+        // const textMaterial = new MeshPhongMaterial({color: '#000', flatShading: true});
+        // const textMesh = new Mesh(textGeometry, textMaterial);
+        // textMesh.position.setX(this.x);
+        // this.scene.add(textMesh);
+
+
+        this.x += 10;
+        o.position.setX(this.x);
+        o.scale.set(1 / 100, 1 / 100, 1 / 100);
+        this.scene.add(o);
+      });
+    });
+
   }
 
   helper(): void {
@@ -80,9 +167,9 @@ export class ThreeFirstDemoComponent implements OnInit {
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.target = new THREE.Vector3(0, 15, 0);
     controls.maxPolarAngle = Math.PI / 2;
-    // controls.addEventListener('change', () => {
-    //   this.renderer.render(this.scene, this.camera);
-    // }); // add this only if there is no animation loop (requestAnimationFrame)
+    controls.addEventListener('change', () => {
+      this.renderer.render(this.scene, this.camera);
+    }); // add this only if there is no animation loop (requestAnimationFrame)
     this.controls = controls;
   }
 
@@ -139,8 +226,8 @@ export class ThreeFirstDemoComponent implements OnInit {
   }
 
   createCamera(): THREE.PerspectiveCamera {
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 30, 50);
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 30000);
+    camera.position.set(110, 500, 500);
     camera.lookAt(new THREE.Vector3(0, 15, 0));
     return camera;
   }
