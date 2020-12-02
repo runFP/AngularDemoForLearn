@@ -4,10 +4,11 @@ import { ThreeFirstDemoComponent } from './component/three-first-demo/three-firs
 import { ThreeHomeComponent } from './home/three-home/three-home.component';
 import {ThreeRoutingModule} from './three-routing.module';
 import {FormsModule} from '@angular/forms';
+import { RollerMetalComponent } from './component/roller-metal/roller-metal.component';
 
 
 @NgModule({
-  declarations: [ThreeFirstDemoComponent, ThreeHomeComponent],
+  declarations: [ThreeFirstDemoComponent, ThreeHomeComponent, RollerMetalComponent],
   imports: [
     CommonModule,
     FormsModule,
