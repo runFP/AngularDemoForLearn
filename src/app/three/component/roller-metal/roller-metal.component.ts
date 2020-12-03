@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {RollerMetalService} from './roller-metal.service';
+import * as THREE from 'three';
+import {createHelper} from './machines/utils';
+import {Camera, Scene, WebGLRenderer} from 'three';
+import {AppendingMachine} from './machines/appendingMachine/AppendingMachine';
 
 @Component({
   selector: 'app-roller-metal',
@@ -7,11 +11,34 @@ import {RollerMetalService} from './roller-metal.service';
   styleUrls: ['./roller-metal.component.scss']
 })
 export class RollerMetalComponent implements OnInit {
+  scene: Scene;
+  camera: Camera;
+  renderer: WebGLRenderer;
 
-  constructor(rmService: RollerMetalService) {
+  // machine
+  appendMachine = null;
+
+  constructor(private rmService: RollerMetalService) {
   }
 
   ngOnInit() {
+    this.renderer = this.rmService.createRenderer();
+    this.scene = this.rmService.createScene();
+    this.camera = this.rmService.createCamera();
+    const ambientLight = new THREE.AmbientLight();
+
+    this.appendMachine = new AppendingMachine();
+    this.appendMachine.init(this.camera, this.renderer, this.scene).then(() => {
+      this.scene.add(this.appendMachine.group);
+      console.log(this.appendMachine.group);
+      this.renderer.render(this.scene, this.camera);
+    });
+
+    this.scene.add(this.camera, ambientLight);
+
+
+    createHelper(this.camera, this.scene, this.renderer);
+    this.renderer.render(this.scene, this.camera);
   }
 
 }

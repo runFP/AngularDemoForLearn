@@ -209,7 +209,7 @@ export class ThreeFirstDemoComponent implements OnInit {
         const centerX = Math.abs(Math.floor((max.x - min.x) / 2 / this.shrink));
         const centerY = Math.abs(Math.floor((max.y - min.y) / 2 / this.shrink));
         const centerZ = Math.abs(Math.floor((max.z - min.z) / 2 / this.shrink));
-
+        console.log(expand);
         // 添加obj对应的文字，并在obj上方居中对齐
         const textVector = new Vector3(0, 0, 0);
         const textGeometry = new TextGeometry(text, {
