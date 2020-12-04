@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RollerMetalService} from './roller-metal.service';
 import * as THREE from 'three';
-import {createHelper} from './machines/utils';
+import {createOrbitControls, createTransFormControl} from './machines/utils';
 import {Camera, Scene, WebGLRenderer} from 'three';
 import {AppendingMachine} from './machines/appendingMachine/AppendingMachine';
 
@@ -14,6 +14,7 @@ export class RollerMetalComponent implements OnInit {
   scene: Scene;
   camera: Camera;
   renderer: WebGLRenderer;
+  orbitControls;
 
   // machine
   appendMachine = null;
@@ -31,13 +32,14 @@ export class RollerMetalComponent implements OnInit {
     this.appendMachine.init(this.camera, this.renderer, this.scene).then(() => {
       this.scene.add(this.appendMachine.group);
       console.log(this.appendMachine.group);
+      createTransFormControl(this.camera, this.scene, this.renderer, this.appendMachine.group, this.orbitControls);
       this.renderer.render(this.scene, this.camera);
     });
 
     this.scene.add(this.camera, ambientLight);
 
 
-    createHelper(this.camera, this.scene, this.renderer);
+    this.orbitControls = createOrbitControls(this.camera, this.scene, this.renderer);
     this.renderer.render(this.scene, this.camera);
   }
 
