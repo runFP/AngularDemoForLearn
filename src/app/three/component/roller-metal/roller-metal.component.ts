@@ -68,5 +68,9 @@ export class RollerMetalComponent implements OnInit {
     this.appendMachine.moveVertical();
   }
 
+  startVertical() {
+    this.appendMachine.startVertical();
+  }
+
 
 }

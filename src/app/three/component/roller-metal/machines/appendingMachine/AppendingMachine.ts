@@ -21,7 +21,7 @@ const PATH = {
 };
 
 const HORIZONTAL_MAX = 12;
-const VERTICAL_MAX = 12;
+const VERTICAL_MIN = -8;
 
 
 /**
@@ -57,6 +57,7 @@ export class AppendingMachine extends BaseMachine {
   vhAction;
 
   vhActionId = null;
+  verticalActionId = null;
 
   // 是否已初始化
   isInit = false;
@@ -111,17 +112,35 @@ export class AppendingMachine extends BaseMachine {
   }
 
 
-  /**
-   * 上下移动
-   */
-  moveVertical() {
-    this.verticalStart.next(this.verticalGroup);
-    this.verticalEnd.next(this.verticalGroup);
-    this.verticalGroup.position.setY(-8);
-    this.render();
+  /** 动画相关方法开始 */
+  startVertical(duration = 0.8) {
+    const times = [];
+    const values = [];
+    const tmp = new Vector3();
+
+    for (let i = 0; i < duration * 10; i++) {
+      times.push(i / 10);
+      tmp.setY(-i).toArray(values, values.length);
+    }
+
+    const track = new VectorKeyframeTrack('.position', times, values);
+    const clip = new AnimationClip('verticalMove', duration, [track]);
+    const mixer = new AnimationMixer(this.verticalGroup);
+    this.verticalAction = mixer.clipAction(clip);
+    this.verticalAction.loop = LoopOnce;
+    this.verticalAction.clampWhenFinished = true;
+    this.verticalAction.play();
+    const clock = new Clock();
+    const animate = () => {
+      this.vhActionId = requestAnimationFrame(animate);
+      if (mixer) {
+        mixer.update(clock.getDelta());
+      }
+      this.render();
+    };
+    animate();
   }
 
-  /** 动画相关方法开始 */
 
   /**
    * 左右移动
@@ -149,8 +168,8 @@ export class AppendingMachine extends BaseMachine {
     const clip = new AnimationClip('horizontalMove', duration, [track]);
     const mixer = new AnimationMixer(this.vhGroup);
     this.vhAction = mixer.clipAction(clip);
-    this.vhAction.play();
     this.vhAction.loop = LoopPingPong;
+    this.vhAction.play();
 
     // action.loop = LoopOnce;
     this.horizontalStart.next(this.horizontalGroup);
@@ -178,7 +197,8 @@ export class AppendingMachine extends BaseMachine {
    * 暂停动画，不会重置
    */
   pauseHorizontal() {
-    this.vhAction.paused = true;
+    this.vhAction.setEffectiveTimeScale(0);
+    // this.vhAction.paused = true;
   }
 
   cancelHorizontal() {
@@ -196,8 +216,28 @@ export class AppendingMachine extends BaseMachine {
    * @param distance
    */
   moveHorizontal(distance) {
-    distance = distance > HORIZONTAL_MAX ? HORIZONTAL_MAX : distance;
+    if (distance < 0) {
+      distance = 0;
+    } else if (distance > HORIZONTAL_MAX) {
+      distance = HORIZONTAL_MAX;
+    }
     this.vhGroup.position.setX(distance);
+    this.render();
+  }
+
+  /**
+   * 上下移动
+   * @param distance
+   */
+  moveVertical(distance = -8) {
+    if (distance > 0) {
+      distance = 0;
+    } else if (distance < VERTICAL_MIN) {
+      distance = VERTICAL_MIN;
+    }
+    this.verticalStart.next(this.verticalGroup);
+    this.verticalEnd.next(this.verticalGroup);
+    this.verticalGroup.position.setY(distance);
     this.render();
   }
 
