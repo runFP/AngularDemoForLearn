@@ -28,7 +28,6 @@ import {RestoreScrollDirective} from './components/lift-cycle-hook/restore-scrol
 import {UpdateColorCellDirective} from './components/lift-cycle-hook/update-color-cell/update-color-cell.directive';
 import {ColorPickerModule} from 'ngx-color-picker';
 import {PickerColorComponent} from './components/simple-ag-grid/picker-color/picker-color.component';
-import {TestComponent} from './components/aggrid-work-with-form/test';
 
 const agGridWorkWithForm = [
   AgGridModule.withComponents([FormCellComponent, CellEditComponent, AngularFilterComponent]),
@@ -52,7 +51,6 @@ const agGridWorkWithForm = [
     RestoreScrollDirective,
     UpdateColorCellDirective,
     PickerColorComponent,
-    TestComponent,
   ],
   imports: [
     OverlayModule,

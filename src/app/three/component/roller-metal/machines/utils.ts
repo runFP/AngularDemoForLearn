@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 import {TransformControls} from 'three/examples/jsm/controls/TransformControls';
+import {isArray} from 'util';
 
 /**
  * 加载MTLOBJ文件
@@ -83,6 +84,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
 
   transformControl.addEventListener('change', (event) => {
     console.log('transformControl change', event);
+    console.log('transformControl change', event.target.children[0].worldPosition);
     renderer.render(scene, camera);
   });
 
@@ -101,16 +103,23 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
  *          再在外面包一层group，而外层group的本地坐标为(x:0,y:0,z:0)恰好与世界坐标一直，通过操作该group来操作原有模型
  * @param inf
  */
-export function fixedObjLocalOrigin(inf: MtlObjInf) {
-  const vector = new Vector3();
-  inf.box3.getCenter(vector);
-  inf.obj.position.set(-vector.x, -vector.y, -vector.z);
+export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
+  if (!(inf instanceof Array)) {
+    inf = [inf];
+  }
 
-  // 导入的obj文件有本地坐标原点偏移，使用一个group包着，操作该group来做各种位移，旋转操作
-  const group = new Group();
-  group.add(inf.obj);
+  return inf.map(item => {
+    const vector = new Vector3();
+    item.box3.getCenter(vector);
+    item.obj.position.set(-vector.x, -vector.y, -vector.z);
 
-  return group;
+    // 导入的obj文件有本地坐标原点偏移，使用一个group包着，操作该group来做各种位移，旋转操作
+    const group = new Group();
+    group.add(item.obj);
+
+    return group;
+  });
+
 }
 
 interface MtlObjInf {

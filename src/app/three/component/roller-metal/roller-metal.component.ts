@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RollerMetalService} from './roller-metal.service';
 import * as THREE from 'three';
 import {createOrbitControls, createTransFormControl} from './machines/utils';
-import {Camera, Scene, WebGLRenderer} from 'three';
+import {Camera, LoadingManager, Scene, WebGLRenderer} from 'three';
 import {AppendingMachine} from './machines/appendingMachine/AppendingMachine';
 
 @Component({
@@ -17,9 +17,14 @@ export class RollerMetalComponent implements OnInit {
   orbitControls;
 
   // machine
-  appendMachine = null;
+  appendMachine: AppendingMachine | null = null;
+
+  loadManager = new LoadingManager();
 
   constructor(private rmService: RollerMetalService) {
+    this.loadManager.onLoad = () => {
+      console.log('load!!!!');
+    };
   }
 
   ngOnInit() {
@@ -28,7 +33,7 @@ export class RollerMetalComponent implements OnInit {
     this.camera = this.rmService.createCamera();
     const ambientLight = new THREE.AmbientLight();
 
-    this.appendMachine = new AppendingMachine();
+    this.appendMachine = new AppendingMachine(this.loadManager);
     this.appendMachine.init(this.camera, this.renderer, this.scene).then(() => {
       this.scene.add(this.appendMachine.group);
       console.log(this.appendMachine.group);
@@ -42,5 +47,26 @@ export class RollerMetalComponent implements OnInit {
     this.orbitControls = createOrbitControls(this.camera, this.scene, this.renderer);
     this.renderer.render(this.scene, this.camera);
   }
+
+  stopHorizontal() {
+    this.appendMachine.stopHorizontal();
+  }
+
+  startHorizontal() {
+    this.appendMachine.startHorizontal();
+  }
+
+  pauseHorizontal() {
+    this.appendMachine.pauseHorizontal();
+  }
+
+  cancelHorizontal() {
+    this.appendMachine.cancelHorizontal();
+  }
+
+  moveVertical() {
+    this.appendMachine.moveVertical();
+  }
+
 
 }
