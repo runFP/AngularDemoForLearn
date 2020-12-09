@@ -1,5 +1,5 @@
-import {Injectable} from '@angular/core';
-import {Camera, PCFSoftShadowMap, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
+import {ElementRef, Injectable} from '@angular/core';
+import {Camera, Color, PCFSoftShadowMap, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
 import * as THREE from 'three';
 
 @Injectable({
@@ -10,18 +10,19 @@ export class RollerMetalService {
   constructor() {
   }
 
-  createRenderer(): WebGLRenderer {
+  createRenderer(container: ElementRef): WebGLRenderer {
     const renderer = new WebGLRenderer({antialias: true});
-    renderer.setClearColor('#fff6e6');
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
-    document.body.appendChild(renderer.domElement);
+    container.nativeElement.appendChild(renderer.domElement);
     return renderer;
   }
 
   createScene(): Scene {
-    return new Scene();
+    const scene = new Scene();
+    scene.background = new Color(0xbfe3dd);
+    return scene;
   }
 
   createCamera(): Camera {

@@ -6,6 +6,8 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 import {TransformControls} from 'three/examples/jsm/controls/TransformControls';
 import {isArray} from 'util';
+import {AppendingMachine} from './appendingMachine/AppendingMachine';
+import {BaseMachine} from './baseMachine';
 
 /**
  * 加载MTLOBJ文件
@@ -56,7 +58,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
     mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersections = raycaster.intersectObjects(object3d.children, true);
+    const intersections = raycaster.intersectObjects(object3d, true);
     if (intersections.length > 0) {
       const object = intersections[0].object;
       console.log(object);
@@ -74,7 +76,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
         return isInclude;
       }
 
-      object3d.children.forEach(group => {
+      object3d.forEach(group => {
         if (groupInclude(group)) {
           transformControl.attach(group);
         }
@@ -95,7 +97,6 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
 
   scene.add(transformControl);
 }
-
 
 /**
  * 缘起：因为obj导入有部门模型的实际位置与自身原点有较大编译，导致拖动，选转无发找到正确的对应
@@ -121,6 +122,7 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
   });
 
 }
+
 
 interface MtlObjInf {
   mtl: MaterialCreator | null;
