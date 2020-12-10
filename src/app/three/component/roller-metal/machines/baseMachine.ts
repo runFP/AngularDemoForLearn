@@ -1,9 +1,12 @@
-import {AnimationAction, AnimationClip, AnimationMixer, KeyframeTrack, LoadingManager} from 'three';
+import {AnimationAction, AnimationClip, AnimationMixer, Group, KeyframeTrack, LoadingManager} from 'three';
 
 export class BaseMachine {
+  group: Group;
   name: string;
   manager: LoadingManager | null;
-  animationManagers: AnimationManager[];
+  animationManagers: AnimationManager[] = [];
+  // 是否已初始化
+  isInit = false;
 
   constructor(manager?: LoadingManager) {
     this.manager = manager;
