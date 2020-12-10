@@ -57,8 +57,6 @@ export class MoveCutMachine extends BaseMachine {
         this.clamp = clamp;
         this.translation = translation;
 
-        const [baseG, verticalG, clampG, translationG] = fixedObjLocalOrigin([base, vertical, clamp, translation]);
-
         this.group.add(...fixedObjLocalOrigin([base, vertical, clamp, translation]));
       }, () => {
       }, () => {

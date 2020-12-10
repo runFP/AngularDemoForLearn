@@ -45,7 +45,6 @@ export class AppendingMachine extends BaseMachine {
   horizontal = null;
 
   // 已经进行了位置修复的组，组内包含了最原始的模型对象
-  baseGroup: Group;
   verticalGroup: Group;
   horizontalGroup: Group;
 
@@ -83,12 +82,10 @@ export class AppendingMachine extends BaseMachine {
     this.horizontalGroup = new Group();
     this.group = new Group();
     this.vhGroup = new Group();
-    this.baseGroup = new Group();
     this.verticalGroup.name = 'verticalGroup';
     this.horizontalGroup.name = 'horizontalGroup';
     this.group.name = 'group';
     this.vhGroup.name = 'vhGroup';
-    this.baseGroup.name = 'baseGroup';
   }
 
 
@@ -116,14 +113,12 @@ export class AppendingMachine extends BaseMachine {
           horizontalG.position.set(-5, 0, 11.1);
           verticalG.position.set(-5, 0, 11.1);
 
-          this.baseGroup.add(baseG);
           // 偏移后再次添加到group，这样可以相对于目前在base上的位置移动
           this.horizontalGroup.add(horizontalG);
           this.verticalGroup.add(verticalG);
 
           this.vhGroup.add(this.horizontalGroup, this.verticalGroup);
-          // this.group.add(this.baseGroup, this.horizontalGroup, this.verticalGroup);
-          this.group.add(this.baseGroup, this.vhGroup);
+          this.group.add(baseG, this.vhGroup);
           this.isInit = true;
         }, () => {
         }, () => {

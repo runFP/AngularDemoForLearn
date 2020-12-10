@@ -9,6 +9,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {factoryMachine} from './machines/factoryMachine';
 import {BigPunchMachine} from './machines/appendingMachine/BigPunchMachine';
 import {MoveCutMachine} from './machines/appendingMachine/MoveCutMachine';
+import {Rail} from './machines/appendingMachine/Rail';
 
 @Component({
   selector: 'app-roller-metal',
@@ -25,6 +26,8 @@ export class RollerMetalComponent implements OnInit {
   clock = new Clock();
   loadManager = new LoadingManager();
 
+  rail = new Rail(this.loadManager);
+
   /** 机器相关 */
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
     // 需要加载的机器名，需和机器的name属性对应,加载后可通过该名字从machine中获取机器实例
@@ -34,10 +37,15 @@ export class RollerMetalComponent implements OnInit {
     {name: 'bigPunch', type: 'bigPunch'},
     {name: 'moveCut2', type: 'moveCut'},
     {name: 'no2', type: 'no2'},
+    {name: 'moveCut3', type: 'moveCut'},
+    {name: 'no3', type: 'no3'},
+    {name: 'moveCut4', type: 'moveCut'},
+    {name: 'no4', type: 'no4'},
   ];
 
   machines: { name: string, machine: BaseMachine }[] = []; // 所有机器的实例
-  machinePromise: Promise<BaseMachine>[] = []; // 加载初始化的所有回调，用于启动程序
+  machinePromise: Promise<BaseMachine>[] = []; // 加载初始化的所有回调
+  otherPromise: Promise<any>[] = []; // 加载其他模型的回调
   appendMachine: AppendingMachine | null = null;
 
 
@@ -53,7 +61,7 @@ export class RollerMetalComponent implements OnInit {
     this.camera = this.rmService.createCamera();
 
     const dirLight = new THREE.DirectionalLight(0xffffff);
-    dirLight.position.set(0, 20, 20);
+    dirLight.position.set(0, 20, 0);
     dirLight.castShadow = true;
     this.scene.add(this.camera, dirLight);
     // 阴影
@@ -67,7 +75,7 @@ export class RollerMetalComponent implements OnInit {
     this.scene.add(groundMesh);
 
     this.instantiateMachines();
-    this.initMachines();
+    this.init();
     this.startUp();
     this.animation();
 
@@ -85,6 +93,11 @@ export class RollerMetalComponent implements OnInit {
     });
   }
 
+  private init() {
+    this.otherPromise.push(this.rail.init());
+    this.initMachines();
+  }
+
   /**
    * 所有机器进行初始化
    * @private
@@ -99,14 +112,14 @@ export class RollerMetalComponent implements OnInit {
    * 机器初始化完成后，启动
    */
   startUp(): Promise<string> {
-    return Promise.all(this.machinePromise).then(machines => {
+    return Promise.all([...this.machinePromise, ...this.otherPromise]).then(elements => {
       const groups = [];
 
       this.positionInit();
 
-      machines.forEach(machine => {
-        groups.push(...machine.group.children);
-        this.scene.add(machine.group);
+      elements.forEach(element => {
+        groups.push(...element.group.children);
+        this.scene.add(element.group);
       });
 
       this.render();
@@ -121,10 +134,15 @@ export class RollerMetalComponent implements OnInit {
    * 初始化各种机器的位置
    */
   positionInit() {
+    this.rail.group.position.setX(235);
     this.getMachine<MoveCutMachine>('moveCut1').group.position.setX(33);
     this.getMachine<BigPunchMachine>('bigPunch').group.position.setX(59);
     this.getMachine<BigPunchMachine>('moveCut2').group.position.setX(90);
     this.getMachine<BigPunchMachine>('no2').group.position.setX(117);
+    this.getMachine<BigPunchMachine>('moveCut3').group.position.setX(145);
+    this.getMachine<BigPunchMachine>('no3').group.position.setX(172.5);
+    this.getMachine<BigPunchMachine>('moveCut4').group.position.setX(200);
+    this.getMachine<BigPunchMachine>('no4').group.position.setX(227);
   }
 
   /**

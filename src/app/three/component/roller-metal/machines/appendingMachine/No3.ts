@@ -21,12 +21,17 @@ export class No3 extends BaseMachine {
   base = null;
   vertical = null;
   group: Group;
+  // 已经进行了位置修复的组，组内包含了最原始的模型对象
+  verticalGroup: Group;
 
   animationManagers: AnimationManager[] = [];
 
   constructor(manager?: LoadingManager) {
     super(manager);
     this.group = new Group();
+    this.verticalGroup = new Group();
+    this.group.name = 'group';
+    this.verticalGroup.name = 'verticalGroup';
   }
 
   init(): Promise<any> {
@@ -36,9 +41,11 @@ export class No3 extends BaseMachine {
         this.base = base;
         this.vertical = vertical;
 
-        const [baseG, verticalG] = fixedObjLocalOrigin([base]);
+        const [baseG, verticalG] = fixedObjLocalOrigin([base, vertical]);
 
-        this.group.add(baseG, verticalG);
+        verticalG.position.set(-1.5, 0, 10);
+        this.verticalGroup.add(verticalG);
+        this.group.add(baseG, this.verticalGroup);
       }, () => {
       }, () => {
         resolve(this);
