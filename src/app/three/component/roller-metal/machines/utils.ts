@@ -36,7 +36,7 @@ export function loadMtlObj(mtlPath: string, objPath: string, manager: LoadingMan
 }
 
 export function createOrbitControls(camera, scene, renderer, object3d?: any[]): OrbitControls {
-  const helper = new GridHelper(1000, 10);
+  const helper = new GridHelper(1000, 100);
   scene.add(helper);
 
   const orbitControls = new OrbitControls(camera, renderer.domElement);
@@ -48,20 +48,23 @@ export function createOrbitControls(camera, scene, renderer, object3d?: any[]): 
   return orbitControls;
 }
 
-export function createTransFormControl(camera, scene, renderer, object3d, orbitControls) {
+export function createTransFormControl(camera, scene, renderer, object3d, orbitControls, container) {
   const raycaster = new Raycaster();
   const mouse = new THREE.Vector2();
   const transformControl = new TransformControls(camera, renderer.domElement);
-
+  const getBoundingClientRect = container.getBoundingClientRect();
   document.addEventListener('click', ev => {
     ev.preventDefault();
-    mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+    /**
+     * 若非全屏，则鼠标的位置要减去渲染容器的起始点再除于容器的正常宽高
+     */
+    mouse.x = ((ev.clientX - getBoundingClientRect.left) / container.clientWidth) * 2 - 1;
+    mouse.y = -((ev.clientY - getBoundingClientRect.top) / container.clientHeight) * 2 + 1;
+
     raycaster.setFromCamera(mouse, camera);
     const intersections = raycaster.intersectObjects(object3d, true);
     if (intersections.length > 0) {
       const object = intersections[0].object;
-      console.log(object);
 
       function groupInclude(group, isInclude = false): boolean {
         group.children.forEach(item => {
@@ -112,7 +115,7 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
   return inf.map(item => {
     const vector = new Vector3();
     item.box3.getCenter(vector);
-    item.obj.position.set(-vector.x, -vector.y, -vector.z);
+    item.obj.position.set(-vector.x, 0, -vector.z);
 
     // 导入的obj文件有本地坐标原点偏移，使用一个group包着，操作该group来做各种位移，旋转操作
     const group = new Group();
@@ -124,7 +127,7 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
 }
 
 
-interface MtlObjInf {
+export interface MtlObjInf {
   mtl: MaterialCreator | null;
   obj: Group | null;
   /** object3d的边界信息*/

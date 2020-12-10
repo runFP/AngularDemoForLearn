@@ -12,21 +12,23 @@ import {fixedObjLocalOrigin, loadMtlObj} from '../utils';
 import {AnimationManager, BaseMachine} from '../baseMachine';
 
 const SHRINK = 100;
-
-const PATH = {
-  BASE: {
-    'MTL_PATH': '/assets/modal/roller/上料机-静态.mtl',
-    'OBJ_PATH': '/assets/modal/roller/上料机-静态.obj'
+const PATH = [
+  {
+    name: 'base',
+    mtlPath: '/assets/modal/roller/上料机-静态.mtl',
+    objPath: '/assets/modal/roller/上料机-静态.obj'
   },
-  VERTICAL: {
-    'MTL_PATH': '/assets/modal/roller/上料机-上下移动.mtl',
-    'OBJ_PATH': '/assets/modal/roller/上料机-上下移动.obj'
+  {
+    name: 'vertical',
+    mtlPath: '/assets/modal/roller/上料机-上下移动.mtl',
+    objPath: '/assets/modal/roller/上料机-上下移动.obj'
   },
-  HORIZONTAL: {
-    'MTL_PATH': '/assets/modal/roller/上料机-左右平移.mtl',
-    'OBJ_PATH': '/assets/modal/roller/上料机-左右平移.obj'
+  {
+    name: 'horizontal',
+    mtlPath: '/assets/modal/roller/上料机-左右平移.mtl',
+    objPath: '/assets/modal/roller/上料机-左右平移.obj'
   }
-};
+];
 
 const HORIZONTAL_MAX = 12;
 const VERTICAL_MAX = 12;
@@ -60,22 +62,15 @@ export class AppendingMachine extends BaseMachine {
   horizontalStart = new Subject();
   horizontalEnd = new Subject();
 
-  // 动画控制
-  horizontalAction;
-  verticalAction;
-  vhAction;
 
   // 混合/动画控制控制
   animationManagers: AnimationManager[] = [
     {name: 'vertical', track: null, action: null, clip: null, mixer: null},
-    // {name: 'vertical', track: null, action: null, clip: null, mixer: new AnimationMixer(this.verticalGroup)},
     {name: 'vh', track: null, action: null, clip: null, mixer: null},
   ];
 
   vhActionId = null;
 
-  // 是否已初始化
-  isInit = false;
 
   camera;
   renderer;
@@ -108,35 +103,33 @@ export class AppendingMachine extends BaseMachine {
 
     this.createAnimation();
     return new Promise(resolve => {
-      zip(loadMtlObj(PATH.BASE.MTL_PATH, PATH.BASE.OBJ_PATH, this.manager, SHRINK),
-        loadMtlObj(PATH.VERTICAL.MTL_PATH, PATH.VERTICAL.OBJ_PATH, this.manager, SHRINK),
-        loadMtlObj(PATH.HORIZONTAL.MTL_PATH, PATH.HORIZONTAL.OBJ_PATH, this.manager, SHRINK))
-        .subscribe(([base, vertical, horizontal]) => {
-            this.base = base;
-            this.vertical = vertical;
-            this.horizontal = horizontal;
+      const allPathLoad = PATH.map(machinePath => loadMtlObj(machinePath.mtlPath, machinePath.objPath, this.manager, SHRINK));
+      zip(...allPathLoad).subscribe(([base, vertical, horizontal]) => {
+          this.base = base;
+          this.vertical = vertical;
+          this.horizontal = horizontal;
 
-            // 修复位置
-            const [baseG, verticalG, horizontalG] = fixedObjLocalOrigin([base, vertical, horizontal]);
+          // 修复位置
+          const [baseG, verticalG, horizontalG] = fixedObjLocalOrigin([base, vertical, horizontal]);
 
-            // 处理3者相对位置，使其完美结合
-            horizontalG.position.set(-5, 6.2, 11.1);
-            verticalG.position.set(-5, 10, 11.1);
+          // 处理3者相对位置，使其完美结合
+          horizontalG.position.set(-5, 0, 11.1);
+          verticalG.position.set(-5, 0, 11.1);
 
-            this.baseGroup.add(baseG);
-            // 偏移后再次添加到group，这样可以相对于目前在base上的位置移动
-            this.horizontalGroup.add(horizontalG);
-            this.verticalGroup.add(verticalG);
+          this.baseGroup.add(baseG);
+          // 偏移后再次添加到group，这样可以相对于目前在base上的位置移动
+          this.horizontalGroup.add(horizontalG);
+          this.verticalGroup.add(verticalG);
 
-            this.vhGroup.add(this.horizontalGroup, this.verticalGroup);
-            // this.group.add(this.baseGroup, this.horizontalGroup, this.verticalGroup);
-            this.group.add(this.baseGroup, this.vhGroup);
-            this.isInit = true;
-          }, () => {
-          }, () => {
-            resolve(this);
-          }
-        );
+          this.vhGroup.add(this.horizontalGroup, this.verticalGroup);
+          // this.group.add(this.baseGroup, this.horizontalGroup, this.verticalGroup);
+          this.group.add(this.baseGroup, this.vhGroup);
+          this.isInit = true;
+        }, () => {
+        }, () => {
+          resolve(this);
+        }
+      );
     });
   }
 
@@ -151,7 +144,7 @@ export class AppendingMachine extends BaseMachine {
     const tmp = new Vector3();
     const duration = 3;
 
-    for (let i = 0, j = duration * 10 ; i <= duration * 10; i++, j--) {
+    for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
       if (i > duration * 10 / 2) {
         tmp.setX(j).toArray(values, values.length);

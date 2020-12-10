@@ -12,7 +12,8 @@ export class RollerMetalService {
 
   createRenderer(container: ElementRef): WebGLRenderer {
     const renderer = new WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    console.dir(container.nativeElement);
+    renderer.setSize(container.nativeElement.clientWidth, container.nativeElement.clientHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
     container.nativeElement.appendChild(renderer.domElement);

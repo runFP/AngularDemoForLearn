@@ -7,6 +7,8 @@ import {AppendingMachine} from './machines/appendingMachine/AppendingMachine';
 import {BaseMachine} from './machines/baseMachine';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {factoryMachine} from './machines/factoryMachine';
+import {BigPunchMachine} from './machines/appendingMachine/BigPunchMachine';
+import {MoveCutMachine} from './machines/appendingMachine/MoveCutMachine';
 
 @Component({
   selector: 'app-roller-metal',
@@ -24,9 +26,18 @@ export class RollerMetalComponent implements OnInit {
   loadManager = new LoadingManager();
 
   /** 机器相关 */
-  machineNames = ['append']; // 需要加载的机器名，需和机器的name属性对应,加载后可通过该名字从machine中获取机器实例
-  machines: BaseMachine[] = []; // 所有机器的实例
-  machinePromise: Promise<any>[] = []; // 加载初始化的所有回调，用于启动程序
+    // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
+    // 需要加载的机器名，需和机器的name属性对应,加载后可通过该名字从machine中获取机器实例
+  loadMachines: { name: string, type: string }[] = [
+    {name: 'append', type: 'append'},
+    {name: 'moveCut1', type: 'moveCut'},
+    {name: 'bigPunch', type: 'bigPunch'},
+    {name: 'moveCut2', type: 'moveCut'},
+    {name: 'no2', type: 'no2'},
+  ];
+
+  machines: { name: string, machine: BaseMachine }[] = []; // 所有机器的实例
+  machinePromise: Promise<BaseMachine>[] = []; // 加载初始化的所有回调，用于启动程序
   appendMachine: AppendingMachine | null = null;
 
 
@@ -49,7 +60,7 @@ export class RollerMetalComponent implements OnInit {
     const shadowMaterial = new THREE.ShadowMaterial();
     shadowMaterial.opacity = 0.5;
     const groundMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(100, .1, 100),
+      new THREE.BoxGeometry(1000, .1, 1000),
       shadowMaterial
     );
     groundMesh.receiveShadow = true;
@@ -69,8 +80,8 @@ export class RollerMetalComponent implements OnInit {
    * @private
    */
   private instantiateMachines(): void {
-    this.machineNames.forEach(name => {
-      this.machines.push(factoryMachine(name, this.loadManager));
+    this.loadMachines.forEach(loadMachine => {
+      this.machines.push({name: loadMachine.name, machine: factoryMachine(loadMachine.type, this.loadManager)});
     });
   }
 
@@ -79,30 +90,50 @@ export class RollerMetalComponent implements OnInit {
    * @private
    */
   private initMachines(): void {
-    this.machines.forEach(machine => {
-      this.machinePromise.push(machine.init(this.camera, this.renderer, this.scene));
+    this.machines.forEach(machineInf => {
+      this.machinePromise.push(machineInf.machine.init(this.camera, this.renderer, this.scene));
     });
   }
 
   /**
    * 机器初始化完成后，启动
    */
-  startUp(): void {
-    Promise.all(this.machinePromise).then(machines => {
+  startUp(): Promise<string> {
+    return Promise.all(this.machinePromise).then(machines => {
       const groups = [];
+
+      this.positionInit();
+
       machines.forEach(machine => {
-        console.log(machine.group);
         groups.push(...machine.group.children);
         this.scene.add(machine.group);
       });
+
       this.render();
-      createTransFormControl(this.camera, this.scene, this.renderer, groups, this.orbitControls);
+
+      createTransFormControl(this.camera, this.scene, this.renderer, groups, this.orbitControls, this.container.nativeElement);
+
+      return 'started';
     });
   }
 
+  /**
+   * 初始化各种机器的位置
+   */
+  positionInit() {
+    this.getMachine<MoveCutMachine>('moveCut1').group.position.setX(33);
+    this.getMachine<BigPunchMachine>('bigPunch').group.position.setX(59);
+    this.getMachine<BigPunchMachine>('moveCut2').group.position.setX(90);
+    this.getMachine<BigPunchMachine>('no2').group.position.setX(117);
+  }
+
+  /**
+   * 根据名字返回对用的机器实例
+   * @param name
+   */
   getMachine<T extends BaseMachine>(name): T | null {
-    const instance = this.machines.find(machine => machine.name === name);
-    return instance ? instance as T : null;
+    const instanceInf = this.machines.find(machineInf => machineInf.name === name);
+    return instanceInf ? instanceInf.machine as T : null;
   }
 
   playHorizontal() {
@@ -129,8 +160,8 @@ export class RollerMetalComponent implements OnInit {
      * import:动画中有一条全局混合器时间线，和我们平时看电影一样，同一个时刻，所有的元素的位置都已经是固定的
      */
     const mixerUpdateDelta = this.clock.getDelta();
-    this.machines.forEach(machine => {
-      machine.animationManagers.forEach(am => {
+    this.machines.forEach(machineInf => {
+      machineInf.machine.animationManagers.forEach(am => {
         if (am.mixer) {
           am.mixer.update(mixerUpdateDelta);
         }
