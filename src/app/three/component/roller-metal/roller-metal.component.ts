@@ -9,7 +9,9 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {factoryMachine} from './machines/factoryMachine';
 import {BigPunchMachine} from './machines/appendingMachine/BigPunchMachine';
 import {MoveCutMachine} from './machines/appendingMachine/MoveCutMachine';
-import {Rail} from './machines/appendingMachine/Rail';
+import {Rail} from './machines/other/Rail';
+import {_Math} from 'three/src/math/Math';
+import clamp = _Math.clamp;
 
 @Component({
   selector: 'app-roller-metal',
@@ -26,7 +28,7 @@ export class RollerMetalComponent implements OnInit {
   clock = new Clock();
   loadManager = new LoadingManager();
 
-  rail = new Rail(this.loadManager);
+  // rail = new Rail(this.loadManager);
 
   /** 机器相关 */
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
@@ -41,6 +43,10 @@ export class RollerMetalComponent implements OnInit {
     {name: 'no3', type: 'no3'},
     {name: 'moveCut4', type: 'moveCut'},
     {name: 'no4', type: 'no4'},
+    {name: 'smallCut', type: 'smallCut'},
+    {name: 'car', type: 'car'},
+    {name: 'clamp', type: 'clamp'},
+    {name: 'riveting', type: 'riveting'},
   ];
 
   machines: { name: string, machine: BaseMachine }[] = []; // 所有机器的实例
@@ -59,25 +65,23 @@ export class RollerMetalComponent implements OnInit {
     this.renderer = this.rmService.createRenderer(this.container);
     this.scene = this.rmService.createScene();
     this.camera = this.rmService.createCamera();
+    //
+    // const dirLight = new THREE.DirectionalLight(0xffffff);
+    // dirLight.position.set(0, 20, 0);
+    // this.scene.add(this.camera, dirLight);
+    const ambientLight = new THREE.AmbientLight();
+    this.scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff);
-    dirLight.position.set(0, 20, 0);
-    dirLight.castShadow = true;
-    this.scene.add(this.camera, dirLight);
-    // 阴影
-    const shadowMaterial = new THREE.ShadowMaterial();
-    shadowMaterial.opacity = 0.5;
-    const groundMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(1000, .1, 1000),
-      shadowMaterial
-    );
-    groundMesh.receiveShadow = true;
-    this.scene.add(groundMesh);
+    const pointLight = new THREE.PointLight();
+    pointLight.position.set(60, 100, 0);
+    pointLight.shadow.mapSize.width = 1024;
+    pointLight.shadow.mapSize.height = 1024;
+    this.scene.add(pointLight);
 
     this.instantiateMachines();
     this.init();
     this.startUp();
-    this.animation();
+    // this.animation();
 
     this.orbitControls = createOrbitControls(this.camera, this.scene, this.renderer);
     this.render();
@@ -94,7 +98,7 @@ export class RollerMetalComponent implements OnInit {
   }
 
   private init() {
-    this.otherPromise.push(this.rail.init());
+    // this.otherPromise.push(this.rail.init());
     this.initMachines();
   }
 
@@ -134,7 +138,7 @@ export class RollerMetalComponent implements OnInit {
    * 初始化各种机器的位置
    */
   positionInit() {
-    this.rail.group.position.setX(235);
+    // this.rail.group.position.set(242.6, 0, 10.6);
     this.getMachine<MoveCutMachine>('moveCut1').group.position.setX(33);
     this.getMachine<BigPunchMachine>('bigPunch').group.position.setX(59);
     this.getMachine<BigPunchMachine>('moveCut2').group.position.setX(90);
@@ -143,6 +147,10 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<BigPunchMachine>('no3').group.position.setX(172.5);
     this.getMachine<BigPunchMachine>('moveCut4').group.position.setX(200);
     this.getMachine<BigPunchMachine>('no4').group.position.setX(227);
+    this.getMachine<BigPunchMachine>('smallCut').group.position.set(238, -4.6, 7);
+    this.getMachine<BigPunchMachine>('car').group.position.set(248, 0, 7);
+    this.getMachine<BigPunchMachine>('clamp').group.position.set(256, -7, 6);
+    this.getMachine<BigPunchMachine>('riveting').group.position.set(322, 0, 7);
   }
 
   /**

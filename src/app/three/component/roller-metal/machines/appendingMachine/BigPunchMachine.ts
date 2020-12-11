@@ -15,32 +15,39 @@ const PATH = [
     mtlPath: '/assets/modal/roller/大冲床-动态.mtl',
     objPath: '/assets/modal/roller/大冲床-动态.obj'
   },
+  {
+    name: 'alertLight',
+    mtlPath: '/assets/modal/roller/报警灯.mtl',
+    objPath: '/assets/modal/roller/报警灯.obj'
+  },
 ];
 
 export class BigPunchMachine extends BaseMachine {
   name = 'bigPunch';
 
-  group: Group;
-
+  group = new Group();
 
   base: MtlObjInf = null;
   vertical: MtlObjInf = null;
-
+  alertLight: MtlObjInf = null;
+  alertLightGroup = new Group();
   constructor(manager?: LoadingManager) {
     super(manager);
-    this.group = new Group();
   }
 
   init(): Promise<any> {
     return new Promise<any>(resolve => {
       const allPathLoad = PATH.map(machinePath => loadMtlObj(machinePath.mtlPath, machinePath.objPath, this.manager, SHRINK));
-      zip(...allPathLoad).subscribe(([base, vertical]) => {
+      zip(...allPathLoad).subscribe(([base, vertical, alertLight]) => {
         this.base = base;
         this.vertical = vertical;
+        this.alertLight = alertLight;
 
-        const [baseG, verticalG] = fixedObjLocalOrigin([base, vertical]);
+        const [baseG, verticalG, alertLightG] = fixedObjLocalOrigin([base, vertical, alertLight]);
 
-        this.group.add(baseG, verticalG);
+        alertLightG.position.set(23, 70, 25);
+        this.alertLightGroup.add(alertLightG);
+        this.group.add(baseG, verticalG, this.alertLightGroup);
       }, () => {
       }, () => {
         resolve(this);
