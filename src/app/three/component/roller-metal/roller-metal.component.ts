@@ -11,7 +11,6 @@ import {BigPunchMachine} from './machines/appendingMachine/BigPunchMachine';
 import {MoveCutMachine} from './machines/appendingMachine/MoveCutMachine';
 import {Rail} from './machines/other/Rail';
 import {_Math} from 'three/src/math/Math';
-import clamp = _Math.clamp;
 
 @Component({
   selector: 'app-roller-metal',
@@ -28,25 +27,29 @@ export class RollerMetalComponent implements OnInit {
   clock = new Clock();
   loadManager = new LoadingManager();
 
-  // rail = new Rail(this.loadManager);
+  rail = new Rail(this.loadManager);
 
   /** 机器相关 */
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
     // 需要加载的机器名，需和机器的name属性对应,加载后可通过该名字从machine中获取机器实例
   loadMachines: { name: string, type: string }[] = [
-    {name: 'append', type: 'append'},
-    {name: 'moveCut1', type: 'moveCut'},
-    {name: 'bigPunch', type: 'bigPunch'},
-    {name: 'moveCut2', type: 'moveCut'},
-    {name: 'no2', type: 'no2'},
-    {name: 'moveCut3', type: 'moveCut'},
-    {name: 'no3', type: 'no3'},
-    {name: 'moveCut4', type: 'moveCut'},
-    {name: 'no4', type: 'no4'},
-    {name: 'smallCut', type: 'smallCut'},
-    {name: 'car', type: 'car'},
-    {name: 'clamp', type: 'clamp'},
-    {name: 'riveting', type: 'riveting'},
+    {name: 'append', type: 'Append'},
+    {name: 'moveCut1', type: 'MoveCut'},
+    {name: 'bigPunch', type: 'BigPunch'},
+    {name: 'moveCut2', type: 'MoveCut'},
+    {name: 'no2', type: 'No2'},
+    {name: 'moveCut3', type: 'MoveCut'},
+    {name: 'no3', type: 'No3'},
+    {name: 'moveCut4', type: 'MoveCut'},
+    {name: 'no4', type: 'No4'},
+    {name: 'smallCut', type: 'SmallCut'},
+    {name: 'car', type: 'Car'},
+    {name: 'clamp', type: 'Clamp'},
+    {name: 'riveting', type: 'Riveting'},
+    {name: 'moveBelt', type: 'MoveBelt'},
+    {name: 'liftMachine', type: 'LiftMachine'},
+    {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
+    {name: 'robotMachine', type: 'RobotMachine'},
   ];
 
   machines: { name: string, machine: BaseMachine }[] = []; // 所有机器的实例
@@ -98,7 +101,7 @@ export class RollerMetalComponent implements OnInit {
   }
 
   private init() {
-    // this.otherPromise.push(this.rail.init());
+    this.otherPromise.push(this.rail.init());
     this.initMachines();
   }
 
@@ -138,19 +141,25 @@ export class RollerMetalComponent implements OnInit {
    * 初始化各种机器的位置
    */
   positionInit() {
-    // this.rail.group.position.set(242.6, 0, 10.6);
-    this.getMachine<MoveCutMachine>('moveCut1').group.position.setX(33);
-    this.getMachine<BigPunchMachine>('bigPunch').group.position.setX(59);
-    this.getMachine<BigPunchMachine>('moveCut2').group.position.setX(90);
-    this.getMachine<BigPunchMachine>('no2').group.position.setX(117);
-    this.getMachine<BigPunchMachine>('moveCut3').group.position.setX(145);
-    this.getMachine<BigPunchMachine>('no3').group.position.setX(172.5);
-    this.getMachine<BigPunchMachine>('moveCut4').group.position.setX(200);
-    this.getMachine<BigPunchMachine>('no4').group.position.setX(227);
-    this.getMachine<BigPunchMachine>('smallCut').group.position.set(238, -4.6, 7);
-    this.getMachine<BigPunchMachine>('car').group.position.set(248, 0, 7);
-    this.getMachine<BigPunchMachine>('clamp').group.position.set(256, -7, 6);
-    this.getMachine<BigPunchMachine>('riveting').group.position.set(322, 0, 7);
+    this.rail.group.position.set(242.6, 0, 10.6);
+    this.getMachine<MoveCutMachine>('moveCut1').group.position.setX(28);
+    this.getMachine<BigPunchMachine>('bigPunch').group.position.setX(54);
+    this.getMachine<BigPunchMachine>('moveCut2').group.position.setX(82);
+    this.getMachine<BigPunchMachine>('no2').group.position.setX(108);
+    this.getMachine<BigPunchMachine>('moveCut3').group.position.setX(135);
+    this.getMachine<BigPunchMachine>('no3').group.position.setX(162.5);
+    this.getMachine<BigPunchMachine>('moveCut4').group.position.setX(190);
+    this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
+    this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, -4.6, 7);
+    this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
+    this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
+    this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
+    this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
+    this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
+    this.getMachine<BigPunchMachine>('liftMachine').group.rotation.set(0, -Math.PI / 2, 0);
+    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
+    this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
+    this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
   }
 
   /**
