@@ -10,7 +10,8 @@ import {factoryMachine} from './machines/factoryMachine';
 import {BigPunchMachine} from './machines/appendingMachine/BigPunchMachine';
 import {MoveCutMachine} from './machines/appendingMachine/MoveCutMachine';
 import {Rail} from './machines/other/Rail';
-import {_Math} from 'three/src/math/Math';
+import {SmallCutMachine} from './machines/appendingMachine/SmallCutMachine';
+import {No4} from './machines/appendingMachine/No4';
 
 @Component({
   selector: 'app-roller-metal',
@@ -27,7 +28,7 @@ export class RollerMetalComponent implements OnInit {
   clock = new Clock();
   loadManager = new LoadingManager();
 
-  rail = new Rail(this.loadManager);
+  // rail = new Rail(this.loadManager);
 
   /** 机器相关 */
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
@@ -47,9 +48,9 @@ export class RollerMetalComponent implements OnInit {
     {name: 'clamp', type: 'Clamp'},
     {name: 'riveting', type: 'Riveting'},
     {name: 'moveBelt', type: 'MoveBelt'},
-    {name: 'liftMachine', type: 'LiftMachine'},
-    {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
-    {name: 'robotMachine', type: 'RobotMachine'},
+    // {name: 'liftMachine', type: 'LiftMachine'},
+    // {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
+    // {name: 'robotMachine', type: 'RobotMachine'},
   ];
 
   machines: { name: string, machine: BaseMachine }[] = []; // 所有机器的实例
@@ -84,7 +85,7 @@ export class RollerMetalComponent implements OnInit {
     this.instantiateMachines();
     this.init();
     this.startUp();
-    // this.animation();
+    this.animation();
 
     this.orbitControls = createOrbitControls(this.camera, this.scene, this.renderer);
     this.render();
@@ -101,7 +102,7 @@ export class RollerMetalComponent implements OnInit {
   }
 
   private init() {
-    this.otherPromise.push(this.rail.init());
+    // this.otherPromise.push(this.rail.init());
     this.initMachines();
   }
 
@@ -141,25 +142,55 @@ export class RollerMetalComponent implements OnInit {
    * 初始化各种机器的位置
    */
   positionInit() {
-    this.rail.group.position.set(242.6, 0, 10.6);
-    this.getMachine<MoveCutMachine>('moveCut1').group.position.setX(28);
-    this.getMachine<BigPunchMachine>('bigPunch').group.position.setX(54);
-    this.getMachine<BigPunchMachine>('moveCut2').group.position.setX(82);
+    // this.rail.group.position.set(242.6, 0, 10.6);
+    this.getMachine<AppendingMachine>('append').group.position.set(-4.5, 0, -2.4);
+    this.getMachine<MoveCutMachine>('moveCut1').group.position.set(28, 0, 9);
+    this.getMachine<BigPunchMachine>('bigPunch').group.position.set(54, 0, 12);
+    this.getMachine<BigPunchMachine>('moveCut2').group.position.set(82, 0, 9);
     this.getMachine<BigPunchMachine>('no2').group.position.setX(108);
-    this.getMachine<BigPunchMachine>('moveCut3').group.position.setX(135);
+    this.getMachine<BigPunchMachine>('moveCut3').group.position.set(135, 0, 9);
     this.getMachine<BigPunchMachine>('no3').group.position.setX(162.5);
-    this.getMachine<BigPunchMachine>('moveCut4').group.position.setX(190);
+    this.getMachine<BigPunchMachine>('moveCut4').group.position.set(190, 0, 9);
     this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
     this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, -4.6, 7);
     this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
     this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
     this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
     this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
-    this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
-    this.getMachine<BigPunchMachine>('liftMachine').group.rotation.set(0, -Math.PI / 2, 0);
-    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
-    this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
-    this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
+    // this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
+    // this.getMachine<BigPunchMachine>('liftMachine').group.rotation.set(0, -Math.PI / 2, 0);
+    // this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
+    // this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
+    // this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
+
+    // 动画衔接
+    this.getMachine<AppendingMachine>('append').horizontalEnd.subscribe(() => {
+      this.getMachine<MoveCutMachine>('moveCut1')!.playTranslationLeft();
+      this.getMachine<MoveCutMachine>('moveCut2')!.playTranslationLeft();
+      this.getMachine<MoveCutMachine>('moveCut3')!.playTranslationLeft();
+      this.getMachine<MoveCutMachine>('moveCut4')!.playTranslationLeft();
+    });
+
+    this.getMachine<MoveCutMachine>('moveCut1').translationRestoreRightEnd.subscribe(() => {
+      this.getMachine<MoveCutMachine>('bigPunch').playVertical();
+    });
+
+    this.getMachine<MoveCutMachine>('moveCut2').translationRestoreRightEnd.subscribe(() => {
+      this.getMachine<MoveCutMachine>('no2').playVertical();
+    });
+
+    this.getMachine<MoveCutMachine>('moveCut2').translationRestoreRightEnd.subscribe(() => {
+      this.getMachine<MoveCutMachine>('no3').playVertical();
+    });
+
+    this.getMachine<MoveCutMachine>('moveCut3').translationRestoreRightEnd.subscribe(() => {
+      this.getMachine<MoveCutMachine>('no4').playVertical();
+    });
+
+    this.getMachine<No4>('no4').verticalEnd.subscribe(() => {
+      this.getMachine<MoveCutMachine>('smallCut').playTranslationLeft();
+    });
+
   }
 
   /**
@@ -176,12 +207,9 @@ export class RollerMetalComponent implements OnInit {
   }
 
   playVertical() {
-    this.getMachine<AppendingMachine>('append')!.playVertical();
+    this.getMachine<SmallCutMachine>('smallCut')!.playVertical();
   }
 
-  moveVertical() {
-    this.appendMachine.moveVertical();
-  }
 
   animation() {
     requestAnimationFrame(() => this.animation());

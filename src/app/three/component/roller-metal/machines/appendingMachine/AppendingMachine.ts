@@ -98,7 +98,7 @@ export class AppendingMachine extends BaseMachine {
     this.renderer = renderer;
     this.scene = scene;
 
-    this.createAnimation();
+    this.initAnimation();
     return new Promise(resolve => {
       const allPathLoad = PATH.map(machinePath => loadMtlObj(machinePath.mtlPath, machinePath.objPath, this.manager, SHRINK));
       zip(...allPathLoad).subscribe(([base, vertical, horizontal]) => {
@@ -128,12 +128,12 @@ export class AppendingMachine extends BaseMachine {
     });
   }
 
-  private createAnimation() {
-    this.createHorizontalAnimation();
-    this.createVerticalAnimation();
+  private initAnimation() {
+    this.initHorizontalAnimation();
+    this.initVerticalAnimation();
   }
 
-  private createHorizontalAnimation() {
+  private initHorizontalAnimation() {
     const times = [];
     const values = [];
     const tmp = new Vector3();
@@ -161,7 +161,7 @@ export class AppendingMachine extends BaseMachine {
     Object.assign(this.getAnimationManager('vh'), {track, clip, action, mixer});
   }
 
-  private createVerticalAnimation() {
+  private initVerticalAnimation() {
     const times = [];
     const values = [];
     const tmp = new Vector3();
@@ -184,17 +184,9 @@ export class AppendingMachine extends BaseMachine {
     action.loop = LoopOnce;
     mixer.addEventListener('finished', () => {
       this.playHorizontal();
-      this.horizontalEnd.next(this.horizontalGroup);
+      this.verticalEnd.next(this.horizontalGroup);
     });
     Object.assign(this.getAnimationManager('vertical'), {track, clip, action, mixer});
-  }
-
-  private getAnimationManager(name: string): AnimationManager {
-    const matchAm = this.animationManagers.find(am => am.name === name);
-    if (!matchAm) {
-      throw new Error('动画管理器名字不匹配');
-    }
-    return matchAm;
   }
 
   /**

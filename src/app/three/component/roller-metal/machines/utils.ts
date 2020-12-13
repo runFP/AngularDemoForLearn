@@ -1,6 +1,18 @@
 import {MaterialCreator, MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
-import {Box3, DefaultLoadingManager, GridHelper, Group, LoadingManager, Material, Raycaster, Vector3} from 'three';
+import {
+  AnimationAction,
+  AnimationClip,
+  Box3,
+  DefaultLoadingManager,
+  GridHelper,
+  Group, KeyframeTrack,
+  LoadingManager, LoopOnce,
+  Material, NumberKeyframeTrack,
+  Raycaster,
+  Vector3,
+  VectorKeyframeTrack
+} from 'three';
 import {Observable} from 'rxjs';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
@@ -36,14 +48,13 @@ export function loadMtlObj(mtlPath: string, objPath: string, manager: LoadingMan
 }
 
 export function createOrbitControls(camera, scene, renderer, object3d?: any[]): OrbitControls {
-  const helper = new GridHelper(1000, 100);
-  scene.add(helper);
+  // const helper = new GridHelper(1000, 100);
+  // scene.add(helper);
 
   const orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.update();
   orbitControls.addEventListener('change', (event) => {
     renderer.render(scene, camera);
-    console.log('orbitControls change');
   });
   return orbitControls;
 }
@@ -124,6 +135,24 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
     return group;
   });
 
+}
+
+export function createAnimation(trackName, clipName, times, values, mixer, duration, trackType = 'Number'): { track: KeyframeTrack, clip: AnimationClip, action: AnimationAction } {
+  let track = null;
+  switch (trackType) {
+    case 'Vector':
+      track = new VectorKeyframeTrack(trackName, times, values);
+      break;
+    case 'Number':
+      track = new NumberKeyframeTrack(trackName, times, values);
+      break;
+  }
+
+  const clip = new AnimationClip(clipName, duration, [track]);
+  const action = mixer.clipAction(clip);
+  action.clampWhenFinished = true;
+  action.loop = LoopOnce;
+  return {track, clip, action};
 }
 
 
