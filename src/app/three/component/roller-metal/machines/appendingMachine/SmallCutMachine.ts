@@ -33,6 +33,7 @@ export class SmallCutMachine extends BaseMachine {
   clamp: MtlObjInf = null;
 
   group = new Group();
+  clampGroup = new Group();
   translationGroup = new Group();
   verticalGroup = new Group();
 
@@ -44,8 +45,19 @@ export class SmallCutMachine extends BaseMachine {
   translationRestoreRightEnd = new Subject();
   translationRestoreLeftStart = new Subject();
   translationRestoreLeftEnd = new Subject();
+  clampRightStart = new Subject();
+  clampRightEnd = new Subject();
+  clampLeftStart = new Subject();
+  clampLeftEnd = new Subject();
+  clampRestoreRightStart = new Subject();
+  clampRestoreRightEnd = new Subject();
+  clampRestoreLeftStart = new Subject();
+  clampRestoreLeftEnd = new Subject();
   verticalStart = new Subject();
   verticalEnd = new Subject();
+
+  previousActionsType = {'translation': null, 'clamp': null, 'vertical': null};
+
 
   // 混合/动画控制控制
   animationManagers: AnimationManager[] = [
@@ -53,6 +65,10 @@ export class SmallCutMachine extends BaseMachine {
     {name: 'translationLeft', track: null, action: null, clip: null, mixer: null},
     {name: 'translationRestoreRight', track: null, action: null, clip: null, mixer: null},
     {name: 'translationRestoreLeft', track: null, action: null, clip: null, mixer: null},
+    {name: 'clampRight', track: null, action: null, clip: null, mixer: null},
+    {name: 'clampLeft', track: null, action: null, clip: null, mixer: null},
+    {name: 'clampRestoreRight', track: null, action: null, clip: null, mixer: null},
+    {name: 'clampRestoreLeft', track: null, action: null, clip: null, mixer: null},
     {name: 'vertical', track: null, action: null, clip: null, mixer: null},
   ];
 
@@ -71,11 +87,12 @@ export class SmallCutMachine extends BaseMachine {
         this.pole = pole;
         this.clamp = clamp;
 
-        const [baseG, girderG, poleG, clampG] = fixedObjLocalOrigin([base, girder, pole, clamp])
+        const [baseG, girderG, poleG, clampG] = fixedObjLocalOrigin([base, girder, pole, clamp]);
 
-        this.translationGroup.add(poleG, clampG);
-        this.verticalGroup.add(girderG, this.translationGroup);
-        this.group.add(baseG, this.verticalGroup, this.verticalGroup);
+        this.clampGroup.add(clampG);
+        this.translationGroup.add(poleG, this.clampGroup);
+        this.verticalGroup.add(baseG, this.translationGroup);
+        this.group.add(girderG, this.verticalGroup, this.verticalGroup);
       }, () => {
       }, () => {
         resolve(this);
@@ -85,10 +102,11 @@ export class SmallCutMachine extends BaseMachine {
 
   private initAnimation() {
     this.initTranslationMoveAnimation();
+    this.initClampMoveAnimation();
     this.initVerticalMoveAnimation();
   }
 
-  private initTranslationMoveAnimation(duration = 3) {
+  private initTranslationMoveAnimation(duration = 2.2) {
     const times = [];
     const valuesR = [];
     const valuesL = [];
@@ -96,6 +114,7 @@ export class SmallCutMachine extends BaseMachine {
     const valuesRL = [];
     const distance = 6;
     const rate = distance / duration / 10;
+
 
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
@@ -116,19 +135,22 @@ export class SmallCutMachine extends BaseMachine {
     const restoresLeftAnimation = createAnimation('.position[x]', 'translationRestoreLeft', times, valuesRL, mixer, duration);
 
     mixer.addEventListener('finished', (e) => {
-      if (this.activeAction.name === 'translationRight') {
+      if (this.previousActionsType['translation'].name === 'translationRight') {
         this.translationRightEnd.next(this.translationGroup);
-        this.playVertical();
-      } else if (this.activeAction.name === 'translationLeft') {
+        this.playClampRestoresLeft();
+        // this.playVertical();
+      } else if (this.previousActionsType['translation'].name === 'translationLeft') {
         this.translationLeftEnd.next(this.translationGroup);
-        this.playVertical();
-      } else if (this.activeAction.name === 'translationRestoreRight') {
+        this.playClampLeft();
+        // this.playVertical();
+      } else if (this.previousActionsType['translation'].name === 'translationRestoreRight') {
         this.translationRestoreRightEnd.next(this.translationGroup);
+        this.playClampRestoresRight();
         // 一直循环
         if (this.loop) {
           this.playTranslationLeft();
         }
-      } else if (this.activeAction.name === 'translationRestoreLeft') {
+      } else if (this.previousActionsType['translation'].name === 'translationRestoreLeft') {
         this.translationRestoreLeftEnd.next(this.translationGroup);
         this.playTranslationRight();
       }
@@ -138,6 +160,53 @@ export class SmallCutMachine extends BaseMachine {
     Object.assign(this.getAnimationManager('translationLeft'), {...leftAnimation, mixer});
     Object.assign(this.getAnimationManager('translationRestoreRight'), {...restoresRightAnimation, mixer});
     Object.assign(this.getAnimationManager('translationRestoreLeft'), {...restoresLeftAnimation, mixer});
+  }
+
+  private initClampMoveAnimation(duration = 1.4) {
+    const times = [];
+    const valuesR = [];
+    const valuesL = [];
+    const valuesRR = [];
+    const valuesRL = [];
+    const distance = 10;
+    const rate = distance / duration / 10;
+    for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
+      times.push(i / 10);
+      // right
+      valuesR.push(rate * i);
+      // left
+      valuesL.push(-rate * i);
+      // restoreRight
+      valuesRR.push(rate * j);
+      // restoreLeft
+      valuesRL.push(-rate * j);
+    }
+
+    const mixer = new AnimationMixer(this.clampGroup);
+    const rightAnimation = createAnimation('.position[x]', 'clampRight', times, valuesR, mixer, duration);
+    const leftAnimation = createAnimation('.position[x]', 'clampLeft', times, valuesL, mixer, duration);
+    const restoresRightAnimation = createAnimation('.position[x]', 'clampRestoreRight', times, valuesRR, mixer, duration);
+    const restoresLeftAnimation = createAnimation('.position[x]', 'clampRestoreLeft', times, valuesRL, mixer, duration);
+
+    mixer.addEventListener('finished', (e) => {
+      if (this.previousActionsType['clamp'].name === 'clampRight') {
+        this.clampRightEnd.next(this.translationGroup);
+        this.playVertical();
+      } else if (this.previousActionsType['clamp'].name === 'clampLeft') {
+        this.clampLeftEnd.next(this.translationGroup);
+        this.playVertical();
+      } else if (this.previousActionsType['clamp'].name === 'clampRestoreRight') {
+        this.clampRestoreRightEnd.next(this.translationGroup);
+      } else if (this.previousActionsType['clamp'].name === 'clampRestoreLeft') {
+        this.clampRestoreLeftEnd.next(this.translationGroup);
+        this.playClampRight();
+      }
+    });
+
+    Object.assign(this.getAnimationManager('clampRight'), {...rightAnimation, mixer});
+    Object.assign(this.getAnimationManager('clampLeft'), {...leftAnimation, mixer});
+    Object.assign(this.getAnimationManager('clampRestoreRight'), {...restoresRightAnimation, mixer});
+    Object.assign(this.getAnimationManager('clampRestoreLeft'), {...restoresLeftAnimation, mixer});
   }
 
   private initVerticalMoveAnimation(duration = 0.6) {
@@ -159,12 +228,10 @@ export class SmallCutMachine extends BaseMachine {
     const animation = createAnimation('.position[y]', 'vertical', times, values, mixer, duration);
 
     mixer.addEventListener('finished', (e) => {
-      if (this.activeAction) {
-        if (this.activeAction.name === 'translationRight') {
-          this.playRestoresRight();
-        } else if (this.activeAction.name === 'translationLeft') {
-          this.playRestoresLeft();
-        }
+      if (this.previousActionsType['translation'].name === 'translationRight') {
+        this.playRestoresRight();
+      } else if (this.previousActionsType['translation'].name === 'translationLeft') {
+        this.playRestoresLeft();
       }
       this.verticalEnd.next(this.verticalGroup);
     });
@@ -175,39 +242,55 @@ export class SmallCutMachine extends BaseMachine {
   playTranslationRight(duration = 0.2) {
     this.isPlay = true;
     this.translationRightStart.next(this.translationGroup);
-    this.fadeToAction('translationRight', 0.2);
+    this.multipleFadeToAction('translationRight', 0.2, 'translation');
   }
 
   playTranslationLeft(duration = 0.2) {
     this.isPlay = true;
     this.translationLeftStart.next(this.translationGroup);
-    this.fadeToAction('translationLeft', 0.2);
+    this.multipleFadeToAction('translationLeft', 0.2, 'translation');
   }
 
   playRestoresRight(duration = 0.2) {
     this.isPlay = true;
     this.translationRestoreRightStart.next(this.translationGroup);
-    this.fadeToAction('translationRestoreRight', 0.2);
+    this.multipleFadeToAction('translationRestoreRight', 0.2, 'translation');
   }
 
   playRestoresLeft(duration = 0.2) {
     this.isPlay = true;
-    this.translationRestoreLeftStart.next(this.translationGroup);
-    this.fadeToAction('translationRestoreLeft', 0.2);
+    this.clampRestoreLeftStart.next(this.translationGroup);
+    this.multipleFadeToAction('translationRestoreLeft', 0.2, 'translation');
   }
 
-  /**
-   * 该动画需要结合playRight或者playLeft以保证x得位置，因此不需要调用fadeToAction
-   * @param duration
-   */
+  /** 抓手*/
+  playClampRight(duration = 0.2) {
+    this.isPlay = true;
+    this.clampRightStart.next(this.clampGroup);
+    this.multipleFadeToAction('clampRight', 0.2, 'clamp');
+  }
+
+  playClampLeft(duration = 0.2) {
+    this.isPlay = true;
+    this.clampLeftStart.next(this.clampGroup);
+    this.multipleFadeToAction('clampLeft', 0.2, 'clamp');
+  }
+
+  playClampRestoresRight(duration = 0.2) {
+    this.isPlay = true;
+    this.clampRestoreRightStart.next(this.clampGroup);
+    this.multipleFadeToAction('clampRestoreRight', 0.2, 'clamp');
+  }
+
+  playClampRestoresLeft(duration = 0.2) {
+    this.isPlay = true;
+    this.clampRestoreLeftStart.next(this.clampGroup);
+    this.multipleFadeToAction('clampRestoreLeft', 0.2, 'clamp');
+  }
+
   playVertical(duration = 1.2) {
     this.isPlay = true;
     this.verticalStart.next(this.verticalGroup);
-    this.getAnimationManager('vertical').action.reset()
-      .setEffectiveTimeScale(1)
-      .setEffectiveWeight(1)
-      .fadeIn(duration)
-      .play();
+    this.multipleFadeToAction('vertical', duration, 'vertical');
   }
-
 }

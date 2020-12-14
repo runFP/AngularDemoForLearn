@@ -9,7 +9,8 @@ export class BaseMachine {
   isInit = false;
 
   // 当一个mixe有多个动画时，避免彼此干扰
-  previousAction; // 上次激活动画
+  previousAction; // 上次激活动画（单类型动画）
+  previousActionsType: { [type: string]: null | AnimationManager }; // 上次激活动画（多类型动画）
   activeAction; // 当前激活动画
 
   isPlay = false; // 当前动画播放状态
@@ -33,7 +34,12 @@ export class BaseMachine {
     return matchAm;
   }
 
-  // 动画渐入
+  /**
+   * 单类型动画控制
+   * @param name
+   * @param duration
+   * @protected
+   */
   protected fadeToAction(name, duration) {
     this.previousAction = this.activeAction;
     this.activeAction = this.getAnimationManager(name);
@@ -44,6 +50,29 @@ export class BaseMachine {
 
     this.activeAction.action
       .reset()
+      .setEffectiveTimeScale(1)
+      .setEffectiveWeight(1)
+      .fadeIn(duration)
+      .play();
+  }
+
+  /**
+   * 多类型动画控制
+   * @param name
+   * @param duration
+   * @param type
+   */
+  protected multipleFadeToAction(name, duration, type) {
+    const previousAction = this.previousActionsType[type];
+    const activeAction = this.getAnimationManager(name);
+    this.activeAction = activeAction;
+    this.previousActionsType[type] = activeAction;
+
+    if (previousAction) {
+      previousAction.action.fadeOut(duration);
+    }
+
+    activeAction.action.reset()
       .setEffectiveTimeScale(1)
       .setEffectiveWeight(1)
       .fadeIn(duration)
