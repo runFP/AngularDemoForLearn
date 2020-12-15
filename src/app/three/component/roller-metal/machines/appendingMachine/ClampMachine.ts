@@ -17,6 +17,7 @@ export class ClampMachine extends BaseMachine {
   base: MtlObjInf = null;
 
   group = new Group();
+  clampGroup = new Group();
   // 已经进行了位置修复的组，组内包含了最原始的模型对象
 
   animationManagers: AnimationManager[] = [];
@@ -26,18 +27,39 @@ export class ClampMachine extends BaseMachine {
   }
 
   init(): Promise<any> {
+    this.initAnimation();
     return new Promise<any>(resolve => {
       const allPathLoad = PATH.map(machinePath => loadMtlObj(machinePath.mtlPath, machinePath.objPath, this.manager, SHRINK));
       zip(...allPathLoad).subscribe(([base]) => {
         this.base = base;
 
         const [baseG] = fixedObjLocalOrigin([base]);
-
-        this.group.add(baseG);
+        this.clampGroup.add(baseG);
+        this.group.add(this.clampGroup);
       }, () => {
       }, () => {
         resolve(this);
       });
     });
   }
+
+  private initAnimation() {
+    this.initAnimationVertical();
+  }
+
+  private initAnimationVertical(duration = 1) {
+    const times = [];
+    const values = [];
+
+    for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
+      times.push(i / 10);
+      if (i === Math.floor(duration * 10 / 2)) {
+        values.push();
+      } else {
+
+      }
+    }
+
+  }
+
 }

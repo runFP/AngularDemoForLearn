@@ -46,7 +46,7 @@ export class RollerMetalComponent implements OnInit {
     {name: 'no4', type: 'No4'},
     // {name: 'smallCut', type: 'SmallCut'},
     {name: 'car', type: 'Car'},
-    // {name: 'clamp', type: 'Clamp'},
+    {name: 'clamp', type: 'Clamp'},
     {name: 'riveting', type: 'Riveting'},
     // {name: 'moveBelt', type: 'MoveBelt'},
     // {name: 'liftMachine', type: 'LiftMachine'},
@@ -155,7 +155,7 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
     // this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
     this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
-    // this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
+    this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
     this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
     // this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
     // this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
