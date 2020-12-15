@@ -1,7 +1,7 @@
 import {AnimationManager, BaseMachine} from '../baseMachine';
-import {AnimationClip, AnimationMixer, Group, LoadingManager} from 'three';
+import {AnimationMixer, Group, LoadingManager} from 'three';
 import {createAnimation, fixedObjLocalOrigin, loadMtlObj, MtlObjInf} from '../utils';
-import {zip} from 'rxjs';
+import {Subject, zip} from 'rxjs';
 
 const SHRINK = 100;
 const PATH = [
@@ -30,6 +30,13 @@ export class CarMachine extends BaseMachine {
 
   mixer = null;
 
+  move1Start = new Subject();
+  move1End = new Subject();
+  move2Start = new Subject();
+  move2End = new Subject();
+  moveBackStart = new Subject();
+  moveBackEnd = new Subject();
+
   constructor(manager?: LoadingManager) {
     super(manager);
   }
@@ -53,12 +60,23 @@ export class CarMachine extends BaseMachine {
 
   private initAnimation(): void {
     this.mixer = new AnimationMixer(this.carGroup);
+    this.mixer.addEventListener('finished', () => {
+      if (this.activeAction) {
+        if (this.activeAction.name === 'carMove1') {
+          this.move1End.next(this.carGroup);
+        } else if (this.activeAction.name === 'carMove2') {
+          this.move2End.next(this.carGroup);
+        } else if (this.activeAction.name === 'carMoveBack') {
+          this.moveBackEnd.next(this.carGroup);
+        }
+      }
+    });
     this.initMove1Animation();
     this.initMove2Animation();
     this.initMoveBackAnimation();
   }
 
-  private initMove1Animation(duration = 0.6) {
+  private initMove1Animation(duration = 1) {
     const times = [];
     const values = [];
     const distance = 4;
@@ -76,7 +94,6 @@ export class CarMachine extends BaseMachine {
   }
 
   private initMove2Animation(duration = 2.4) {
-    console.log('move1EndPoint', this.move1EndPoint);
     const times = [];
     const values = [];
     const distance = 14;
@@ -106,16 +123,19 @@ export class CarMachine extends BaseMachine {
 
   playMove1(duration = 0.2) {
     this.isPlay = true;
+    this.move1Start.next(this.carGroup);
     this.fadeToAction('carMove1', duration);
   }
 
   playMove2(duration = 0.2) {
     this.isPlay = true;
+    this.move2Start.next(this.carGroup);
     this.fadeToAction('carMove2', duration);
   }
 
   playMoveBack(duration = 0.2) {
     this.isPlay = true;
+    this.moveBackStart.next(this.carGroup);
     this.fadeToAction('carMoveBack', duration);
   }
 

@@ -1,7 +1,7 @@
 import {AnimationManager, BaseMachine} from '../baseMachine';
-import {Group, LoadingManager} from 'three';
-import {fixedObjLocalOrigin, loadMtlObj, MtlObjInf} from '../utils';
-import {zip} from 'rxjs';
+import {AnimationMixer, Group, LoadingManager} from 'three';
+import {createAnimation, fixedObjLocalOrigin, loadMtlObj, MtlObjInf} from '../utils';
+import {Subject, zip} from 'rxjs';
 
 const SHRINK = 100;
 const PATH = [
@@ -20,7 +20,12 @@ export class ClampMachine extends BaseMachine {
   clampGroup = new Group();
   // 已经进行了位置修复的组，组内包含了最原始的模型对象
 
-  animationManagers: AnimationManager[] = [];
+  animationManagers: AnimationManager[] = [
+    {name: 'vertical', track: null, action: null, clip: null, mixer: null},
+  ];
+
+  moveVerticalStart = new Subject();
+  moveVerticalEnd = new Subject();
 
   constructor(manager?: LoadingManager) {
     super(manager);
@@ -53,13 +58,26 @@ export class ClampMachine extends BaseMachine {
 
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
-      if (i === Math.floor(duration * 10 / 2)) {
-        values.push();
+      if (i <= Math.floor(duration * 10 / 2)) {
+        values.push(-i);
       } else {
-
+        values.push(-j);
       }
     }
 
+    const mixer = new AnimationMixer(this.clampGroup);
+    const animation = createAnimation('.position[y]', 'clampMove', times, values, mixer, duration);
+    mixer.addEventListener('finished', () => {
+      this.moveVerticalEnd.next(this.clampGroup);
+    });
+
+    Object.assign(this.getAnimationManager('vertical'), {...animation, mixer});
+  }
+
+  playClampMove() {
+    this.isPlay = true;
+    this.moveVerticalStart.next(this.clampGroup);
+    this.getAnimationManager('vertical').action.reset().play();
   }
 
 }

@@ -21,7 +21,7 @@ export class BaseMachine {
   }
 
   init(...args): Promise<any> {
-    return new Promise<any>(resolve => {
+    return new Promise<any>(() => {
     });
   }
 
@@ -45,7 +45,7 @@ export class BaseMachine {
     this.activeAction = this.getAnimationManager(name);
 
     if (this.previousAction && this.previousAction.name !== this.activeAction.name) {
-      this.previousAction.action.fadeOut(duration);
+      this.previousAction.mixer.stopAllAction();
     }
 
     this.activeAction.action
