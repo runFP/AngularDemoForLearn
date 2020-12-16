@@ -8,7 +8,7 @@ import {
   GridHelper,
   Group, KeyframeTrack,
   LoadingManager, LoopOnce,
-  Material, NumberKeyframeTrack,
+  Material, NumberKeyframeTrack, Object3D,
   Raycaster,
   Vector3,
   VectorKeyframeTrack
@@ -17,9 +17,6 @@ import {Observable} from 'rxjs';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 import {TransformControls} from 'three/examples/jsm/controls/TransformControls';
-import {isArray} from 'util';
-import {AppendingMachine} from './appendingMachine/AppendingMachine';
-import {BaseMachine} from './baseMachine';
 
 /**
  * 加载MTLOBJ文件
@@ -76,7 +73,8 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
     const intersections = raycaster.intersectObjects(object3d, true);
     if (intersections.length > 0) {
       const object = intersections[0].object;
-
+      console.log(object);
+      transformControl.attach(object);
       function groupInclude(group, isInclude = false): boolean {
         group.children.forEach(item => {
           if (item.isGroup) {
@@ -90,16 +88,15 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
         return isInclude;
       }
 
-      object3d.forEach(group => {
+    /*  object3d.forEach(group => {
         if (groupInclude(group)) {
           transformControl.attach(group);
         }
-      });
+      });*/
     }
   });
 
   transformControl.addEventListener('change', (event) => {
-    console.log('transformControl change', event);
     console.log('transformControl change', event.target.children[0].worldPosition);
     renderer.render(scene, camera);
   });
@@ -135,6 +132,25 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
     return group;
   });
 
+}
+
+/**
+ * 按照给定的对象来对源对象进行缩放，和位置的修复，保持和目标对象一致，
+ * 当你需要从一个整体模型抽出一小个独立的模型时，为保持小模型的位置依然处于整体模型的位置
+ * @param targetObj
+ * @param originObj
+ */
+export function fixedObjSingle(targetObj: MtlObjInf, originObj: Object3D): Group {
+  const group = new Group();
+  const vector = new Vector3();
+  const targetScale = targetObj.obj.scale;
+
+  targetObj.box3.getCenter(vector);
+  originObj.scale.set(targetScale.x, targetScale.y, targetScale.z);
+  originObj.position.set(-vector.x, 0, -vector.z);
+  group.add(originObj);
+
+  return group;
 }
 
 export function createAnimation(trackName, clipName, times, values, mixer, duration, trackType = 'Number'): { track: KeyframeTrack, clip: AnimationClip, action: AnimationAction } {

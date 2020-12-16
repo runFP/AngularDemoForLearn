@@ -13,7 +13,7 @@ const PATH = [
 ];
 
 export class ClampMachine extends BaseMachine {
-  name: 'clamp';
+  name = 'clamp';
   base: MtlObjInf = null;
 
   group = new Group();

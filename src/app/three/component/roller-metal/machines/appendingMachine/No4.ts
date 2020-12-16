@@ -21,7 +21,7 @@ const PATH = [
 ];
 
 export class No4 extends BaseMachine {
-  name: 'no4';
+  name = 'no4';
   base: MtlObjInf = null;
   vertical: MtlObjInf = null;
   alertLight: MtlObjInf = null;

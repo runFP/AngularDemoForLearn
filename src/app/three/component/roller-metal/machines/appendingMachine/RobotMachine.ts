@@ -13,7 +13,7 @@ const PATH = [
 ];
 
 export class RobotMachine extends BaseMachine {
-  name: 'robot';
+  name = 'robot';
   base: MtlObjInf = null;
 
   group = new Group();

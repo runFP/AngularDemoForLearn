@@ -13,7 +13,7 @@ const PATH = [
 ];
 
 export class LineSpeedMachine extends BaseMachine {
-  name: 'lineSpeed';
+  name = 'lineSpeed';
   base: MtlObjInf = null;
 
   group = new Group();

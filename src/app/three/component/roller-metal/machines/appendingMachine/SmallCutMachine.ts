@@ -25,7 +25,7 @@ const PATH = [
 ];
 
 export class SmallCutMachine extends BaseMachine {
-  name: 'smallCut';
+  name = 'smallCut';
   // 导入的最原始的模型对象（object3D)
   base: MtlObjInf = null;
   girder: MtlObjInf = null;

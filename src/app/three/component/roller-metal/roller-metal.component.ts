@@ -14,6 +14,9 @@ import {SmallCutMachine} from './machines/appendingMachine/SmallCutMachine';
 import {No4} from './machines/appendingMachine/No4';
 import {CarMachine} from './machines/appendingMachine/CarMachine';
 import {ClampMachine} from './machines/appendingMachine/ClampMachine';
+import {RivetingMachine} from './machines/appendingMachine/RivetingMachine';
+import {MoveBeltMachine} from './machines/appendingMachine/MoveBeltMachine';
+import {LiftMachine} from './machines/appendingMachine/LiftMachine';
 
 @Component({
   selector: 'app-roller-metal',
@@ -29,6 +32,7 @@ export class RollerMetalComponent implements OnInit {
   orbitControls: OrbitControls;
   clock = new Clock();
   loadManager = new LoadingManager();
+  isLoadComplete = false; // 是否完全加载
 
   // rail = new Rail(this.loadManager);
 
@@ -63,7 +67,9 @@ export class RollerMetalComponent implements OnInit {
 
   constructor(private rmService: RollerMetalService) {
     this.loadManager.onLoad = () => {
-      console.log('load!!!!');
+      console.log('isLoadComplete!!!!');
+      this.isLoadComplete = true;
+      // this.animation();
     };
   }
 
@@ -71,10 +77,7 @@ export class RollerMetalComponent implements OnInit {
     this.renderer = this.rmService.createRenderer(this.container);
     this.scene = this.rmService.createScene();
     this.camera = this.rmService.createCamera();
-    //
-    // const dirLight = new THREE.DirectionalLight(0xffffff);
-    // dirLight.position.set(0, 20, 0);
-    // this.scene.add(this.camera, dirLight);
+
     const ambientLight = new THREE.AmbientLight();
     this.scene.add(ambientLight);
 
@@ -87,7 +90,6 @@ export class RollerMetalComponent implements OnInit {
     this.instantiateMachines();
     this.init();
     this.startUp();
-    this.animation();
 
     this.orbitControls = createOrbitControls(this.camera, this.scene, this.renderer);
     this.render();
@@ -205,6 +207,23 @@ export class RollerMetalComponent implements OnInit {
       this.getMachine<CarMachine>('car').playMove2();
     });
 
+    this.getMachine<CarMachine>('car').move2End.subscribe(() => {
+      this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
+    });
+
+    this.getMachine<RivetingMachine>('riveting').overallJigVerticalEnd.subscribe((inf) => {
+      if (inf.direction === -1) {
+        this.getMachine<RivetingMachine>('riveting').playOverallJigRight();
+        this.getMachine<CarMachine>('car').playMoveBack();
+      } else {
+        this.getMachine<RivetingMachine>('riveting').playOverallJigLeft();
+      }
+    });
+
+    this.getMachine<RivetingMachine>('riveting').overallJigRightEnd.subscribe(() => {
+      this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
+    });
+
   }
 
   /**
@@ -224,16 +243,20 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<CarMachine>('car')!.playMove1();
   }
 
-  playMove2() {
-    this.getMachine<CarMachine>('car')!.playMove2();
+  playMoveBeltVertical() {
+    this.getMachine<MoveBeltMachine>('moveBelt')!.playMoveBeltVertical();
   }
 
-  playMoveBack() {
-    this.getMachine<CarMachine>('car')!.playMoveBack();
+  playMoveBel() {
+    this.getMachine<MoveBeltMachine>('moveBelt')!.playMoveBeltVerticalContinue();
   }
 
-  playClampMove() {
-    this.getMachine<ClampMachine>('clamp')!.playClampMove();
+  playLiftBoardMoveUp() {
+    this.getMachine<LiftMachine>('liftMachine')!.playLiftBoardMoveUp();
+  }
+
+  playLiftBoardMoveDown() {
+    this.getMachine<LiftMachine>('liftMachine')!.playLiftBoardMoveDown();
   }
 
 
@@ -250,9 +273,13 @@ export class RollerMetalComponent implements OnInit {
      */
     const mixerUpdateDelta = this.clock.getDelta();
     this.machines.forEach(machineInf => {
+
       machineInf.machine.animationManagers.forEach(am => {
         if (am.mixer) {
           am.mixer.update(mixerUpdateDelta);
+        }
+        if (machineInf.machine.name === 'moveBelt') {
+          (<MoveBeltMachine>machineInf.machine).checkMoveBeltVerticalHalfState();
         }
       });
       this.render();

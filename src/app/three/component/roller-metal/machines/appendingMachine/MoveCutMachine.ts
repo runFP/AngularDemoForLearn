@@ -28,7 +28,7 @@ const PATH = [
 ];
 
 export class MoveCutMachine extends BaseMachine {
-  name: 'moveCut';
+  name = 'moveCut';
   // 导入的最原始的模型对象（object3D)
   base = null;
   vertical = null;
