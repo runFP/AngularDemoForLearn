@@ -73,8 +73,9 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
     const intersections = raycaster.intersectObjects(object3d, true);
     if (intersections.length > 0) {
       const object = intersections[0].object;
-      console.log(object);
-      transformControl.attach(object);
+
+      // transformControl.attach(object);
+
       function groupInclude(group, isInclude = false): boolean {
         group.children.forEach(item => {
           if (item.isGroup) {
@@ -88,11 +89,12 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
         return isInclude;
       }
 
-    /*  object3d.forEach(group => {
+      object3d.forEach(group => {
         if (groupInclude(group)) {
+          console.log(group);
           transformControl.attach(group);
         }
-      });*/
+      });
     }
   });
 
@@ -115,7 +117,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
  *          再在外面包一层group，而外层group的本地坐标为(x:0,y:0,z:0)恰好与世界坐标一直，通过操作该group来操作原有模型
  * @param inf
  */
-export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
+export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[], fixedY = false): Group[] {
   if (!(inf instanceof Array)) {
     inf = [inf];
   }
@@ -123,7 +125,8 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[]): Group[] {
   return inf.map(item => {
     const vector = new Vector3();
     item.box3.getCenter(vector);
-    item.obj.position.set(-vector.x, 0, -vector.z);
+    item.obj.position.set(-vector.x, fixedY ? -vector.y : 0, -vector.z);
+
 
     // 导入的obj文件有本地坐标原点偏移，使用一个group包着，操作该group来做各种位移，旋转操作
     const group = new Group();
@@ -152,6 +155,46 @@ export function fixedObjSingle(targetObj: MtlObjInf, originObj: Object3D): Group
 
   return group;
 }
+
+/**
+ * 指定属性和判断函数,若判断函数返回true，则把对应object收集，最后添加到一个group中
+ * @param target
+ * @param name 需要判断object的属性，支持命名空间写法 eg: 'material.name' 相当于object[material][name]
+ * @param fn 判断函数回调，第一个参数为根据name拿到object的属性值
+ */
+export function getObjectByProperty(target: Group, name: string, fn: (...arg) => boolean): Group {
+  const group = new Group();
+  const foundObject = [];
+
+  // 根据name找到对应的属性值
+  function nameSplitToProperty(findTarget: Object3D, findName: string, findFn: (...arg) => boolean): boolean {
+    const property = findName.split('.');
+    let i = 0;
+    while (property.length > i) {
+      findTarget = findTarget[property[i]];
+      i++;
+    }
+    return findFn(findTarget);
+  }
+
+  // 递归查找
+  function recursionFind(findGroup, findName, findFn) {
+    if (findGroup.children && findGroup.children.length > 0) {
+      findGroup.children.forEach(child => {
+        recursionFind(child, findName, findFn);
+      });
+    } else {
+      if (nameSplitToProperty(findGroup, findName, findFn)) {
+        foundObject.push(findGroup);
+      }
+    }
+  }
+
+  recursionFind(target, name, fn);
+  group.add(...foundObject);
+  return group;
+}
+
 
 export function createAnimation(trackName, clipName, times, values, mixer, duration, trackType = 'Number'): { track: KeyframeTrack, clip: AnimationClip, action: AnimationAction } {
   let track = null;

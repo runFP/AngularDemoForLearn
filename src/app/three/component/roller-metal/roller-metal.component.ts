@@ -17,6 +17,7 @@ import {ClampMachine} from './machines/appendingMachine/ClampMachine';
 import {RivetingMachine} from './machines/appendingMachine/RivetingMachine';
 import {MoveBeltMachine} from './machines/appendingMachine/MoveBeltMachine';
 import {LiftMachine} from './machines/appendingMachine/LiftMachine';
+import {RobotMachine} from './machines/appendingMachine/RobotMachine';
 
 @Component({
   selector: 'app-roller-metal',
@@ -163,8 +164,9 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
     this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
     this.getMachine<BigPunchMachine>('liftMachine').group.rotation.set(0, -Math.PI / 2, 0);
-    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
-    this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
+    // this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
+    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 0, 0);
+    // this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
     this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
 
     // 动画衔接
@@ -257,6 +259,15 @@ export class RollerMetalComponent implements OnInit {
 
   playLiftBoardMoveDown() {
     this.getMachine<LiftMachine>('liftMachine')!.playLiftBoardMoveDown();
+  }
+
+  playTongRotation() {
+    this.getMachine<RobotMachine>('robotMachine')!.playTongRotation();
+  }
+
+  playRotation() {
+    this.getMachine<RobotMachine>('robotMachine')!.playRotation();
+    this.render();
   }
 
 
