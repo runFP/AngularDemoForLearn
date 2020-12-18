@@ -41,7 +41,7 @@ export class RollerMetalComponent implements OnInit {
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
     // 需要加载的机器名，需和机器的name属性对应,加载后可通过该名字从machine中获取机器实例
   loadMachines: { name: string, type: string }[] = [
-    {name: 'append', type: 'Append'},
+    // {name: 'append', type: 'Append'},
     // {name: 'moveCut1', type: 'MoveCut'},
     // {name: 'bigPunch', type: 'BigPunch'},
     // {name: 'moveCut2', type: 'MoveCut'},
@@ -148,7 +148,7 @@ export class RollerMetalComponent implements OnInit {
    */
   positionInit() {
     // this.rail.group.position.set(242.6, 0, 10.6);
-    this.getMachine<AppendingMachine>('append').group.position.set(-4.5, 0, -2.4);
+    // this.getMachine<AppendingMachine>('append').group.position.set(-4.5, 0, -2.4);
     // this.getMachine<MoveCutMachine>('moveCut1').group.position.set(28, 0, 9);
     // this.getMachine<BigPunchMachine>('bigPunch').group.position.set(54, 0, 12);
     // this.getMachine<BigPunchMachine>('moveCut2').group.position.set(82, 0, 9);
@@ -165,17 +165,17 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
     this.getMachine<BigPunchMachine>('liftMachine').group.rotation.set(0, -Math.PI / 2, 0);
     // this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
-    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 0, 0);
+    // this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 0, 0);
     // this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
     this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
 
     // 动画衔接
-    this.getMachine<AppendingMachine>('append').horizontalEnd.subscribe(() => {
-      // this.getMachine<MoveCutMachine>('moveCut1')!.playTranslationLeft();
-      // this.getMachine<MoveCutMachine>('moveCut2')!.playTranslationLeft();
-      // this.getMachine<MoveCutMachine>('moveCut3')!.playTranslationLeft();
-      this.getMachine<MoveCutMachine>('moveCut4')!.playTranslationLeft();
-    });
+    // this.getMachine<AppendingMachine>('append').horizontalEnd.subscribe(() => {
+    //   // this.getMachine<MoveCutMachine>('moveCut1')!.playTranslationLeft();
+    //   // this.getMachine<MoveCutMachine>('moveCut2')!.playTranslationLeft();
+    //   // this.getMachine<MoveCutMachine>('moveCut3')!.playTranslationLeft();
+    //   this.getMachine<MoveCutMachine>('moveCut4')!.playTranslationLeft();
+    // });
 
     // this.getMachine<MoveCutMachine>('moveCut1').translationRestoreRightEnd.subscribe(() => {
     //   this.getMachine<MoveCutMachine>('bigPunch').playVertical();

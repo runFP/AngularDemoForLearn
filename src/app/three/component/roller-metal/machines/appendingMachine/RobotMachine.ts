@@ -39,9 +39,10 @@ export class RobotMachine extends BaseMachine {
       zip(...allPathLoad).subscribe(([base]) => {
         this.base = base;
         // 抓手
-            const tong = getObjectByProperty(base.obj, 'material.name', value => ['Material_A7', 'Material_A8', 'Material_A9'].indexOf(value) !== -1);
-            const tongG = fixedObjSingle(base, tong);
-            this.tongG.add(tongG);
+        const tong = getObjectByProperty(base.obj, 'material.name', value => ['Material_A7', 'Material_A8', 'Material_A9'].indexOf(value) !== -1);
+        const tongG = fixedObjSingle(base, tong, {x: 3, y: 0, z: 0});
+        this.tongG.add(tongG.group);
+        console.log(tongG.fixedPosition);
         /*    // 臂1
             const arm2 = getObjectByProperty(base.obj, 'material.name', value => ['Material_A3', 'Material_A4', 'Material_A5', 'Material_A6'].indexOf(value) !== -1);
             const arm2G = fixedObjSingle(base, arm2);
@@ -54,9 +55,9 @@ export class RobotMachine extends BaseMachine {
             const pedestal = getObjectByProperty(base.obj, 'material.name', value => value === 'Material_A1');
             const pedestalG = fixedObjSingle(base, pedestal);
             this.pedestalG.add(pedestalG);*/
-
+        this.tongG.position.set(tongG.fixedPosition.x, tongG.fixedPosition.y, tongG.fixedPosition.z);
         const [baseG] = fixedObjLocalOrigin([base], true);
-        baseG.rotation.set(-Math.PI / 2, 0, 0);
+        // baseG.rotation.set(-Math.PI / 2, 0, 0);
         // this.group.add(baseG, this.pedestalG, this.arm1G, this.arm2G, tong);
         this.group.add(baseG, this.tongG);
       }, () => {

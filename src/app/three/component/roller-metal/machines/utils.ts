@@ -23,6 +23,7 @@ import {TransformControls} from 'three/examples/jsm/controls/TransformControls';
  * @param objPath
  * @param mtlPath
  * @param manager
+ * @param shrink
  */
 export function loadMtlObj(mtlPath: string, objPath: string, manager: LoadingManager = DefaultLoadingManager, shrink: number = 1): Observable<MtlObjInf> {
   const mtl = new MTLLoader(manager);
@@ -45,8 +46,8 @@ export function loadMtlObj(mtlPath: string, objPath: string, manager: LoadingMan
 }
 
 export function createOrbitControls(camera, scene, renderer, object3d?: any[]): OrbitControls {
-  // const helper = new GridHelper(1000, 100);
-  // scene.add(helper);
+  const helper = new GridHelper(1000, 100);
+  scene.add(helper);
 
   const orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.update();
@@ -116,6 +117,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
  * 修复原理：先把模型的位置通过position归为到世界坐标原点(x:0,y:0,z:0),
  *          再在外面包一层group，而外层group的本地坐标为(x:0,y:0,z:0)恰好与世界坐标一直，通过操作该group来操作原有模型
  * @param inf
+ * @param fixedY
  */
 export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[], fixedY = false): Group[] {
   if (!(inf instanceof Array)) {
@@ -138,22 +140,40 @@ export function fixedObjLocalOrigin(inf: MtlObjInf | MtlObjInf[], fixedY = false
 }
 
 /**
- * 按照给定的对象来对源对象进行缩放，和位置的修复，保持和目标对象一致，
+ *  按照给定的对象来对源对象进行缩放，和位置的修复，保持和目标对象一致，
  * 当你需要从一个整体模型抽出一小个独立的模型时，为保持小模型的位置依然处于整体模型的位置
  * @param targetObj
  * @param originObj
+ * @param correctionValue
  */
-export function fixedObjSingle(targetObj: MtlObjInf, originObj: Object3D): Group {
+export function fixedObjSingle(targetObj: MtlObjInf, originObj: Object3D, correctionValue = {x: 0, y: 0, z: 0}): any {
   const group = new Group();
-  const vector = new Vector3();
+  const targetVector = new Vector3();
+  const originVector = new Vector3();
   const targetScale = targetObj.obj.scale;
+  const originBox3 = new Box3();
 
-  targetObj.box3.getCenter(vector);
   originObj.scale.set(targetScale.x, targetScale.y, targetScale.z);
-  originObj.position.set(-vector.x, 0, -vector.z);
+  originBox3.expandByObject(originObj);
+
+  targetObj.box3.getCenter(targetVector);
+  originBox3.getCenter(originVector);
+
+  // 当把局部元素剥离进行位置修复后，需要重新放置于原来位于整体所在的位置
+  const fixedPosition = {
+    x: getPosition(targetVector.x, originVector.x + correctionValue.x),
+    y: getPosition(targetVector.y, originVector.y + correctionValue.y),
+    z: getPosition(targetVector.z, originVector.z + correctionValue.z)
+  };
+
+  originObj.position.set(-originVector.x + correctionValue.x, -originVector.y + correctionValue.y, -originVector.z + correctionValue.z);
   group.add(originObj);
 
-  return group;
+  function getPosition(a, b) {
+    return a > b ? a - b : b - a;
+  }
+
+  return {group, fixedPosition};
 }
 
 /**
