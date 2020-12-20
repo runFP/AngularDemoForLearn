@@ -48,13 +48,13 @@ export class RollerMetalComponent implements OnInit {
     // {name: 'no2', type: 'No2'},
     // {name: 'moveCut3', type: 'MoveCut'},
     // {name: 'no3', type: 'No3'},
-    {name: 'moveCut4', type: 'MoveCut'},
-    {name: 'no4', type: 'No4'},
-    {name: 'smallCut', type: 'SmallCut'},
-    {name: 'car', type: 'Car'},
-    {name: 'clamp', type: 'Clamp'},
-    {name: 'riveting', type: 'Riveting'},
-    {name: 'moveBelt', type: 'MoveBelt'},
+    // {name: 'moveCut4', type: 'MoveCut'},
+    // {name: 'no4', type: 'No4'},
+    // {name: 'smallCut', type: 'SmallCut'},
+    // {name: 'car', type: 'Car'},
+    // {name: 'clamp', type: 'Clamp'},
+    // {name: 'riveting', type: 'Riveting'},
+    // {name: 'moveBelt', type: 'MoveBelt'},
     {name: 'liftMachine', type: 'LiftMachine'},
     {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
     {name: 'robotMachine', type: 'RobotMachine'},
@@ -70,7 +70,7 @@ export class RollerMetalComponent implements OnInit {
     this.loadManager.onLoad = () => {
       console.log('isLoadComplete!!!!');
       this.isLoadComplete = true;
-      // this.animation();
+      this.animation();
     };
   }
 
@@ -155,18 +155,15 @@ export class RollerMetalComponent implements OnInit {
     // this.getMachine<BigPunchMachine>('no2').group.position.setX(108);
     // this.getMachine<BigPunchMachine>('moveCut3').group.position.set(135, 0, 9);
     // this.getMachine<BigPunchMachine>('no3').group.position.setX(162.5);
-    this.getMachine<BigPunchMachine>('moveCut4').group.position.set(190, 0, 9);
-    this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
-    this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
-    this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
-    this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
-    this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
-    this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
-    this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 0, 8.73);
-    this.getMachine<BigPunchMachine>('liftMachine').group.rotation.set(0, -Math.PI / 2, 0);
-    // this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 32, 77);
-    // this.getMachine<BigPunchMachine>('robotMachine').group.position.set(505, 0, 0);
-    // this.getMachine<BigPunchMachine>('robotMachine').group.rotation.set(-Math.PI / 2, 0, 0);
+    // this.getMachine<BigPunchMachine>('moveCut4').group.position.set(190, 0, 9);
+    // this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
+    // this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
+    // this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
+    // this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
+    // this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
+    // this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
+    this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 30, 8.73);
+    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(506, 32, 6.78);
     this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
 
     // 动画衔接
@@ -188,7 +185,7 @@ export class RollerMetalComponent implements OnInit {
     // this.getMachine<MoveCutMachine>('moveCut3').translationRestoreRightEnd.subscribe(() => {
     //   this.getMachine<MoveCutMachine>('no3').playVertical();
     // });
-
+/*
     this.getMachine<MoveCutMachine>('moveCut4').translationRestoreRightEnd.subscribe(() => {
       this.getMachine<MoveCutMachine>('no4').playVertical();
     });
@@ -224,7 +221,7 @@ export class RollerMetalComponent implements OnInit {
 
     this.getMachine<RivetingMachine>('riveting').overallJigRightEnd.subscribe(() => {
       this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
-    });
+    });*/
 
   }
 
@@ -265,11 +262,45 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<RobotMachine>('robotMachine')!.playTongRotation();
   }
 
-  playRotation() {
-    this.getMachine<RobotMachine>('robotMachine')!.playRotation();
-    this.render();
+  playTongRotationRevert() {
+    this.getMachine<RobotMachine>('robotMachine')!.playTongRotationRevert();
   }
 
+  playArm2Down() {
+    this.getMachine<RobotMachine>('robotMachine')!.playArm2Down();
+  }
+
+  playArm2DownRevert() {
+    this.getMachine<RobotMachine>('robotMachine')!.playArm2DownRevert();
+  }
+
+  playArm1Back() {
+    this.getMachine<RobotMachine>('robotMachine')!.playArm1Back();
+  }
+
+  playArm1BackRevert() {
+    this.getMachine<RobotMachine>('robotMachine')!.playArm1BackRevert();
+  }
+
+  playArm1Front() {
+    this.getMachine<RobotMachine>('robotMachine')!.playArm1Front();
+  }
+
+  playArm1FrontRevert() {
+    this.getMachine<RobotMachine>('robotMachine')!.playArm1FrontRevert();
+  }
+
+  playPedestalRotation() {
+    this.getMachine<RobotMachine>('robotMachine')!.playPedestalRotation();
+  }
+
+  playPedestalRotationRevert() {
+    this.getMachine<RobotMachine>('robotMachine')!.playPedestalRotationRevert();
+  }
+
+  playWork() {
+    this.getMachine<RobotMachine>('robotMachine')!.playWork();
+  }
 
   animation() {
     requestAnimationFrame(() => this.animation());

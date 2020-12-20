@@ -74,7 +74,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
     const intersections = raycaster.intersectObjects(object3d, true);
     if (intersections.length > 0) {
       const object = intersections[0].object;
-
+      console.log(object);
       // transformControl.attach(object);
 
       function groupInclude(group, isInclude = false): boolean {
@@ -153,6 +153,7 @@ export function fixedObjSingle(targetObj: MtlObjInf, originObj: Object3D, correc
   const targetScale = targetObj.obj.scale;
   const originBox3 = new Box3();
 
+  // 保持缩放比例
   originObj.scale.set(targetScale.x, targetScale.y, targetScale.z);
   originBox3.expandByObject(originObj);
 
@@ -160,18 +161,13 @@ export function fixedObjSingle(targetObj: MtlObjInf, originObj: Object3D, correc
   originBox3.getCenter(originVector);
 
   // 当把局部元素剥离进行位置修复后，需要重新放置于原来位于整体所在的位置
-  const fixedPosition = {
-    x: getPosition(targetVector.x, originVector.x + correctionValue.x),
-    y: getPosition(targetVector.y, originVector.y + correctionValue.y),
-    z: getPosition(targetVector.z, originVector.z + correctionValue.z)
-  };
+  const fixedPosition = new Vector3(
+    originVector.x - targetVector.x - correctionValue.x,
+    originVector.y - targetVector.y - correctionValue.y,
+    originVector.z - targetVector.z - correctionValue.z);
 
   originObj.position.set(-originVector.x + correctionValue.x, -originVector.y + correctionValue.y, -originVector.z + correctionValue.z);
   group.add(originObj);
-
-  function getPosition(a, b) {
-    return a > b ? a - b : b - a;
-  }
 
   return {group, fixedPosition};
 }

@@ -1,7 +1,8 @@
 import {AnimationManager, BaseMachine} from '../baseMachine';
 import {AnimationMixer, Group, LoadingManager} from 'three';
-import {createAnimation, fixedObjLocalOrigin, fixedObjSingle, loadMtlObj, MtlObjInf} from '../utils';
+import {createAnimation, fixedObjLocalOrigin, fixedObjSingle, getObjectByProperty, loadMtlObj, MtlObjInf} from '../utils';
 import {Subject, zip} from 'rxjs';
+import {BigPunchMachine} from './BigPunchMachine';
 
 const SHRINK = 100;
 const PATH = [
@@ -36,19 +37,21 @@ export class LiftMachine extends BaseMachine {
   }
 
   init(): Promise<any> {
-    this.initAnimation();
     return new Promise<any>(resolve => {
       const allPathLoad = PATH.map(machinePath => loadMtlObj(machinePath.mtlPath, machinePath.objPath, this.manager, SHRINK));
       zip(...allPathLoad).subscribe(([base]) => {
         this.base = base;
+        const [baseG] = fixedObjLocalOrigin([base], true);
 
-        const listBoard = base.obj.getObjectByName(LIFT_BOARD_NAME);
-        const listBoardG = fixedObjSingle(base, listBoard);
-        const [baseG] = fixedObjLocalOrigin([base]);
+        const listBoard = getObjectByProperty(base.obj, 'name', value => value === LIFT_BOARD_NAME);
+        const listBoardInf = fixedObjSingle(base, listBoard);
 
-        this.liftBoardGroup.add(listBoardG);
+        this.liftBoardGroup.add(listBoardInf.group);
+        this.liftBoardGroup.position.copy(listBoardInf.fixedPosition);
         this.group.add(baseG, this.liftBoardGroup);
-        // this.group.add(baseG);
+        this.group.rotation.set(0, -Math.PI / 2, 0);
+
+        this.initAnimation();
       }, () => {
       }, () => {
         resolve(this);
@@ -70,11 +73,9 @@ export class LiftMachine extends BaseMachine {
     const verticalRate = verticalDistance / verticalDuration / 10;
     for (let i = 0, j = verticalDuration * 10; i <= verticalDuration * 10; i++, j--) {
       times.push(i / 10);
-      valuesUp.push(verticalRate * i);
-      valuesDown.push(verticalRate * j);
+      valuesUp.push(this.liftBoardGroup.position.y + verticalRate * i);
+      valuesDown.push(this.liftBoardGroup.position.y + verticalRate * j);
     }
-    console.log(valuesUp);
-    console.log(valuesDown);
     const upAnimation = createAnimation('.position[y]', 'liftBoardMoveUp', times, valuesUp, mixer, verticalDuration);
     const downAnimation = createAnimation('.position[y]', 'liftBoardMoveDown', times, valuesDown, mixer, verticalDuration);
 
@@ -88,8 +89,6 @@ export class LiftMachine extends BaseMachine {
 
     Object.assign(this.getAnimationManager('liftBoardMoveUp'), {...upAnimation, mixer});
     Object.assign(this.getAnimationManager('liftBoardMoveDown'), {...downAnimation, mixer});
-
-
   }
 
   playLiftBoardMoveUp(duration = 0.2) {
