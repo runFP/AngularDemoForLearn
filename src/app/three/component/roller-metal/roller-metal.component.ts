@@ -138,7 +138,7 @@ export class RollerMetalComponent implements OnInit {
       const a = new Material();
       this.scene.add(a.cube);
       this.render();
-      createTransFormControl(this.camera, this.scene, this.renderer, [a], this.orbitControls, this.container.nativeElement);
+      createTransFormControl(this.camera, this.scene, this.renderer, [a.cube], this.orbitControls, this.container.nativeElement);
       return 'started';
     });
   }
