@@ -2,7 +2,7 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {RollerMetalService} from './roller-metal.service';
 import * as THREE from 'three';
 import {createOrbitControls, createTransFormControl} from './machines/utils';
-import {Camera, Clock, LoadingManager, Scene, WebGLRenderer} from 'three';
+import {Camera, Clock, Group, LoadingManager, Scene, Vector3, WebGLRenderer} from 'three';
 import {AppendingMachine} from './machines/appendingMachine/AppendingMachine';
 import {BaseMachine} from './machines/baseMachine';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
@@ -19,6 +19,8 @@ import {MoveBeltMachine} from './machines/appendingMachine/MoveBeltMachine';
 import {LiftMachine} from './machines/appendingMachine/LiftMachine';
 import {RobotMachine} from './machines/appendingMachine/RobotMachine';
 import {Material} from './machines/other/Material';
+import {No3} from './machines/appendingMachine/No3';
+import {No2} from './machines/appendingMachine/No2';
 
 @Component({
   selector: 'app-roller-metal',
@@ -36,7 +38,9 @@ export class RollerMetalComponent implements OnInit {
   loadManager = new LoadingManager();
   isLoadComplete = false; // 是否完全加载
 
-  rail = new Rail(this.loadManager);
+  materials: Material[] = [];
+
+  // rail = new Rail(this.loadManager);
 
   /** 机器相关 */
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
@@ -51,14 +55,14 @@ export class RollerMetalComponent implements OnInit {
     {name: 'no3', type: 'No3'},
     {name: 'moveCut4', type: 'MoveCut'},
     {name: 'no4', type: 'No4'},
-    {name: 'smallCut', type: 'SmallCut'},
-    {name: 'car', type: 'Car'},
-    {name: 'clamp', type: 'Clamp'},
-    {name: 'riveting', type: 'Riveting'},
-    {name: 'moveBelt', type: 'MoveBelt'},
-    {name: 'liftMachine', type: 'LiftMachine'},
-    {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
-    {name: 'robotMachine', type: 'RobotMachine'},
+    // {name: 'smallCut', type: 'SmallCut'},
+    // {name: 'car', type: 'Car'},
+    // {name: 'clamp', type: 'Clamp'},
+    // {name: 'riveting', type: 'Riveting'},
+    // {name: 'moveBelt', type: 'MoveBelt'},
+    // {name: 'liftMachine', type: 'LiftMachine'},
+    // {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
+    // {name: 'robotMachine', type: 'RobotMachine'},
   ];
 
   machines: { name: string, machine: BaseMachine }[] = []; // 所有机器的实例
@@ -70,7 +74,7 @@ export class RollerMetalComponent implements OnInit {
     this.loadManager.onLoad = () => {
       console.log('isLoadComplete!!!!');
       this.isLoadComplete = true;
-      // this.animation();
+      this.animation();
     };
   }
 
@@ -107,7 +111,7 @@ export class RollerMetalComponent implements OnInit {
   }
 
   private init() {
-    this.otherPromise.push(this.rail.init());
+    // this.otherPromise.push(this.rail.init());
     this.initMachines();
   }
 
@@ -117,7 +121,7 @@ export class RollerMetalComponent implements OnInit {
    */
   private initMachines(): void {
     this.machines.forEach(machineInf => {
-      this.machinePromise.push(machineInf.machine.init(this.camera, this.renderer, this.scene));
+      this.machinePromise.push(machineInf.machine.init());
     });
   }
 
@@ -136,6 +140,7 @@ export class RollerMetalComponent implements OnInit {
       });
 
       const a = new Material();
+      this.materials.push(a);
       this.scene.add(a.cube);
       this.render();
       createTransFormControl(this.camera, this.scene, this.renderer, [a.cube], this.orbitControls, this.container.nativeElement);
@@ -147,7 +152,7 @@ export class RollerMetalComponent implements OnInit {
    * 初始化各种机器的位置
    */
   positionInit() {
-    this.rail.group.position.set(242.6, 0, 10.6);
+    // this.rail.group.position.set(242.6, 0, 10.6);
     this.getMachine<AppendingMachine>('append').group.position.set(-4.5, 0, -2.4);
     this.getMachine<MoveCutMachine>('moveCut1').group.position.set(28, 0, 9);
     this.getMachine<BigPunchMachine>('bigPunch').group.position.set(54, 0, 12);
@@ -157,70 +162,195 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<BigPunchMachine>('no3').group.position.setX(162.5);
     this.getMachine<BigPunchMachine>('moveCut4').group.position.set(190, 0, 9);
     this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
-    this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
-    this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
-    this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
-    this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
-    this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
-    this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 30, 8.73);
-    this.getMachine<BigPunchMachine>('robotMachine').group.position.set(506, 32, 6.78);
-    this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);
+    /* this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
+     this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
+     this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
+     this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
+     this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
+     this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 30, 8.73);
+     this.getMachine<BigPunchMachine>('robotMachine').group.position.set(506, 32, 6.78);
+     this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);*/
 
     // 动画衔接
-    this.getMachine<AppendingMachine>('append').horizontalEnd.subscribe(() => {
+    this.getMachine<AppendingMachine>('append').verticalDownEnd.subscribe((append: AppendingMachine) => {
+      this.materials.forEach(m => {
+        if (m.append_v === false) {
+          m.append_v = true;
+          append.verticalGroup.attach(m.cube);
+        }
+      });
+    });
+
+    this.getMachine<AppendingMachine>('append').horizontalGoEnd.subscribe((append: AppendingMachine) => {
+      this.materials.forEach(m => {
+        if (m.append_v === true && m.mc1_left === false) {
+          m.append_h = true;
+          this.scene.attach(m.cube);
+          m.cube.position.setY(10.5);
+        }
+      });
       this.getMachine<MoveCutMachine>('moveCut1')!.playTranslationLeft();
       this.getMachine<MoveCutMachine>('moveCut2')!.playTranslationLeft();
       this.getMachine<MoveCutMachine>('moveCut3')!.playTranslationLeft();
       this.getMachine<MoveCutMachine>('moveCut4')!.playTranslationLeft();
     });
 
+    // ------------------------------------ moveCut1 ----------------------------------------------------------
     this.getMachine<MoveCutMachine>('moveCut1').translationRestoreRightEnd.subscribe(() => {
-      this.getMachine<MoveCutMachine>('bigPunch').playVertical();
+      this.getMachine<BigPunchMachine>('bigPunch').playVertical();
     });
+    this.getMachine<MoveCutMachine>('moveCut1')!.downEnd.subscribe((mc1: MoveCutMachine) => {
+      this.materials.forEach(m => {
+        if (m.append_h === true && m.mc1_left === false) {
+          m.mc1_left = true;
+          mc1.clampG.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc1_left === true && m.mc1_middle === false) {
+          m.mc1_middle = true;
+          this.scene.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc1_middle === true && m.mc1_right === false) {
+          m.mc1_right = true;
+          mc1.clamp2G.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc1_right === true && m.big_punch === false) {
+          this.scene.attach(m.cube);
+          m.cube.position.add(new Vector3(3, 0, 0));
+        }
+      });
 
+    });
+    // ------------------------------------ bigPunch ----------------------------------------------------------
+    this.getMachine<BigPunchMachine>('bigPunch').verticalEnd.subscribe(() => {
+      this.materials.forEach(m => {
+        if (m.mc1_right === true && m.big_punch === false) {
+          m.big_punch = true;
+        }
+      });
+    });
+    // ------------------------------------ moveCut2 ----------------------------------------------------------
     this.getMachine<MoveCutMachine>('moveCut2').translationRestoreRightEnd.subscribe(() => {
-      this.getMachine<MoveCutMachine>('no2').playVertical();
+      this.getMachine<No2>('no2').playVertical();
     });
-
+    this.getMachine<MoveCutMachine>('moveCut2')!.downEnd.subscribe((mc2: MoveCutMachine) => {
+      this.materials.forEach(m => {
+        if (m.big_punch === true && m.mc2_left === false) {
+          m.mc2_left = true;
+          mc2.clampG.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc2_left === true && m.mc2_middle === false) {
+          m.mc2_middle = true;
+          this.scene.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc2_middle === true && m.mc2_right === false) {
+          m.mc2_right = true;
+          mc2.clamp2G.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc2_right === true && m.no2_punch === false) {
+          this.scene.attach(m.cube);
+        }
+      });
+    });
+    // ------------------------------------ no2 ----------------------------------------------------------
+    this.getMachine<No2>('no2').verticalEnd.subscribe(() => {
+      this.materials.forEach(m => {
+        if (m.mc2_right === true && m.no2_punch === false) {
+          m.no2_punch = true;
+        }
+      });
+    });
+    // ------------------------------------ moveCut3 ----------------------------------------------------------
     this.getMachine<MoveCutMachine>('moveCut3').translationRestoreRightEnd.subscribe(() => {
-      this.getMachine<MoveCutMachine>('no3').playVertical();
+      this.getMachine<No3>('no3').playVertical();
     });
+    this.getMachine<MoveCutMachine>('moveCut3')!.downEnd.subscribe((mc3: MoveCutMachine) => {
+      this.materials.forEach(m => {
+        if (m.no2_punch === true && m.mc3_left === false) {
+          m.mc3_left = true;
+          mc3.clampG.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc3_left === true && m.mc3_middle === false) {
+          m.mc3_middle = true;
+          this.scene.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc3_middle === true && m.mc3_right === false) {
+          m.mc3_right = true;
+          mc3.clamp2G.attach(m.cube);
+          m.cube.position.setY(12);
+        } else if (m.mc3_right === true && m.no3_punch === false) {
+          this.scene.attach(m.cube);
+        }
+      });
+    });
+    // ------------------------------------ no3 ----------------------------------------------------------
+    this.getMachine<No3>('no3').verticalEnd.subscribe(() => {
+      this.materials.forEach(m => {
+        if (m.mc3_right === true && m.no3_punch === false) {
+          m.no3_punch = true;
+        }
+      });
+    });
+    // ------------------------------------ moveCut4 ----------------------------------------------------------
     this.getMachine<MoveCutMachine>('moveCut4').translationRestoreRightEnd.subscribe(() => {
-      this.getMachine<MoveCutMachine>('no4').playVertical();
+      this.getMachine<No4>('no4').playVertical();
     });
-
+    this.getMachine<MoveCutMachine>('moveCut4')!.downEnd.subscribe((mc4: MoveCutMachine) => {
+      this.materials.forEach(m => {
+        if (m.no3_punch === true && m.mc4_left === false) {
+          m.mc4_left = true;
+          mc4.clampG.attach(m.cube);
+           m.cube.position.setY(12);
+        } else if (m.mc4_left === true && m.mc4_middle === false) {
+          m.mc4_middle = true;
+          this.scene.attach(m.cube);
+           m.cube.position.setY(12);
+        } else if (m.mc4_middle === true && m.mc4_right === false) {
+          m.mc4_right = true;
+          mc4.clamp2G.attach(m.cube);
+           m.cube.position.setY(12);
+        } else if (m.mc4_right === true && m.no4_punch === false) {
+          this.scene.attach(m.cube);
+        }
+      });
+    });
+    // ------------------------------------ no4 ----------------------------------------------------------
     this.getMachine<No4>('no4').verticalEnd.subscribe(() => {
-      this.getMachine<MoveCutMachine>('smallCut').playTranslationLeft();
+      this.materials.forEach(m => {
+        if (m.mc4_right === true && m.no4_punch === false) {
+          m.no4_punch = true;
+        }
+      });
+      // this.getMachine<MoveCutMachine>('smallCut').playTranslationLeft();
     });
+    /*
+        this.getMachine<SmallCutMachine>('smallCut').translationRestoreRightEnd.subscribe(() => {
+          this.getMachine<CarMachine>('car').playMove1();
+        });
 
-    this.getMachine<SmallCutMachine>('smallCut').translationRestoreRightEnd.subscribe(() => {
-      this.getMachine<CarMachine>('car').playMove1();
-    });
+        this.getMachine<CarMachine>('car').move1End.subscribe(() => {
+          this.getMachine<ClampMachine>('clamp').playClampMove();
+        });
 
-    this.getMachine<CarMachine>('car').move1End.subscribe(() => {
-      this.getMachine<ClampMachine>('clamp').playClampMove();
-    });
+        this.getMachine<ClampMachine>('clamp').moveVerticalEnd.subscribe(() => {
+          this.getMachine<CarMachine>('car').playMove2();
+        });
 
-    this.getMachine<ClampMachine>('clamp').moveVerticalEnd.subscribe(() => {
-      this.getMachine<CarMachine>('car').playMove2();
-    });
+        this.getMachine<CarMachine>('car').move2End.subscribe(() => {
+          this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
+        });
 
-    this.getMachine<CarMachine>('car').move2End.subscribe(() => {
-      this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
-    });
+        this.getMachine<RivetingMachine>('riveting').overallJigVerticalEnd.subscribe((inf) => {
+          if (inf.direction === -1) {
+            this.getMachine<RivetingMachine>('riveting').playOverallJigRight();
+            this.getMachine<CarMachine>('car').playMoveBack();
+          } else {
+            this.getMachine<RivetingMachine>('riveting').playOverallJigLeft();
+          }
+        });
 
-    this.getMachine<RivetingMachine>('riveting').overallJigVerticalEnd.subscribe((inf) => {
-      if (inf.direction === -1) {
-        this.getMachine<RivetingMachine>('riveting').playOverallJigRight();
-        this.getMachine<CarMachine>('car').playMoveBack();
-      } else {
-        this.getMachine<RivetingMachine>('riveting').playOverallJigLeft();
-      }
-    });
-
-    this.getMachine<RivetingMachine>('riveting').overallJigRightEnd.subscribe(() => {
-      this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
-    });
+        this.getMachine<RivetingMachine>('riveting').overallJigRightEnd.subscribe(() => {
+          this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
+        });*/
 
   }
 
@@ -233,8 +363,11 @@ export class RollerMetalComponent implements OnInit {
     return instanceInf ? instanceInf.machine as T : null;
   }
 
-  playHorizontal() {
-    this.getMachine<AppendingMachine>('append')!.playHorizontal();
+  playVerticalDown() {
+    const a = new Material();
+    this.materials.push(a);
+    this.scene.add(a.cube);
+    this.getMachine<AppendingMachine>('append')!.playVerticalDown();
   }
 
   playMove1() {

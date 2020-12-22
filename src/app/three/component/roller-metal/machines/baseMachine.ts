@@ -57,7 +57,7 @@ export class BaseMachine {
   }
 
   /**
-   * 多类型动画控制
+   * 多类型动画控制,同类型互斥，不同类型组合
    * @param name
    * @param duration
    * @param type

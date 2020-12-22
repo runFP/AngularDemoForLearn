@@ -8,7 +8,7 @@ import {
   VectorKeyframeTrack
 } from 'three';
 import {Subject, zip} from 'rxjs';
-import {fixedObjLocalOrigin, loadMtlObj} from '../utils';
+import {createAnimation, fixedObjLocalOrigin, loadMtlObj} from '../utils';
 import {AnimationManager, BaseMachine} from '../baseMachine';
 
 const SHRINK = 100;
@@ -45,59 +45,44 @@ export class AppendingMachine extends BaseMachine {
   horizontal = null;
 
   // 已经进行了位置修复的组，组内包含了最原始的模型对象
-  verticalGroup: Group;
-  horizontalGroup: Group;
+  verticalGroup = new Group();
+  horizontalGroup = new Group();
 
   // 所有部件的组
-  group: Group;
+  group = new Group();
   // 垂直和上下平移组
-  vhGroup: Group;
+  vhGroup = new Group();
 
   // 上下移动回调
-  verticalStart = new Subject();
-  verticalEnd = new Subject();
+  verticalDownStart = new Subject();
+  verticalDownEnd = new Subject();
+  verticalUpStart = new Subject();
+  verticalUpEnd = new Subject();
 
   // 左右移动回调
-  horizontalStart = new Subject();
-  horizontalEnd = new Subject();
+  horizontalGoStart = new Subject();
+  horizontalGoEnd = new Subject();
+  horizontalBackStart = new Subject();
+  horizontalBackEnd = new Subject();
 
 
   // 混合/动画控制控制
   animationManagers: AnimationManager[] = [
-    {name: 'vertical', track: null, action: null, clip: null, mixer: null},
-    {name: 'vh', track: null, action: null, clip: null, mixer: null},
+    {name: 'verticalDown', track: null, action: null, clip: null, mixer: null},
+    {name: 'verticalUp', track: null, action: null, clip: null, mixer: null},
+    {name: 'horizontalGo', track: null, action: null, clip: null, mixer: null},
+    {name: 'horizontalBack', track: null, action: null, clip: null, mixer: null},
   ];
-
-  vhActionId = null;
-
-
-  camera;
-  renderer;
-  scene;
 
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.verticalGroup = new Group();
-    this.horizontalGroup = new Group();
-    this.group = new Group();
-    this.vhGroup = new Group();
-    this.verticalGroup.name = 'verticalGroup';
-    this.horizontalGroup.name = 'horizontalGroup';
-    this.group.name = 'group';
-    this.vhGroup.name = 'vhGroup';
   }
-
 
   /**
    * 初始化 调用任何操作前必须先执行该方法来加载模型并做相应的初始工作
    * @param shrink 缩放比例
    */
-  init(camera, renderer, scene, shrink: number = 100): Promise<any> {
-    this.camera = camera;
-    this.renderer = renderer;
-    this.scene = scene;
-
+  init(shrink: number = 100): Promise<any> {
     this.initAnimation();
     return new Promise(resolve => {
       const allPathLoad = PATH.map(machinePath => loadMtlObj(machinePath.mtlPath, machinePath.objPath, this.manager, SHRINK));
@@ -135,68 +120,72 @@ export class AppendingMachine extends BaseMachine {
 
   private initHorizontalAnimation() {
     const times = [];
-    const values = [];
-    const tmp = new Vector3();
-    const duration = 3;
+    const valuesGo = [];
+    const valuesBack = [];
+    const duration = 1.5;
+    const distance = 15;
+    const rate = distance / duration / 10;
 
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
-      if (i > duration * 10 / 2) {
-        tmp.setX(j).toArray(values, values.length);
-      } else {
-        tmp.setX(i).toArray(values, values.length);
-      }
+      valuesGo.push(rate * i);
+      valuesBack.push(rate * j);
     }
 
     const mixer = new AnimationMixer(this.vhGroup);
-    const track = new VectorKeyframeTrack('.position', times, values);
-    const clip = new AnimationClip('vhMove', duration, [track]);
-    const action = mixer.clipAction(clip);
-    action.clampWhenFinished = true;
-    action.loop = LoopOnce;
+    const goAnimation = createAnimation('.position[x]', 'horizontalGo', times, valuesGo, mixer, duration);
+    const backAnimation = createAnimation('.position[x]', 'horizontalBack', times, valuesBack, mixer, duration);
+
+    Object.assign(this.getAnimationManager('horizontalGo'), {...goAnimation, mixer});
+    Object.assign(this.getAnimationManager('horizontalBack'), {...backAnimation, mixer});
     mixer.addEventListener('finished', () => {
-      this.playVertical();
-      this.horizontalEnd.next(this.vhGroup);
+      if (this.activeAction.name === 'horizontalGo') {
+        this.horizontalGoEnd.next(this);
+        this.playHorizontalBack();
+      } else if (this.activeAction.name === 'horizontalBack') {
+        this.horizontalBackEnd.next(this);
+      }
     });
-    Object.assign(this.getAnimationManager('vh'), {track, clip, action, mixer});
   }
 
   private initVerticalAnimation() {
     const times = [];
-    const values = [];
-    const tmp = new Vector3();
-    const duration = 1.6;
+    const valuesDown = [];
+    const valuesUp = [];
+    const duration = 0.8;
+    const distance = 8;
+    const rate = distance / duration / 10;
 
-    for (let i = 0, j = duration * 10; i < duration * 10; i++, j--) {
+    for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
-      if (i > duration * 10 / 2) {
-        tmp.setY(-j).toArray(values, values.length);
-      } else {
-        tmp.setY(-i).toArray(values, values.length);
-      }
+      valuesDown.push(-i * rate);
+      valuesUp.push(-j * rate);
     }
 
     const mixer = new AnimationMixer(this.verticalGroup);
-    const track = new VectorKeyframeTrack('.position', times, values);
-    const clip = new AnimationClip('verticalMove', duration, [track]);
-    const action = mixer.clipAction(clip);
-    action.clampWhenFinished = true;
-    action.loop = LoopOnce;
+    const downAnimation = createAnimation('.position[y]', 'verticalDown', times, valuesDown, mixer, duration);
+    const upAnimation = createAnimation('.position[y]', 'verticalUp', times, valuesUp, mixer, duration);
+    Object.assign(this.getAnimationManager('verticalDown'), {...downAnimation, mixer});
+    Object.assign(this.getAnimationManager('verticalUp'), {...upAnimation, mixer});
+
     mixer.addEventListener('finished', () => {
-      this.playHorizontal();
-      this.verticalEnd.next(this.horizontalGroup);
+      if (this.activeAction.name === 'verticalDown') {
+        this.verticalDownEnd.next(this);
+        this.playVerticalUp();
+      } else if (this.activeAction.name === 'verticalUp') {
+        this.verticalUpEnd.next(this);
+        this.playHorizontalGo();
+      }
     });
-    Object.assign(this.getAnimationManager('vertical'), {track, clip, action, mixer});
   }
 
   /**
    * 上下移动
    */
   moveVertical() {
-    this.verticalStart.next(this.verticalGroup);
-    this.verticalEnd.next(this.verticalGroup);
-    this.verticalGroup.position.setY(-8);
-    this.render();
+    /*    this.verticalStart.next(this.verticalGroup);
+        this.verticalEnd.next(this.verticalGroup);
+        this.verticalGroup.position.setY(-8);*/
   }
 
   /** 动画相关方法开始 */
@@ -204,22 +193,28 @@ export class AppendingMachine extends BaseMachine {
   /**
    * 左右移动
    */
-  playHorizontal(duration = 1.2) {
-    this.horizontalStart.next(this.horizontalGroup);
-    const action = this.getAnimationManager('vh').action;
-    action.reset().play();
+  playHorizontalGo(duration = 0.2) {
+    this.horizontalGoStart.next(this);
+    this.fadeToAction('horizontalGo', duration);
   }
 
+  playHorizontalBack(duration = 0.2) {
+    this.horizontalBackStart.next(this);
+    this.fadeToAction('horizontalBack', duration);
+  }
 
   /**
    * 左右移动
    */
-  playVertical(duration = 0.8) {
-    this.horizontalStart.next(this.horizontalGroup);
-    const action = this.getAnimationManager('vertical').action;
-    action.reset().play();
+  playVerticalDown(duration = 0.2) {
+    this.verticalDownStart.next(this);
+    this.fadeToAction('verticalDown', duration);
   }
 
+  playVerticalUp(duration = 0.2) {
+    this.verticalUpStart.next(this);
+    this.fadeToAction('verticalUp', duration);
+  }
 
   /** 动画相关方法结束 */
 
@@ -230,12 +225,8 @@ export class AppendingMachine extends BaseMachine {
   moveHorizontal(distance) {
     distance = distance > HORIZONTAL_MAX ? HORIZONTAL_MAX : distance;
     this.vhGroup.position.setX(distance);
-    this.render();
   }
 
-  render() {
-    this.renderer.render(this.scene, this.camera);
-  }
 
 }
 

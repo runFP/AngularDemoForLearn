@@ -38,6 +38,8 @@ export class MoveCutMachine extends BaseMachine {
   group = new Group();
   translationGroup = new Group();
   verticalGroup = new Group();
+  clampG = new Group();
+  clamp2G = new Group();
 
   translationRightStart = new Subject();
   translationRightEnd = new Subject();
@@ -47,17 +49,21 @@ export class MoveCutMachine extends BaseMachine {
   translationRestoreRightEnd = new Subject();
   translationRestoreLeftStart = new Subject();
   translationRestoreLeftEnd = new Subject();
-  verticalStart = new Subject();
-  verticalEnd = new Subject();
+  downStart = new Subject();
+  downEnd = new Subject();
+  upStart = new Subject();
+  upEnd = new Subject();
 
 
   // 混合/动画控制控制
+  previousActionsType = {translation: null, vertical: null};
   animationManagers: AnimationManager[] = [
     {name: 'translationRight', track: null, action: null, clip: null, mixer: null},
     {name: 'translationLeft', track: null, action: null, clip: null, mixer: null},
     {name: 'translationRestoreRight', track: null, action: null, clip: null, mixer: null},
     {name: 'translationRestoreLeft', track: null, action: null, clip: null, mixer: null},
-    {name: 'vertical', track: null, action: null, clip: null, mixer: null},
+    {name: 'down', track: null, action: null, clip: null, mixer: null},
+    {name: 'up', track: null, action: null, clip: null, mixer: null},
   ];
 
 
@@ -80,7 +86,9 @@ export class MoveCutMachine extends BaseMachine {
         const clamp2G = clampG.clone();
         clampG.position.setX(12.5);
         clamp2G.position.setX(-12.5);
-        this.translationGroup.add(translationG, clampG, clamp2G);
+        this.clampG.add(clampG);
+        this.clamp2G.add(clamp2G);
+        this.translationGroup.add(translationG, this.clampG, this.clamp2G);
         this.verticalGroup.add(verticalG, this.translationGroup);
         this.group.add(baseG, this.verticalGroup);
       }, () => {
@@ -124,19 +132,19 @@ export class MoveCutMachine extends BaseMachine {
 
     mixer.addEventListener('finished', (e) => {
       if (this.activeAction.name === 'translationRight') {
-        this.translationRightEnd.next(this.translationGroup);
-        this.playVertical();
+        this.translationRightEnd.next(this);
+        this.playDown();
       } else if (this.activeAction.name === 'translationLeft') {
-        this.translationLeftEnd.next(this.translationGroup);
-        this.playVertical();
+        this.translationLeftEnd.next(this);
+        this.playDown();
       } else if (this.activeAction.name === 'translationRestoreRight') {
-        this.translationRestoreRightEnd.next(this.translationGroup);
+        this.translationRestoreRightEnd.next(this);
         // 一直循环
         if (this.loop) {
           this.playTranslationLeft();
         }
       } else if (this.activeAction.name === 'translationRestoreLeft') {
-        this.translationRestoreLeftEnd.next(this.translationGroup);
+        this.translationRestoreLeftEnd.next(this);
         this.playTranslationRight();
       }
     });
@@ -149,71 +157,72 @@ export class MoveCutMachine extends BaseMachine {
 
   private initVerticalMoveAnimation(duration = 0.6) {
     const times = [];
-    const values = [];
-    const distance = 6;
+    const downValues = [];
+    const upValues = [];
+    const distance = 1.5;
     const rate = distance / duration / 10;
 
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
-      if (i < duration * 10 / 2) {
-        values.push(-rate * i);
-      } else {
-        values.push(-rate * j);
-      }
+      downValues.push(-rate * i);
+      upValues.push(-rate * j);
     }
 
     const mixer = new AnimationMixer(this.verticalGroup);
-    const animation = createAnimation('.position[y]', 'vertical', times, values, mixer, duration);
+    const downAnimation = createAnimation('.position[y]', 'vertical', times, downValues, mixer, duration);
+    const upAnimation = createAnimation('.position[y]', 'vertical', times, upValues, mixer, duration);
 
     mixer.addEventListener('finished', (e) => {
-      if (this.activeAction) {
-        if (this.activeAction.name === 'translationRight') {
+      if (this.previousActionsType['vertical'].name === 'down') {
+        this.playUp();
+        this.downEnd.next(this);
+      } else if (this.previousActionsType['vertical'].name === 'up') {
+        if (this.previousActionsType['translation'].name === 'translationRight') {
           this.playRestoresRight();
-        } else if (this.activeAction.name === 'translationLeft') {
+        } else if (this.previousActionsType['translation'].name === 'translationLeft') {
           this.playRestoresLeft();
         }
+        this.upEnd.next(this);
       }
-      this.verticalEnd.next(this.verticalGroup);
     });
 
-    Object.assign(this.getAnimationManager('vertical'), {...animation, mixer});
+    Object.assign(this.getAnimationManager('down'), {...downAnimation, mixer});
+    Object.assign(this.getAnimationManager('up'), {...upAnimation, mixer});
   }
 
   playTranslationRight(duration = 0.2) {
     this.isPlay = true;
-    this.translationRightStart.next(this.translationGroup);
-    this.fadeToAction('translationRight', 0.2);
+    this.translationRightStart.next(this);
+    this.multipleFadeToAction('translationRight', duration, 'translation');
   }
 
   playTranslationLeft(duration = 0.2) {
     this.isPlay = true;
-    this.translationLeftStart.next(this.translationGroup);
-    this.fadeToAction('translationLeft', 0.2);
+    this.translationLeftStart.next(this);
+    this.multipleFadeToAction('translationLeft', duration, 'translation');
   }
 
   playRestoresRight(duration = 0.2) {
     this.isPlay = true;
-    this.translationRestoreRightStart.next(this.translationGroup);
-    this.fadeToAction('translationRestoreRight', 0.2);
+    this.translationRestoreRightStart.next(this);
+    this.multipleFadeToAction('translationRestoreRight', duration, 'translation');
   }
 
   playRestoresLeft(duration = 0.2) {
     this.isPlay = true;
-    this.translationRestoreLeftStart.next(this.translationGroup);
-    this.fadeToAction('translationRestoreLeft', 0.2);
+    this.translationRestoreLeftStart.next(this);
+    this.multipleFadeToAction('translationRestoreLeft', duration, 'translation');
   }
 
-  /**
-   * 该动画需要结合playRight或者playLeft以保证x得位置，因此不需要调用fadeToAction
-   * @param duration
-   */
-  playVertical(duration = 1.2) {
+  playDown(duration = 0.2) {
     this.isPlay = true;
-    this.verticalStart.next(this.verticalGroup);
-    this.getAnimationManager('vertical').action.reset()
-      .setEffectiveTimeScale(1)
-      .setEffectiveWeight(1)
-      .fadeIn(duration)
-      .play();
+    this.downStart.next(this);
+    this.multipleFadeToAction('down', duration, 'vertical');
+  }
+
+  playUp(duration = 0.2) {
+    this.isPlay = true;
+    this.upStart.next(this);
+    this.multipleFadeToAction('up', duration, 'vertical');
   }
 }
