@@ -208,14 +208,14 @@ export class RollerMetalComponent implements OnInit {
         } else if (m.mc1_left === true && m.mc1_middle === false) {
           m.mc1_middle = true;
           this.scene.attach(m.cube);
-          m.cube.position.setY(12);
+          m.cube.position.set(mc1.group.position.x, 12, m.cube.position.z);
         } else if (m.mc1_middle === true && m.mc1_right === false) {
           m.mc1_right = true;
           mc1.clamp2G.attach(m.cube);
           m.cube.position.setY(12);
         } else if (m.mc1_right === true && m.big_punch === false) {
           this.scene.attach(m.cube);
-          m.cube.position.add(new Vector3(3, 0, 0));
+          m.cube.position.add(new Vector3(5.9, 0, 0));
         }
       });
 
@@ -241,13 +241,14 @@ export class RollerMetalComponent implements OnInit {
         } else if (m.mc2_left === true && m.mc2_middle === false) {
           m.mc2_middle = true;
           this.scene.attach(m.cube);
-          m.cube.position.setY(12);
+          m.cube.position.set(mc2.group.position.x, 12, m.cube.position.z);
         } else if (m.mc2_middle === true && m.mc2_right === false) {
           m.mc2_right = true;
           mc2.clamp2G.attach(m.cube);
           m.cube.position.setY(12);
         } else if (m.mc2_right === true && m.no2_punch === false) {
           this.scene.attach(m.cube);
+          m.cube.position.add(new Vector3(5.2, 0, 0));
         }
       });
     });
@@ -272,13 +273,14 @@ export class RollerMetalComponent implements OnInit {
         } else if (m.mc3_left === true && m.mc3_middle === false) {
           m.mc3_middle = true;
           this.scene.attach(m.cube);
-          m.cube.position.setY(12);
+          m.cube.position.set(mc3.group.position.x, 12, m.cube.position.z);
         } else if (m.mc3_middle === true && m.mc3_right === false) {
           m.mc3_right = true;
           mc3.clamp2G.attach(m.cube);
           m.cube.position.setY(12);
         } else if (m.mc3_right === true && m.no3_punch === false) {
           this.scene.attach(m.cube);
+          m.cube.position.add(new Vector3(6.5, 0, 0));
         }
       });
     });
@@ -303,13 +305,13 @@ export class RollerMetalComponent implements OnInit {
         } else if (m.mc4_left === true && m.mc4_middle === false) {
           m.mc4_middle = true;
           this.scene.attach(m.cube);
-           m.cube.position.setY(12);
+          m.cube.position.set(mc4.group.position.x, 12, m.cube.position.z);
         } else if (m.mc4_middle === true && m.mc4_right === false) {
           m.mc4_right = true;
           mc4.clamp2G.attach(m.cube);
-           m.cube.position.setY(12);
         } else if (m.mc4_right === true && m.no4_punch === false) {
           this.scene.attach(m.cube);
+          m.cube.position.add(new Vector3(5.2, 0, 0));
         }
       });
     });

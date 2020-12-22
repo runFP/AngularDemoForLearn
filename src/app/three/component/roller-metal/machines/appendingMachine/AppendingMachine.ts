@@ -153,7 +153,7 @@ export class AppendingMachine extends BaseMachine {
     const valuesDown = [];
     const valuesUp = [];
     const duration = 0.8;
-    const distance = 8;
+    const distance = 5.2;
     const rate = distance / duration / 10;
 
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {

@@ -29,10 +29,10 @@ export class Material {
 
   constructor() {
     this.id = Material.i++;
-    const geometry = new PlaneBufferGeometry(8, 15,);
+    const geometry = new PlaneBufferGeometry(8, 15);
     const material = new MeshBasicMaterial({color: '#fff', side: DoubleSide});
     this.cube = new Mesh(geometry, material);
-    this.cube.rotateX(Math.PI / 2).position.set(-10.3, 3, 9);
+    this.cube.rotateX(Math.PI / 2).position.set(-10.3, 6, 9);
   }
 }
 
