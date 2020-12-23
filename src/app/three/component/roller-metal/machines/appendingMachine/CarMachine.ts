@@ -96,7 +96,7 @@ export class CarMachine extends BaseMachine {
   private initMove2Animation(duration = 2.4) {
     const times = [];
     const values = [];
-    const distance = 14;
+    const distance = 18;
     const rate = distance / duration / 10;
     for (let i = 0; i <= duration * 10; i++) {
       times.push(i / 10);

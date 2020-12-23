@@ -166,7 +166,7 @@ export class SmallCutMachine extends BaseMachine {
     const valuesL = [];
     const valuesRR = [];
     const valuesRL = [];
-    const distance = 6;
+    const distance = 4.5;
     const rate = distance / duration / 10;
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);

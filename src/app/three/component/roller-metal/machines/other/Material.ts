@@ -7,14 +7,14 @@ import {
   Path,
   PlaneBufferGeometry,
   Shape,
-  ShapeBufferGeometry
+  ShapeBufferGeometry, Vector3
 } from 'three';
 
 export class Material {
   static i = 0;
 
-  cube: Mesh = null;
-  changeModel: Group = new Group();
+  cube = null;
+  cubeTmp;
   id;
 
   // 当前执行的工序状态
@@ -55,12 +55,12 @@ export class Material {
     const geometry = new PlaneBufferGeometry(8, 15);
     const material = new MeshStandardMaterial({color: '#fff', side: DoubleSide});
     this.cube = new Mesh(geometry, material);
-    this.createChangeModel();
+    this.cubeTmp = this.cube.clone();
     this.cube.rotateX(Math.PI / 2).position.set(-10.3, 6, 9);
   }
 
   createChangeModel() {
-    const cube1 = this.cube.clone();
+    const cube1 = this.cubeTmp.clone();
     cube1.rotateY(Math.PI / 2).position.set(0, 8, 4);
     const cube2 = cube1.clone();
     cube2.position.setX(8);
@@ -74,10 +74,15 @@ export class Material {
     const changeGeometry = new ShapeBufferGeometry(shape);
     const shapeMesh = new Mesh(changeGeometry, new MeshStandardMaterial({color: '#fff', side: DoubleSide}));
     const group = new Group();
+    const newGroup = new Group();
     group.add(cube1, cube2, shapeMesh);
     group.position.set(-7.5, 4, 4);
     group.rotateX(Math.PI / 2).rotateZ(-Math.PI / 2);
-    this.changeModel.add(group);
+    const vector = new Vector3();
+    this.cube.getWorldPosition(vector);
+    newGroup.scale.set(0.5, 0.5, 0.5);
+    newGroup.add(group).position.copy(vector);
+    this.cube = newGroup;
   }
 }
 

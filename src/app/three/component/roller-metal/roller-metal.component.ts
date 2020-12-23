@@ -361,24 +361,29 @@ export class RollerMetalComponent implements OnInit {
     });
 
     this.getMachine<ClampMachine>('clamp').moveVerticalEnd.subscribe(() => {
-      this.getMachine<CarMachine>('car').playMove2();
       this.materials.forEach(m => {
         if (m.carMove1 === true && m.clampModel === false) {
           m.clampModel = true;
-          m.changeModel.position.copy(m.cube.position);
-          this.scene.add(m.changeModel);
-          this.scene.remove(m.cube);
+          this.scene.attach(m.cube).remove(m.cube);
+          m.createChangeModel();
+        }
+      });
+      this.getMachine<CarMachine>('car').playMove2();
+    });
+    this.getMachine<CarMachine>('car').move2Start.subscribe((car: CarMachine) => {
+      this.materials.forEach(m => {
+        if (m.clampModel === true && m.carMove2 === false) {
+          m.cube.position.add(new Vector3(0, 1, 0));
+          car.carGroup.attach(m.cube);
         }
       });
     });
-
     this.getMachine<CarMachine>('car').move2End.subscribe(() => {
       this.getMachine<RivetingMachine>('riveting').playOverallJigDown();
       this.materials.forEach(m => {
         if (m.clampModel === true && m.carMove2 === false) {
           m.carMove2 = true;
-          this.scene.attach(m.cube);
-          m.cube.position.add(new Vector3(3, 0, 0));
+          m.cube.position.add(new Vector3(5, 0, 0));
         }
       });
     });
