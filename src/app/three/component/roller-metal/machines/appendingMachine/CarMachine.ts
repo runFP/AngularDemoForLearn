@@ -63,11 +63,11 @@ export class CarMachine extends BaseMachine {
     this.mixer.addEventListener('finished', () => {
       if (this.activeAction) {
         if (this.activeAction.name === 'carMove1') {
-          this.move1End.next(this.carGroup);
+          this.move1End.next(this);
         } else if (this.activeAction.name === 'carMove2') {
-          this.move2End.next(this.carGroup);
+          this.move2End.next(this);
         } else if (this.activeAction.name === 'carMoveBack') {
-          this.moveBackEnd.next(this.carGroup);
+          this.moveBackEnd.next(this);
         }
       }
     });
@@ -79,7 +79,7 @@ export class CarMachine extends BaseMachine {
   private initMove1Animation(duration = 1) {
     const times = [];
     const values = [];
-    const distance = 4;
+    const distance = 6;
     const rate = distance / duration / 10;
     let end = 0;
     for (let i = 0; i <= duration * 10; i++) {
@@ -123,19 +123,19 @@ export class CarMachine extends BaseMachine {
 
   playMove1(duration = 0.2) {
     this.isPlay = true;
-    this.move1Start.next(this.carGroup);
+    this.move1Start.next(this);
     this.fadeToAction('carMove1', duration);
   }
 
   playMove2(duration = 0.2) {
     this.isPlay = true;
-    this.move2Start.next(this.carGroup);
+    this.move2Start.next(this);
     this.fadeToAction('carMove2', duration);
   }
 
   playMoveBack(duration = 0.2) {
     this.isPlay = true;
-    this.moveBackStart.next(this.carGroup);
+    this.moveBackStart.next(this);
     this.fadeToAction('carMoveBack', duration);
   }
 

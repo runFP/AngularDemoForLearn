@@ -55,10 +55,10 @@ export class RollerMetalComponent implements OnInit {
     {name: 'no3', type: 'No3'},
     {name: 'moveCut4', type: 'MoveCut'},
     {name: 'no4', type: 'No4'},
-    // {name: 'smallCut', type: 'SmallCut'},
-    // {name: 'car', type: 'Car'},
-    // {name: 'clamp', type: 'Clamp'},
-    // {name: 'riveting', type: 'Riveting'},
+    {name: 'smallCut', type: 'SmallCut'},
+    {name: 'car', type: 'Car'},
+    {name: 'clamp', type: 'Clamp'},
+    {name: 'riveting', type: 'Riveting'},
     // {name: 'moveBelt', type: 'MoveBelt'},
     // {name: 'liftMachine', type: 'LiftMachine'},
     // {name: 'lineSpeedMachine', type: 'LineSpeedMachine'},
@@ -162,11 +162,11 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<BigPunchMachine>('no3').group.position.setX(162.5);
     this.getMachine<BigPunchMachine>('moveCut4').group.position.set(190, 0, 9);
     this.getMachine<BigPunchMachine>('no4').group.position.setX(217);
-    /* this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
-     this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
-     this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
-     this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
-     this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
+    this.getMachine<BigPunchMachine>('smallCut').group.position.set(228, 0, 7);
+    this.getMachine<BigPunchMachine>('car').group.position.set(238, 0, 7);
+    this.getMachine<BigPunchMachine>('clamp').group.position.set(246, -7, 6);
+    this.getMachine<BigPunchMachine>('riveting').group.position.set(312, 0, 7);
+    /* this.getMachine<BigPunchMachine>('moveBelt').group.position.set(386.3, 0, 5.28);
      this.getMachine<BigPunchMachine>('liftMachine').group.position.set(448, 30, 8.73);
      this.getMachine<BigPunchMachine>('robotMachine').group.position.set(506, 32, 6.78);
      this.getMachine<BigPunchMachine>('lineSpeedMachine').group.position.set(505, 0, -6);*/
@@ -301,7 +301,7 @@ export class RollerMetalComponent implements OnInit {
         if (m.no3_punch === true && m.mc4_left === false) {
           m.mc4_left = true;
           mc4.clampG.attach(m.cube);
-           m.cube.position.setY(12);
+          m.cube.position.setY(12);
         } else if (m.mc4_left === true && m.mc4_middle === false) {
           m.mc4_middle = true;
           this.scene.attach(m.cube);
@@ -311,7 +311,7 @@ export class RollerMetalComponent implements OnInit {
           mc4.clamp2G.attach(m.cube);
         } else if (m.mc4_right === true && m.no4_punch === false) {
           this.scene.attach(m.cube);
-          m.cube.position.add(new Vector3(5.2, 0, 0));
+          m.cube.position.add(new Vector3(5.2, 2, 0));
         }
       });
     });
@@ -322,37 +322,102 @@ export class RollerMetalComponent implements OnInit {
           m.no4_punch = true;
         }
       });
-      // this.getMachine<MoveCutMachine>('smallCut').playTranslationLeft();
+      this.getMachine<SmallCutMachine>('smallCut').playTranslationLeft();
     });
-    /*
-        this.getMachine<SmallCutMachine>('smallCut').translationRestoreRightEnd.subscribe(() => {
-          this.getMachine<CarMachine>('car').playMove1();
-        });
 
-        this.getMachine<CarMachine>('car').move1End.subscribe(() => {
-          this.getMachine<ClampMachine>('clamp').playClampMove();
-        });
+    this.getMachine<SmallCutMachine>('smallCut').verticalEnd.subscribe((sm: SmallCutMachine) => {
+      this.materials.forEach(m => {
+        if (m.no4_punch === true && m.smallCut_left === false) {
+          m.smallCut_left = true;
+          sm.clampGroup.attach(m.cube);
+        } else if (m.smallCut_left === true && m.smallCut_Right === false) {
+          m.smallCut_Right = true;
+          const car = this.getMachine<CarMachine>('car');
+          m.cube.position.set(car.carGroup.position.x, 15, car.carGroup.position.z);
+          this.scene.attach(m.cube);
+        }
+      });
+    });
 
-        this.getMachine<ClampMachine>('clamp').moveVerticalEnd.subscribe(() => {
-          this.getMachine<CarMachine>('car').playMove2();
-        });
+    this.getMachine<SmallCutMachine>('smallCut').translationRestoreRightEnd.subscribe(() => {
+      this.getMachine<CarMachine>('car').playMove1();
+    });
 
-        this.getMachine<CarMachine>('car').move2End.subscribe(() => {
-          this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
-        });
+    this.getMachine<CarMachine>('car').move1Start.subscribe((car: CarMachine) => {
+      this.materials.forEach(m => {
+        if (m.smallCut_Right === true && m.carMove1 === false) {
+          car.carGroup.attach(m.cube);
+        }
+      });
+    });
 
-        this.getMachine<RivetingMachine>('riveting').overallJigVerticalEnd.subscribe((inf) => {
-          if (inf.direction === -1) {
-            this.getMachine<RivetingMachine>('riveting').playOverallJigRight();
-            this.getMachine<CarMachine>('car').playMoveBack();
-          } else {
-            this.getMachine<RivetingMachine>('riveting').playOverallJigLeft();
+    this.getMachine<CarMachine>('car').move1End.subscribe(() => {
+      this.getMachine<ClampMachine>('clamp').playClampMove();
+      this.materials.forEach(m => {
+        if (m.smallCut_Right === true && m.carMove1 === false) {
+          m.carMove1 = true;
+        }
+      });
+    });
+
+    this.getMachine<ClampMachine>('clamp').moveVerticalEnd.subscribe(() => {
+      this.getMachine<CarMachine>('car').playMove2();
+      this.materials.forEach(m => {
+        if (m.carMove1 === true && m.clampModel === false) {
+          m.clampModel = true;
+          m.changeModel.position.copy(m.cube.position);
+          this.scene.add(m.changeModel);
+          this.scene.remove(m.cube);
+        }
+      });
+    });
+
+    this.getMachine<CarMachine>('car').move2End.subscribe(() => {
+      this.getMachine<RivetingMachine>('riveting').playOverallJigDown();
+      this.materials.forEach(m => {
+        if (m.clampModel === true && m.carMove2 === false) {
+          m.carMove2 = true;
+          this.scene.attach(m.cube);
+          m.cube.position.add(new Vector3(3, 0, 0));
+        }
+      });
+    });
+
+    this.getMachine<RivetingMachine>('riveting').overallJigDownEnd.subscribe((rm: RivetingMachine) => {
+      this.materials.forEach(m => {
+        if (m.carMove2 === true && m.riveting_over === false && rm.direction === -1) {
+          rm.overallJigGroup.attach(m.cube);
+        } else if (m.carMove2 === true && m.riveting_over === false && rm.direction === 1) {
+          if (m.riveting_1 === false) {
+            m.riveting_1 = true;
+          } else if (m.riveting_1 === true && m.riveting_2 === false) {
+            m.riveting_2 = true;
+          } else if (m.riveting_2 === true && m.riveting_3 === false) {
+            m.riveting_3 = true;
+          } else if (m.riveting_3 === true && m.riveting_4 === false) {
+            m.riveting_4 = true;
+          } else if (m.riveting_4 === true && m.riveting_5 === false) {
+            m.riveting_5 = true;
+          } else if (m.riveting_5 === true && m.riveting_6 === false) {
+            m.riveting_6 = true;
           }
-        });
+          this.scene.attach(m.cube);
+        }
+      });
+    });
 
-        this.getMachine<RivetingMachine>('riveting').overallJigRightEnd.subscribe(() => {
-          this.getMachine<RivetingMachine>('riveting').playOverallJigVertical();
-        });*/
+    this.getMachine<RivetingMachine>('riveting').overallJigUpEnd.subscribe((rm: RivetingMachine) => {
+      if (rm.direction === -1) {
+        this.getMachine<RivetingMachine>('riveting').playOverallJigRight();
+        this.getMachine<CarMachine>('car').playMoveBack();
+      } else {
+        this.getMachine<RivetingMachine>('riveting').playOverallJigLeft();
+      }
+    });
+
+    this.getMachine<RivetingMachine>('riveting').overallJigRightEnd.subscribe(() => {
+      this.getMachine<RivetingMachine>('riveting').playOverallJigDown();
+    });
 
   }
 
@@ -370,6 +435,10 @@ export class RollerMetalComponent implements OnInit {
     this.materials.push(a);
     this.scene.add(a.cube);
     this.getMachine<AppendingMachine>('append')!.playVerticalDown();
+  }
+
+  playOverallJigDown() {
+    this.getMachine<RivetingMachine>('riveting')!.playOverallJigDown();
   }
 
   playMove1() {

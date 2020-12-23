@@ -92,7 +92,7 @@ export class SmallCutMachine extends BaseMachine {
         this.clampGroup.add(clampG);
         this.translationGroup.add(poleG, this.clampGroup);
         this.verticalGroup.add(baseG, this.translationGroup);
-        this.group.add(girderG, this.verticalGroup, this.verticalGroup);
+        this.group.add(girderG, this.verticalGroup);
       }, () => {
       }, () => {
         resolve(this);
@@ -136,22 +136,20 @@ export class SmallCutMachine extends BaseMachine {
 
     mixer.addEventListener('finished', (e) => {
       if (this.previousActionsType['translation'].name === 'translationRight') {
-        this.translationRightEnd.next(this.translationGroup);
+        this.translationRightEnd.next(this);
         this.playClampRestoresLeft();
-        // this.playVertical();
       } else if (this.previousActionsType['translation'].name === 'translationLeft') {
-        this.translationLeftEnd.next(this.translationGroup);
+        this.translationLeftEnd.next(this);
         this.playClampLeft();
-        // this.playVertical();
       } else if (this.previousActionsType['translation'].name === 'translationRestoreRight') {
-        this.translationRestoreRightEnd.next(this.translationGroup);
+        this.translationRestoreRightEnd.next(this);
         this.playClampRestoresRight();
         // 一直循环
         if (this.loop) {
           this.playTranslationLeft();
         }
       } else if (this.previousActionsType['translation'].name === 'translationRestoreLeft') {
-        this.translationRestoreLeftEnd.next(this.translationGroup);
+        this.translationRestoreLeftEnd.next(this);
         this.playTranslationRight();
       }
     });
@@ -168,7 +166,7 @@ export class SmallCutMachine extends BaseMachine {
     const valuesL = [];
     const valuesRR = [];
     const valuesRL = [];
-    const distance = 10;
+    const distance = 6;
     const rate = distance / duration / 10;
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
       times.push(i / 10);
@@ -190,15 +188,15 @@ export class SmallCutMachine extends BaseMachine {
 
     mixer.addEventListener('finished', (e) => {
       if (this.previousActionsType['clamp'].name === 'clampRight') {
-        this.clampRightEnd.next(this.translationGroup);
+        this.clampRightEnd.next(this);
         this.playVertical();
       } else if (this.previousActionsType['clamp'].name === 'clampLeft') {
-        this.clampLeftEnd.next(this.translationGroup);
+        this.clampLeftEnd.next(this);
         this.playVertical();
       } else if (this.previousActionsType['clamp'].name === 'clampRestoreRight') {
-        this.clampRestoreRightEnd.next(this.translationGroup);
+        this.clampRestoreRightEnd.next(this);
       } else if (this.previousActionsType['clamp'].name === 'clampRestoreLeft') {
-        this.clampRestoreLeftEnd.next(this.translationGroup);
+        this.clampRestoreLeftEnd.next(this);
         this.playClampRight();
       }
     });
@@ -212,7 +210,7 @@ export class SmallCutMachine extends BaseMachine {
   private initVerticalMoveAnimation(duration = 0.6) {
     const times = [];
     const values = [];
-    const distance = 6;
+    const distance = 2;
     const rate = distance / duration / 10;
 
     for (let i = 0, j = duration * 10; i <= duration * 10; i++, j--) {
@@ -233,7 +231,7 @@ export class SmallCutMachine extends BaseMachine {
       } else if (this.previousActionsType['translation'].name === 'translationLeft') {
         this.playRestoresLeft();
       }
-      this.verticalEnd.next(this.verticalGroup);
+      this.verticalEnd.next(this);
     });
 
     Object.assign(this.getAnimationManager('vertical'), {...animation, mixer});
@@ -241,56 +239,56 @@ export class SmallCutMachine extends BaseMachine {
 
   playTranslationRight(duration = 0.2) {
     this.isPlay = true;
-    this.translationRightStart.next(this.translationGroup);
+    this.translationRightStart.next(this);
     this.multipleFadeToAction('translationRight', 0.2, 'translation');
   }
 
   playTranslationLeft(duration = 0.2) {
     this.isPlay = true;
-    this.translationLeftStart.next(this.translationGroup);
+    this.translationLeftStart.next(this);
     this.multipleFadeToAction('translationLeft', 0.2, 'translation');
   }
 
   playRestoresRight(duration = 0.2) {
     this.isPlay = true;
-    this.translationRestoreRightStart.next(this.translationGroup);
+    this.translationRestoreRightStart.next(this);
     this.multipleFadeToAction('translationRestoreRight', 0.2, 'translation');
   }
 
   playRestoresLeft(duration = 0.2) {
     this.isPlay = true;
-    this.clampRestoreLeftStart.next(this.translationGroup);
+    this.clampRestoreLeftStart.next(this);
     this.multipleFadeToAction('translationRestoreLeft', 0.2, 'translation');
   }
 
   /** 抓手*/
   playClampRight(duration = 0.2) {
     this.isPlay = true;
-    this.clampRightStart.next(this.clampGroup);
+    this.clampRightStart.next(this);
     this.multipleFadeToAction('clampRight', 0.2, 'clamp');
   }
 
   playClampLeft(duration = 0.2) {
     this.isPlay = true;
-    this.clampLeftStart.next(this.clampGroup);
+    this.clampLeftStart.next(this);
     this.multipleFadeToAction('clampLeft', 0.2, 'clamp');
   }
 
   playClampRestoresRight(duration = 0.2) {
     this.isPlay = true;
-    this.clampRestoreRightStart.next(this.clampGroup);
+    this.clampRestoreRightStart.next(this);
     this.multipleFadeToAction('clampRestoreRight', 0.2, 'clamp');
   }
 
   playClampRestoresLeft(duration = 0.2) {
     this.isPlay = true;
-    this.clampRestoreLeftStart.next(this.clampGroup);
+    this.clampRestoreLeftStart.next(this);
     this.multipleFadeToAction('clampRestoreLeft', 0.2, 'clamp');
   }
 
-  playVertical(duration = 1.2) {
+  playVertical(duration = 0.2) {
     this.isPlay = true;
-    this.verticalStart.next(this.verticalGroup);
+    this.verticalStart.next(this);
     this.multipleFadeToAction('vertical', duration, 'vertical');
   }
 }

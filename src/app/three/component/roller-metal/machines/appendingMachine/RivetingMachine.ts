@@ -25,8 +25,10 @@ export class RivetingMachine extends BaseMachine {
   base: MtlObjInf = null;
   overallJig: MtlObjInf = null;
 
-  overallJigVerticalStart = new Subject();
-  overallJigVerticalEnd = new Subject<{ group: Group, direction: 1 | -1 }>();
+  overallJigDownStart = new Subject();
+  overallJigDownEnd = new Subject();
+  overallJigUpStart = new Subject();
+  overallJigUpEnd = new Subject();
   overallJigRightStart = new Subject();
   overallJigRightEnd = new Subject();
   overallJigLeftStart = new Subject();
@@ -34,7 +36,8 @@ export class RivetingMachine extends BaseMachine {
 
   // 混合/动画控制控制
   animationManagers: AnimationManager[] = [
-    {name: 'overallJigMoveVertical', track: null, action: null, clip: null, mixer: null},
+    {name: 'overallJigMoveDown', track: null, action: null, clip: null, mixer: null},
+    {name: 'overallJigMoveUp', track: null, action: null, clip: null, mixer: null},
     {name: 'overallJigMoveRight', track: null, action: null, clip: null, mixer: null},
     {name: 'overallJigMoveLeft', track: null, action: null, clip: null, mixer: null},
   ];
@@ -54,6 +57,7 @@ export class RivetingMachine extends BaseMachine {
         this.overallJig = overallJig;
 
         const [baseG, overallJigG] = fixedObjLocalOrigin([base, overallJig]);
+        overallJigG.position.setX(5);
         this.overallJigGroup.add(overallJigG);
         this.group.add(baseG, this.overallJigGroup);
       }, () => {
@@ -69,27 +73,29 @@ export class RivetingMachine extends BaseMachine {
 
   initOverallJigAnimation() {
     const times = [];
+    const verticalTimes = [];
     const values = [];
+    const downValues = [];
+    const upValues = [];
     const mixer = new AnimationMixer(this.overallJigGroup);
-    const verticalDuration = 1.5;
-    const horizontalDuration = 1.5;
-    const verticalDistance = 16;
+    const verticalDuration = 3;
+    const horizontalDuration = 3;
+    const verticalDistance = 8;
     const verticalRate = verticalDistance / verticalDuration / 10;
-    const horizontalDistance = 24;
+    const horizontalDistance = 20;
     const horizontalRate = horizontalDistance / horizontalDuration / 10;
 
     // move vertical
     for (let i = 0, j = verticalDuration * 10; i <= verticalDuration * 10; i++, j--) {
-      times.push(i / 10);
-      if (i < verticalDuration * 10 / 2) {
-        values.push(-i * verticalRate);
-      } else {
-        values.push(-j * verticalRate);
-      }
+      verticalTimes.push(i / 10);
+      downValues.push(-i * verticalRate);
+      upValues.push(-j * verticalRate);
     }
 
-    const verticalAnimation = createAnimation('.position[y]', 'overallJigMoveVertical', times.slice(), values.slice(), mixer, verticalDuration);
-    Object.assign(this.getAnimationManager('overallJigMoveVertical'), {...verticalAnimation, mixer});
+    const downAnimation = createAnimation('.position[y]', 'overallJigMoveDown', verticalTimes, downValues, mixer, verticalDuration);
+    const upAnimation = createAnimation('.position[y]', 'overallJigMoveUp', verticalTimes, upValues, mixer, verticalDuration);
+    Object.assign(this.getAnimationManager('overallJigMoveDown'), {...downAnimation, mixer});
+    Object.assign(this.getAnimationManager('overallJigMoveUp'), {...upAnimation, mixer});
 
 
     // move right
@@ -99,6 +105,7 @@ export class RivetingMachine extends BaseMachine {
       times.push(i / 10);
       values.push(i * horizontalRate);
     }
+
 
     const rightAnimation = createAnimation('.position[x]', 'overallJigMoveRight', times, values.slice(), mixer, horizontalDuration);
     Object.assign(this.getAnimationManager('overallJigMoveRight'), {...rightAnimation, mixer});
@@ -113,33 +120,43 @@ export class RivetingMachine extends BaseMachine {
     Object.assign(this.getAnimationManager('overallJigMoveLeft'), {...leftAnimation, mixer});
 
     mixer.addEventListener('finished', () => {
-      if (this.activeAction.name === 'overallJigMoveVertical') {
-        this.overallJigVerticalEnd.next({group: this.overallJigGroup, direction: this.direction});
+      if (this.activeAction.name === 'overallJigMoveDown') {
+        this.overallJigDownEnd.next(this);
+        this.playOverallJigUp();
+      } else if (this.activeAction.name === 'overallJigMoveUp') {
+        this.overallJigUpEnd.next(this);
       } else if (this.activeAction.name === 'overallJigMoveRight') {
-        this.overallJigRightEnd.next(this.overallJigGroup);
+        this.overallJigRightEnd.next(this);
       } else if (this.activeAction.name === 'overallJigMoveLeft') {
-        this.overallJigLeftEnd.next(this.overallJigGroup);
+        this.overallJigLeftEnd.next(this);
       }
     });
 
   }
 
-  playOverallJigVertical(duration = 0.2) {
+  playOverallJigDown(duration = 0.2) {
     this.isPlay = true;
-    this.overallJigVerticalStart.next();
-    this.direction = this.activeAction && this.activeAction.name === 'overallJigMoveRight' ? 1 : -1;
-    this.fadeToAction('overallJigMoveVertical', duration);
+    this.overallJigDownStart.next(this);
+    this.fadeToAction('overallJigMoveDown', duration);
+  }
+
+  playOverallJigUp(duration = 0.2) {
+    this.isPlay = true;
+    this.overallJigUpStart.next(this);
+    this.fadeToAction('overallJigMoveUp', duration);
   }
 
   playOverallJigRight(duration = 0.2) {
     this.isPlay = true;
-    this.overallJigRightStart.next(this.overallJigGroup);
+    this.overallJigRightStart.next(this);
+    this.direction =  1;
     this.fadeToAction('overallJigMoveRight', duration);
   }
 
   playOverallJigLeft(duration = 0.2) {
     this.isPlay = true;
-    this.overallJigLeftStart.next(this.overallJigGroup);
+    this.overallJigLeftStart.next(this);
+    this.direction =  -1;
     this.fadeToAction('overallJigMoveLeft', duration);
   }
 }

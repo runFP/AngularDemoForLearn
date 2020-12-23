@@ -62,7 +62,7 @@ export class BaseMachine {
    * @param duration
    * @param type
    */
-  protected multipleFadeToAction(name, duration, type) {
+  protected   multipleFadeToAction(name, duration, type) {
     const previousAction = this.previousActionsType[type];
     const activeAction = this.getAnimationManager(name);
     this.activeAction = activeAction;
