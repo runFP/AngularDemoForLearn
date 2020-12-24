@@ -46,8 +46,8 @@ export class Material {
   riveting_3 = false;
   riveting_4 = false;
   riveting_5 = false;
-  riveting_6 = false;
   riveting_over = false;
+  moveBelt_down = false;
 
 
   constructor() {
@@ -71,17 +71,20 @@ export class Material {
     const ellipsePath = new Path();
     ellipsePath.absellipse(4, 6, 3, 5, 0, Math.PI * 2, true, 0);
     shape.holes.push(ellipsePath);
+
     const changeGeometry = new ShapeBufferGeometry(shape);
     const shapeMesh = new Mesh(changeGeometry, new MeshStandardMaterial({color: '#fff', side: DoubleSide}));
+
     const group = new Group();
     const newGroup = new Group();
     group.add(cube1, cube2, shapeMesh);
     group.position.set(-7.5, 4, 4);
     group.rotateX(Math.PI / 2).rotateZ(-Math.PI / 2);
+
     const vector = new Vector3();
     this.cube.getWorldPosition(vector);
     newGroup.scale.set(0.5, 0.5, 0.5);
-    newGroup.add(group).position.copy(vector);
+    newGroup.add(group).position.copy(vector).add(new Vector3(2.5, 0, 0));
     this.cube = newGroup;
   }
 }

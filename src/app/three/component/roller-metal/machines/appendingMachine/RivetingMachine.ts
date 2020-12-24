@@ -57,7 +57,7 @@ export class RivetingMachine extends BaseMachine {
         this.overallJig = overallJig;
 
         const [baseG, overallJigG] = fixedObjLocalOrigin([base, overallJig]);
-        overallJigG.position.setX(5);
+        overallJigG.position.setX(4.5);
         this.overallJigGroup.add(overallJigG);
         this.group.add(baseG, this.overallJigGroup);
       }, () => {
@@ -92,6 +92,7 @@ export class RivetingMachine extends BaseMachine {
       upValues.push(-j * verticalRate);
     }
 
+
     const downAnimation = createAnimation('.position[y]', 'overallJigMoveDown', verticalTimes, downValues, mixer, verticalDuration);
     const upAnimation = createAnimation('.position[y]', 'overallJigMoveUp', verticalTimes, upValues, mixer, verticalDuration);
     Object.assign(this.getAnimationManager('overallJigMoveDown'), {...downAnimation, mixer});
@@ -106,6 +107,7 @@ export class RivetingMachine extends BaseMachine {
       values.push(i * horizontalRate);
     }
 
+    console.log('right', values);
 
     const rightAnimation = createAnimation('.position[x]', 'overallJigMoveRight', times, values.slice(), mixer, horizontalDuration);
     Object.assign(this.getAnimationManager('overallJigMoveRight'), {...rightAnimation, mixer});
@@ -115,6 +117,8 @@ export class RivetingMachine extends BaseMachine {
     for (let i = horizontalDuration * 10; i >= 0; i--) {
       values.push(i * horizontalRate);
     }
+
+    console.log('left', values);
 
     const leftAnimation = createAnimation('.position[x]', 'overallJigMoveLeft', times, values.slice(), mixer, horizontalDuration);
     Object.assign(this.getAnimationManager('overallJigMoveLeft'), {...leftAnimation, mixer});

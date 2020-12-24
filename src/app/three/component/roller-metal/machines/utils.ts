@@ -46,8 +46,8 @@ export function loadMtlObj(mtlPath: string, objPath: string, manager: LoadingMan
 }
 
 export function createOrbitControls(camera, scene, renderer, object3d?: any[]): OrbitControls {
-  const helper = new GridHelper(1000, 100);
-  scene.add(helper);
+ /* const helper = new GridHelper(1000, 100);
+  scene.add(helper);*/
 
   const orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.update();

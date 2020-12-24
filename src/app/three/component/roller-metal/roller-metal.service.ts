@@ -27,9 +27,9 @@ export class RollerMetalService {
   }
 
   createCamera(): Camera {
-    const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 30000);
-    camera.position.set(0, 200, -500);
-
+    const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+    camera.position.set(300, 200, -300);
+    camera.lookAt(300, 0, 0);
     return camera;
   }
 

@@ -82,13 +82,13 @@ export class MoveBeltMachine extends BaseMachine {
     console.log(verticalAnimation);
     Object.assign(this.getAnimationManager('moveBeltMoveVertical'), {...verticalAnimation, mixer});
     mixer.addEventListener('finished', () => {
-      this.moveVerticaEnd.next(this.moveBeltGroup);
+      this.moveVerticaEnd.next(this);
     });
   }
 
   playMoveBeltVertical(duration = 0.2) {
     this.isPlay = true;
-    this.moveVerticalStart.next(this.moveBeltGroup);
+    this.moveVerticalStart.next(this);
     this.fadeToAction('moveBeltMoveVertical', duration);
   }
 
@@ -98,7 +98,7 @@ export class MoveBeltMachine extends BaseMachine {
    */
   checkMoveBeltVerticalHalfState() {
     if (this.moveBeltGroup.position.y < -12) {
-      this.moveVerticalHalfStart.next(this.moveBeltGroup);
+      this.moveVerticalHalfStart.next(this);
       this.getAnimationManager('moveBeltMoveVertical').action.paused = true;
     }
   }
