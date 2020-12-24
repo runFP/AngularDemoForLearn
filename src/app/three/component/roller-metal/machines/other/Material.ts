@@ -1,5 +1,7 @@
 import {
-  DoubleSide, Group,
+  AnimationAction, AnimationClip,
+  AnimationMixer,
+  DoubleSide, Group, LoopOnce,
   Mesh,
   MeshBasicMaterial,
   MeshPhongMaterial,
@@ -7,7 +9,7 @@ import {
   Path,
   PlaneBufferGeometry,
   Shape,
-  ShapeBufferGeometry, Vector3
+  ShapeBufferGeometry, Vector3, VectorKeyframeTrack
 } from 'three';
 
 export class Material {
@@ -48,6 +50,10 @@ export class Material {
   riveting_5 = false;
   riveting_over = false;
   moveBelt_down = false;
+  moveLift = false;
+
+  rivetingAfterPosition = new Vector3();
+  rivetingBeforePosition = new Vector3();
 
 
   constructor() {
@@ -86,6 +92,38 @@ export class Material {
     newGroup.scale.set(0.5, 0.5, 0.5);
     newGroup.add(group).position.copy(vector).add(new Vector3(2.5, 0, 0));
     this.cube = newGroup;
+  }
+
+  updateRivetingPosition(i) {
+    const rivetingPosition = new Vector3(20, 0, 0);
+    this.cube.getWorldPosition(this.rivetingAfterPosition);
+    this.rivetingAfterPosition.sub(this.rivetingBeforePosition);
+    rivetingPosition.sub(this.rivetingAfterPosition);
+    this.cube.position.add(rivetingPosition);
+  }
+
+  initAnimationMove(distanceX, time) {
+    const times = [];
+    const values = [];
+    const rate = distanceX / time / 10;
+
+    for (let j = 0; j < time * 10; j++) {
+      times.push(j / 10);
+      values.push(this.cube.position.add(new Vector3(rate * j, 0, 0)));
+    }
+
+    const mixer = new AnimationMixer(this.cube);
+    const track = new VectorKeyframeTrack('position', times, values);
+    const clip = new AnimationClip('move', time, [track]);
+    const action = mixer.clipAction(clip);
+    action.clampWhenFinished = true;
+    action.loop = LoopOnce;
+    return {track, clip, action, mixer};
+  }
+
+  playMoveLift() {
+    const animation = this.initAnimationMove(20, 2);
+    animation.action.play();
   }
 }
 

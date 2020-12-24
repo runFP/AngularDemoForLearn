@@ -393,29 +393,42 @@ export class RollerMetalComponent implements OnInit {
         if (m.carMove2 === true && m.riveting_over === false && rm.direction === -1) {
           m.cube.position.setY(rm.group.position.y);
           m.cube.position.add(new Vector3(0, 16, 0));
+          m.cube.getWorldPosition(m.rivetingBeforePosition);
           rm.overallJigGroup.attach(m.cube);
-          console.log('m.position', m.cube.position);
         } else if (m.carMove2 === true && m.riveting_over === false && rm.direction === 1) {
           if (m.riveting_1 === false) {
-            console.log('m.position1', m.cube.position);
+            m.updateRivetingPosition(1);
+            m.cube.getWorldPosition(m.rivetingBeforePosition);
             m.riveting_1 = true;
           } else if (m.riveting_1 === true && m.riveting_2 === false) {
-            console.log('m.position2', m.cube.position);
+            m.updateRivetingPosition(2);
+            m.cube.getWorldPosition(m.rivetingBeforePosition);
+            // console.log('m.position2', m.cube.position);
             m.riveting_2 = true;
           } else if (m.riveting_2 === true && m.riveting_3 === false) {
-            console.log('m.position3', m.cube.position);
+            m.updateRivetingPosition(3);
+            m.cube.getWorldPosition(m.rivetingBeforePosition);
+            // console.log('m.position3', m.cube.position);
             m.riveting_3 = true;
           } else if (m.riveting_3 === true && m.riveting_4 === false) {
+            m.updateRivetingPosition(4);
+            m.cube.getWorldPosition(m.rivetingBeforePosition);
             m.riveting_4 = true;
           } else if (m.riveting_4 === true && m.riveting_5 === false) {
+            m.updateRivetingPosition(5);
+            m.cube.getWorldPosition(m.rivetingBeforePosition);
             m.riveting_5 = true;
           } else if (m.riveting_5 === true && m.riveting_over === false) {
+            m.updateRivetingPosition(6);
+            m.cube.getWorldPosition(m.rivetingBeforePosition);
             m.riveting_over = true;
           }
           this.scene.attach(m.cube);
         }
       });
-      this.getMachine<MoveBeltMachine>('moveBelt').playMoveBeltVertical();
+      if (rm.direction === 1) {
+        this.getMachine<MoveBeltMachine>('moveBelt').playMoveBeltVertical();
+      }
     });
 
     this.getMachine<RivetingMachine>('riveting').overallJigUpEnd.subscribe((rm: RivetingMachine) => {
@@ -439,6 +452,17 @@ export class RollerMetalComponent implements OnInit {
         }
       });
     });
+
+    this.getMachine<MoveBeltMachine>('moveBelt').moveVerticalHalfStart.subscribe((mb: MoveBeltMachine) => {
+      this.materials.forEach(m => {
+        if (m.moveBelt_down === true && m.moveLift === false) {
+          this.scene.attach(m.cube);
+          m.playMoveLift();
+          mb.playMoveBeltVerticalContinue();
+          m.moveBelt_down = true;
+        }
+      });
+    });
   }
 
   /**
@@ -451,9 +475,9 @@ export class RollerMetalComponent implements OnInit {
   }
 
   playVerticalDown() {
-    const a = new Material();
-    this.materials.push(a);
-    this.scene.add(a.cube);
+    /* const a = new Material();
+     this.materials.push(a);
+     this.scene.add(a.cube);*/
     this.getMachine<AppendingMachine>('append')!.playVerticalDown();
   }
 
