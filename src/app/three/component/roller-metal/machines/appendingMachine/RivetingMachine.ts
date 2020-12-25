@@ -107,8 +107,6 @@ export class RivetingMachine extends BaseMachine {
       values.push(i * horizontalRate);
     }
 
-    console.log('right', values);
-
     const rightAnimation = createAnimation('.position[x]', 'overallJigMoveRight', times, values.slice(), mixer, horizontalDuration);
     Object.assign(this.getAnimationManager('overallJigMoveRight'), {...rightAnimation, mixer});
 
@@ -117,8 +115,6 @@ export class RivetingMachine extends BaseMachine {
     for (let i = horizontalDuration * 10; i >= 0; i--) {
       values.push(i * horizontalRate);
     }
-
-    console.log('left', values);
 
     const leftAnimation = createAnimation('.position[x]', 'overallJigMoveLeft', times, values.slice(), mixer, horizontalDuration);
     Object.assign(this.getAnimationManager('overallJigMoveLeft'), {...leftAnimation, mixer});

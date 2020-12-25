@@ -63,6 +63,10 @@ export class RobotMachine extends BaseMachine {
   arm1Front2RevertStart = new Subject();
   arm1Front2RevertEnd = new Subject();
 
+  workStart = new Subject();
+  workEnd = new Subject();
+  workBackStart = new Subject();
+  workBackEnd = new Subject();
 
   pedestalRotationStart = new Subject();
   pedestalRotationEnd = new Subject();
@@ -180,10 +184,8 @@ export class RobotMachine extends BaseMachine {
     mixer.addEventListener('finished', () => {
       if (this.previousActionsType['tong'].name === 'tongRotation') {
         this.tongRotationEnd.next(this.tongG);
-        console.log('tongRotationEnd');
       } else if (this.previousActionsType['tong'].name === 'tongRotationRevert') {
         this.tongRotationRevertEnd.next(this.tongG);
-        console.log('tongRotationRevert');
       }
     });
     const rotationAnimation = createAnimation('.rotation[x]', 'tongRotation', times, values, mixer, rotationDuration);
@@ -242,22 +244,16 @@ export class RobotMachine extends BaseMachine {
     mixer.addEventListener('finished', () => {
       if (this.previousActionsType['arm2'].name === 'arm2Down') {
         this.arm2DownEnd.next(this.arm2G);
-        console.log('arm2DownEnd');
       } else if (this.previousActionsType['arm2'].name === 'arm2DownRevert') {
         this.arm2DownRevertEnd.next(this.arm2G);
-        console.log('arm2DownRevertEnd');
       } else if (this.previousActionsType['arm2'].name === 'arm2Down2') {
         this.arm2Down2End.next(this.arm2G);
-        console.log('arm2Dow2nEnd');
       } else if (this.previousActionsType['arm2'].name === 'arm2Down2Revert') {
         this.arm2Down2RevertEnd.next(this.arm2G);
-        console.log('arm2Down2RevertEnd');
       } else if (this.previousActionsType['arm2'].name === 'arm2Up') {
         this.arm2UpEnd.next(this.arm2G);
-        console.log('arm2UpEnd');
       } else if (this.previousActionsType['arm2'].name === 'arm2UpRevert') {
         this.arm2UpRevertEnd.next(this.arm2G);
-        console.log('arm2UpRevertEnd');
       }
     });
     const downAnimation = createAnimation('.rotation[y]', 'arm2Down', times, valuesDown, mixer, rotationDuration);
@@ -306,22 +302,16 @@ export class RobotMachine extends BaseMachine {
     mixer.addEventListener('finished', () => {
       if (this.previousActionsType['arm1'].name === 'arm1Back') {
         this.arm1BackEnd.next(this.arm1G);
-        console.log('arm1BackEnd');
       } else if (this.previousActionsType['arm1'].name === 'arm1BackRevert') {
         this.arm1BackRevertEnd.next(this.arm1G);
-        console.log('arm1BackRevertEnd');
       } else if (this.previousActionsType['arm1'].name === 'arm1Front') {
         this.arm1FrontEnd.next(this.arm1G);
-        console.log('arm1FrontEnd');
       } else if (this.previousActionsType['arm1'].name === 'arm1FrontRevert') {
         this.arm1FrontRevertEnd.next(this.arm1G);
-        console.log('arm1FrontRevertEnd');
       } else if (this.previousActionsType['arm1'].name === 'arm1Front2') {
         this.arm1Front2End.next(this.arm1G);
-        console.log('arm1Front2End');
       } else if (this.previousActionsType['arm1'].name === 'arm1Front2Revert') {
         this.arm1Front2RevertEnd.next(this.arm1G);
-        console.log('arm1Front2RevertEnd');
       }
     });
     const backAnimation = createAnimation('.rotation[y]', 'arm1Back', times, values, mixer, rotationDuration);
@@ -356,10 +346,8 @@ export class RobotMachine extends BaseMachine {
     mixer.addEventListener('finished', () => {
       if (this.previousActionsType['pedestal'].name === 'pedestalRotation') {
         this.pedestalRotationEnd.next(this.pedestalG);
-        console.log('pedestalRotationEnd');
       } else if (this.previousActionsType['pedestal'].name === 'pedestalRotationRevert') {
         this.pedestalRotationRevertEnd.next(this.pedestalG);
-        console.log('pedestalRotationRevertEnd');
       }
     });
     const rotationAnimation = createAnimation('.rotation[z]', 'pedestalRotation', times, values, mixer, rotationDuration);
@@ -420,7 +408,6 @@ export class RobotMachine extends BaseMachine {
   playArm2Up(duration = 0.2) {
     this.isPlay = true;
     this.arm2UpStart.next(this.arm2G);
-    console.log(this.getAnimationManager('arm2Up').track.values);
     this.getAnimationManager('arm2Up').track.values = new Float32Array(0);
     this.multipleFadeToAction('arm2Up', duration, 'arm2');
   }
@@ -480,6 +467,7 @@ export class RobotMachine extends BaseMachine {
   }
 
   playWork() {
+    this.workStart.next(this);
     this.playPedestalRotation();
     this.playArm1Back();
     // this.playTongRotation();
@@ -494,11 +482,13 @@ export class RobotMachine extends BaseMachine {
         return of('complete');
       })
     ).subscribe(() => {
+      this.workEnd.next(this);
       unSubscribe1.unsubscribe();
     });
   }
 
   playBackWork() {
+    this.workBackStart.next(this);
     this.playArm1FrontRevert();
     const unSubscribe = this.arm1FrontRevertEnd.pipe(
       switchMap(() => {
@@ -526,7 +516,7 @@ export class RobotMachine extends BaseMachine {
         return this.arm2Down2RevertEnd;
       })
     ).subscribe(() => {
-      console.log('!!!!!!!!!!!!!!!');
+      this.workBackEnd.next(this);
       unSubscribe.unsubscribe();
     });
   }

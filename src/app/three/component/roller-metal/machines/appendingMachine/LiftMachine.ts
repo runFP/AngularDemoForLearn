@@ -81,9 +81,9 @@ export class LiftMachine extends BaseMachine {
 
     mixer.addEventListener('finished', () => {
       if (this.activeAction.name === 'liftBoardMoveUp') {
-        this.liftBoardMoveUpEnd.next(this.liftBoardGroup);
+        this.liftBoardMoveUpEnd.next(this);
       } else {
-        this.liftBoardMoveDownEnd.next(this.liftBoardGroup);
+        this.liftBoardMoveDownEnd.next(this);
       }
     });
 
@@ -93,13 +93,13 @@ export class LiftMachine extends BaseMachine {
 
   playLiftBoardMoveUp(duration = 0.2) {
     this.isPlay = true;
-    this.liftBoardMoveUpStart.next(this.liftBoardGroup);
+    this.liftBoardMoveUpStart.next(this);
     this.fadeToAction('liftBoardMoveUp', duration);
   }
 
   playLiftBoardMoveDown(duration = 0.2) {
     this.isPlay = true;
-    this.liftBoardMoveUpStart.next(this.liftBoardGroup);
+    this.liftBoardMoveUpStart.next(this);
     this.fadeToAction('liftBoardMoveDown', duration);
   }
 }

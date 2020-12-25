@@ -26,12 +26,14 @@ export class MoveBeltMachine extends BaseMachine {
   // 已经进行了位置修复的组，组内包含了最原始的模型对象
   moveBeltGroup = new Group();
 
-  moveVerticalStart = new Subject();
-  moveVerticaEnd = new Subject();
-  moveVerticalHalfStart = new Subject();
+  moveDownStart = new Subject();
+  moveDownEnd = new Subject();
+  moveUpStart = new Subject();
+  moveUpEnd = new Subject();
 
   animationManagers: AnimationManager[] = [
-    {name: 'moveBeltMoveVertical', track: null, action: null, clip: null, mixer: null},
+    {name: 'moveBeltMoveDown', track: null, action: null, clip: null, mixer: null},
+    {name: 'moveBeltMoveUp', track: null, action: null, clip: null, mixer: null},
   ];
 
   constructor(manager?: LoadingManager) {
@@ -63,48 +65,47 @@ export class MoveBeltMachine extends BaseMachine {
 
   private initMoveBeltAnimation() {
     const times = [];
-    const values = [];
+    const valuesDown = [];
+    const valuesUp = [];
     const mixer = new AnimationMixer(this.moveBeltGroup);
     const verticalDuration = 1.5;
-    const verticalDistance = 26;
+    const verticalDistance = 10;
     const verticalRate = verticalDistance / verticalDuration / 10;
 
     for (let i = 0, j = verticalDuration * 10; i <= verticalDuration * 10; i++, j--) {
       times.push(i / 10);
-      if (i < verticalDuration * 10 / 2) {
-        values.push(-verticalRate * i);
-      } else {
-        values.push(-verticalRate * j);
-      }
+      valuesDown.push(-verticalRate * i);
+      valuesUp.push(-verticalRate * j);
     }
 
-    const verticalAnimation = createAnimation('.position[y]', 'moveBeltMoveVertical', times, values, mixer, verticalDuration);
-    console.log(verticalAnimation);
-    Object.assign(this.getAnimationManager('moveBeltMoveVertical'), {...verticalAnimation, mixer});
+    const downAnimation = createAnimation('.position[y]', 'moveBeltMoveDown', times, valuesDown, mixer, verticalDuration);
+    const upAnimation = createAnimation('.position[y]', 'moveBeltMoveUp', times, valuesUp, mixer, verticalDuration);
+    Object.assign(this.getAnimationManager('moveBeltMoveDown'), {...downAnimation, mixer});
+    Object.assign(this.getAnimationManager('moveBeltMoveUp'), {...upAnimation, mixer});
     mixer.addEventListener('finished', () => {
-      this.moveVerticaEnd.next(this);
+      if (this.activeAction.name === 'moveBeltMoveDown') {
+        this.moveDownEnd.next(this);
+      } else if (this.activeAction.name === 'moveBeltMoveUp') {
+        this.moveUpEnd.next(this);
+      }
     });
   }
 
-  playMoveBeltVertical(duration = 0.2) {
-    this.isPlay = true;
-    this.moveVerticalStart.next(this);
-    this.fadeToAction('moveBeltMoveVertical', duration);
-  }
 
   /**
    * 不采用以往将多段动画来控制动画的循序，
    * 而是通过判断当前动画根元素位置来分拆一段动画，可以精确控制动画的位移，但比较复杂，这里的-12为上面verticalDistance的一半得出
    */
-  checkMoveBeltVerticalHalfState() {
-    if (this.moveBeltGroup.position.y < -12) {
-      this.moveVerticalHalfStart.next(this);
-      this.getAnimationManager('moveBeltMoveVertical').action.paused = true;
-    }
+  playMoveBeltDown(duration = 0.2) {
+    this.isPlay = true;
+    this.moveDownStart.next(this);
+    this.fadeToAction('moveBeltMoveDown', duration);
   }
 
-  playMoveBeltVerticalContinue() {
-    this.getAnimationManager('moveBeltMoveVertical').action.paused = false;
+  playMoveBeltUp(duration = 0.2) {
+    this.isPlay = true;
+    this.moveUpStart.next(this);
+    this.fadeToAction('moveBeltMoveUp', duration);
   }
 
 

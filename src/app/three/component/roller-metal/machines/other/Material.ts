@@ -11,6 +11,8 @@ import {
   Shape,
   ShapeBufferGeometry, Vector3, VectorKeyframeTrack
 } from 'three';
+import {AnimationManager} from '../baseMachine';
+import {Subject} from 'rxjs';
 
 export class Material {
   static i = 0;
@@ -51,10 +53,17 @@ export class Material {
   riveting_over = false;
   moveBelt_down = false;
   moveLift = false;
+  robot_work = false;
+  robot_workBack = false;
 
   rivetingAfterPosition = new Vector3();
   rivetingBeforePosition = new Vector3();
 
+  dynamicAnimation: AnimationManager;
+
+  actionName;
+  moveStart = new Subject();
+  moveEnd = new Subject();
 
   constructor() {
     this.id = Material.i++;
@@ -102,28 +111,59 @@ export class Material {
     this.cube.position.add(rivetingPosition);
   }
 
-  initAnimationMove(distanceX, time) {
+  initAnimationMove(distance, time, direction = 'x') {
     const times = [];
     const values = [];
-    const rate = distanceX / time / 10;
-
+    const rate = distance / time / 10;
+    const positionVector = new Vector3();
+    this.cube.getWorldPosition(positionVector);
     for (let j = 0; j < time * 10; j++) {
       times.push(j / 10);
-      values.push(this.cube.position.add(new Vector3(rate * j, 0, 0)));
+      if (direction === 'x') {
+        positionVector.add(new Vector3(rate, 0, 0)).clone().toArray(values, values.length);
+      } else if (direction === 'y') {
+        positionVector.add(new Vector3(0, rate, 0)).clone().toArray(values, values.length);
+      } else if (direction === 'z') {
+        positionVector.add(new Vector3(0, 0, rate)).clone().toArray(values, values.length);
+      }
     }
 
     const mixer = new AnimationMixer(this.cube);
-    const track = new VectorKeyframeTrack('position', times, values);
+    const track = new VectorKeyframeTrack('.position', times, values);
     const clip = new AnimationClip('move', time, [track]);
     const action = mixer.clipAction(clip);
     action.clampWhenFinished = true;
     action.loop = LoopOnce;
+
+    mixer.addEventListener('finished', () => {
+      if (this.actionName === 'materialMove') {
+        this.moveEnd.next(this);
+      }
+    });
     return {track, clip, action, mixer};
   }
 
-  playMoveLift() {
-    const animation = this.initAnimationMove(20, 2);
-    animation.action.play();
+  creatMoveAnimationDynamic() {
+    this.dynamicAnimation = {name: 'materialMove', ...this.initAnimationMove(36, 2)};
+    return this.dynamicAnimation;
+  }
+
+  creatMove2AnimationDynamic() {
+    this.dynamicAnimation = {name: 'materialMove', ...this.initAnimationMove(60, 4)};
+    return this.dynamicAnimation;
+  }
+
+  creatMoveYAnimationDynamic() {
+    this.dynamicAnimation = {name: 'materialMoveY', ...this.initAnimationMove(100, 3, 'y')};
+    return this.dynamicAnimation;
+  }
+
+  playMove() {
+    this.moveStart.next(this);
+    this.moveStart.complete();
+    this.dynamicAnimation.mixer.stopAllAction();
+    this.dynamicAnimation.action.reset().play();
+    this.actionName = 'materialMove';
   }
 }
 
