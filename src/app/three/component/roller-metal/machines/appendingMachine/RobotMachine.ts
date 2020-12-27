@@ -238,8 +238,8 @@ export class RobotMachine extends BaseMachine {
 
     const valuesUp = valuesDown.map(v => -v);
     const valuesUpRevert = valuesDownRevert.map(v => -v);
-    const valuesDown2 = valuesDown.map(v => v * 2);
-    const valuesDown2Revert = valuesDownRevert.map(v => v * 2);
+    const valuesDown2 = valuesDown.map(v => v * 3);
+    const valuesDown2Revert = valuesDownRevert.map(v => v * 3);
 
     mixer.addEventListener('finished', () => {
       if (this.previousActionsType['arm2'].name === 'arm2Down') {
@@ -282,7 +282,7 @@ export class RobotMachine extends BaseMachine {
     const rotationDuration = 2;
     const rotationFront2Duration = 4;
     const rotationRate = -Math.PI / 12 / rotationDuration / 10;
-    const rotationFrontRate = Math.PI / 3 / rotationFront2Duration / 10;
+    const rotationFrontRate = Math.PI / 4 / rotationFront2Duration / 10;
 
     for (let i = 0, j = rotationDuration * 10; i <= rotationDuration * 10; i++, j--) {
       times.push(i / 10);
@@ -508,16 +508,16 @@ export class RobotMachine extends BaseMachine {
         this.playSwivelRotation();
         return this.swivelRotationEnd;
       }),
-      switchMap(() => {
-        this.playArm2Down2Revert();
-        this.playArm1Front2Revert();
-        this.playSwivelRotationRevert();
-        this.playTongRotationRevert();
-        return this.arm2Down2RevertEnd;
-      })
     ).subscribe(() => {
       this.workBackEnd.next(this);
       unSubscribe.unsubscribe();
     });
+  }
+
+  playRestore() {
+    this.playArm2Down2Revert();
+    this.playArm1Front2Revert();
+    this.playSwivelRotationRevert();
+    this.playTongRotationRevert();
   }
 }

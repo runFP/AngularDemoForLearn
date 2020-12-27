@@ -20,6 +20,7 @@ export class Material {
   cube = null;
   cubeTmp;
   id;
+  name = Material.i++;
 
   // 当前执行的工序状态
   append_v = false;
@@ -52,7 +53,9 @@ export class Material {
   riveting_5 = false;
   riveting_over = false;
   moveBelt_down = false;
+  beltMove1 = false;
   moveLift = false;
+  beltMove2 = false;
   robot_work = false;
   robot_workBack = false;
 
@@ -65,6 +68,7 @@ export class Material {
   moveStart = new Subject();
   moveEnd = new Subject();
 
+
   constructor() {
     this.id = Material.i++;
     const geometry = new PlaneBufferGeometry(8, 15);
@@ -72,6 +76,7 @@ export class Material {
     this.cube = new Mesh(geometry, material);
     this.cubeTmp = this.cube.clone();
     this.cube.rotateX(Math.PI / 2).position.set(-10.3, 6, 9);
+    // this.cube.rotateX(Math.PI / 2).position.set(214, 6, 9);
   }
 
   createChangeModel() {
@@ -99,7 +104,8 @@ export class Material {
     const vector = new Vector3();
     this.cube.getWorldPosition(vector);
     newGroup.scale.set(0.5, 0.5, 0.5);
-    newGroup.add(group).position.copy(vector).add(new Vector3(2.5, 0, 0));
+    newGroup.add(group).position.copy(vector).add(new Vector3(2.5, 0, -2.5));
+    console.log(group.position);
     this.cube = newGroup;
   }
 
@@ -144,17 +150,22 @@ export class Material {
   }
 
   creatMoveAnimationDynamic() {
-    this.dynamicAnimation = {name: 'materialMove', ...this.initAnimationMove(36, 2)};
+    this.dynamicAnimation = {name: 'materialMove', id: this.name, ...this.initAnimationMove(36, 2)};
     return this.dynamicAnimation;
   }
 
   creatMove2AnimationDynamic() {
-    this.dynamicAnimation = {name: 'materialMove', ...this.initAnimationMove(60, 4)};
+    this.dynamicAnimation = {name: 'materialMove', id: this.name, ...this.initAnimationMove(58, 5)};
+    return this.dynamicAnimation;
+  }
+
+  creatMove3AnimationDynamic() {
+    this.dynamicAnimation = {name: 'materialMove', id: this.name, ...this.initAnimationMove(35, 4)};
     return this.dynamicAnimation;
   }
 
   creatMoveYAnimationDynamic() {
-    this.dynamicAnimation = {name: 'materialMoveY', ...this.initAnimationMove(100, 3, 'y')};
+    this.dynamicAnimation = {name: 'materialMoveY', id: this.name, ...this.initAnimationMove(80, 6, 'y')};
     return this.dynamicAnimation;
   }
 

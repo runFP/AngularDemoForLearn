@@ -46,14 +46,21 @@ export function loadMtlObj(mtlPath: string, objPath: string, manager: LoadingMan
 }
 
 export function createOrbitControls(camera, scene, renderer, object3d?: any[]): OrbitControls {
- /* const helper = new GridHelper(1000, 100);
+  /*const helper = new GridHelper(1000, 100);
   scene.add(helper);*/
 
   const orbitControls = new OrbitControls(camera, renderer.domElement);
+  orbitControls.minDistance = 100;
+  orbitControls.maxDistance = 500;
+  orbitControls.target.set(200, 0, 0);
+  orbitControls.enablePan = false;
   orbitControls.update();
+
   orbitControls.addEventListener('change', (event) => {
     renderer.render(scene, camera);
   });
+
+
   return orbitControls;
 }
 
@@ -75,7 +82,7 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
     if (intersections.length > 0) {
       const object = intersections[0].object;
       console.log(object);
-      // transformControl.attach(object);
+      transformControl.attach(object);
 
       function groupInclude(group, isInclude = false): boolean {
         group.children.forEach(item => {
@@ -90,12 +97,12 @@ export function createTransFormControl(camera, scene, renderer, object3d, orbitC
         return isInclude;
       }
 
-      object3d.forEach(group => {
-        if (groupInclude(group)) {
-          console.log(group);
-          transformControl.attach(group);
-        }
-      });
+      // object3d.forEach(group => {
+      //   if (groupInclude(group)) {
+      //     console.log(group);
+      //     transformControl.attach(group);
+      //   }
+      // });
     }
   });
 

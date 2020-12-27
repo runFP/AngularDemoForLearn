@@ -1,5 +1,5 @@
 import {ElementRef, Injectable} from '@angular/core';
-import {Camera, Color, PCFSoftShadowMap, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
+import {Camera, Color, PCFSoftShadowMap, PerspectiveCamera, Scene, Vector3, WebGLRenderer} from 'three';
 import * as THREE from 'three';
 
 @Injectable({
@@ -22,14 +22,13 @@ export class RollerMetalService {
 
   createScene(): Scene {
     const scene = new Scene();
-    scene.background = new Color(0xbfe3dd);
+    scene.background = new Color('#0e1131');
     return scene;
   }
 
   createCamera(): Camera {
     const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-    camera.position.set(300, 200, -300);
-    camera.lookAt(300, 0, 0);
+    camera.position.set(50, 200, -300);
     return camera;
   }
 

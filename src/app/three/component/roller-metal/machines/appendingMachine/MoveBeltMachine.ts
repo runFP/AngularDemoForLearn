@@ -49,7 +49,7 @@ export class MoveBeltMachine extends BaseMachine {
         this.moveBelt = moveBelt;
 
         const [baseG, moveBeltG] = fixedObjLocalOrigin([base, moveBelt]);
-        moveBeltG.position.setY(12);
+        moveBeltG.position.setY(10);
         this.moveBeltGroup.add(moveBeltG);
         this.group.add(baseG, this.moveBeltGroup);
       }, () => {

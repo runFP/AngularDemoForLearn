@@ -1,4 +1,18 @@
-.container{
+.three-box{
   height: 100%;
   width: 100%;
+  position: relative;
+    .title{
+      position: absolute;
+      background: url("./images/logo.png");
+      background-size: 100% 100%;
+      width: 100%;
+      height: 109px;
+    }
+  .container{
+    height: 100%;
+    width: 100%;
+  }
 }
+
+

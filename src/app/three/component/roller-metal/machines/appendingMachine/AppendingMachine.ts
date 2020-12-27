@@ -122,7 +122,7 @@ export class AppendingMachine extends BaseMachine {
     const times = [];
     const valuesGo = [];
     const valuesBack = [];
-    const duration = 1.5;
+    const duration = 3;
     const distance = 15;
     const rate = distance / duration / 10;
 
@@ -152,7 +152,7 @@ export class AppendingMachine extends BaseMachine {
     const times = [];
     const valuesDown = [];
     const valuesUp = [];
-    const duration = 0.8;
+    const duration = 2;
     const distance = 5.2;
     const rate = distance / duration / 10;
 

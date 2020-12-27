@@ -41,7 +41,7 @@ export class RollerMetalComponent implements OnInit {
   materials: Material[] = [];
   dynamicMixer: AnimationManager[] = [];
 
-  // rail = new Rail(this.loadManager);
+  rail = new Rail(this.loadManager);
 
   /** 机器相关 */
     // loadMachine = ['append', 'moveCut', 'bigPunch', 'moveCut2'];
@@ -89,8 +89,6 @@ export class RollerMetalComponent implements OnInit {
 
     const pointLight = new THREE.PointLight();
     pointLight.position.set(200, 80, 0);
-    pointLight.shadow.mapSize.width = 1024;
-    pointLight.shadow.mapSize.height = 1024;
     this.scene.add(pointLight);
 
     this.instantiateMachines();
@@ -112,7 +110,7 @@ export class RollerMetalComponent implements OnInit {
   }
 
   private init() {
-    // this.otherPromise.push(this.rail.init());
+    this.otherPromise.push(this.rail.init());
     this.initMachines();
   }
 
@@ -140,13 +138,13 @@ export class RollerMetalComponent implements OnInit {
         this.scene.add(element.group);
       });
 
-      const a = new Material();
+    /*  const a = new Material();
       this.materials.push(a);
       // a.createChangeModel();
       // this.dynamicMixer.push(a.creatMoveAnimationDynamic());
-      this.scene.add(a.cube);
+      this.scene.add(a.cube);*/
       this.render();
-      createTransFormControl(this.camera, this.scene, this.renderer, [a.cube], this.orbitControls, this.container.nativeElement);
+      // createTransFormControl(this.camera, this.scene, this.renderer, [a.cube], this.orbitControls, this.container.nativeElement);
       return 'started';
     });
   }
@@ -155,7 +153,7 @@ export class RollerMetalComponent implements OnInit {
    * 初始化各种机器的位置
    */
   positionInit() {
-    // this.rail.group.position.set(242.6, 0, 10.6);
+    this.rail.group.position.set(242.6, 0, 10.6);
     this.getMachine<AppendingMachine>('append').group.position.set(-4.5, 0, -2.4);
     this.getMachine<MoveCutMachine>('moveCut1').group.position.set(28, 0, 9);
     this.getMachine<BigPunchMachine>('bigPunch').group.position.set(54, 0, 12);
@@ -456,14 +454,22 @@ export class RollerMetalComponent implements OnInit {
       this.materials.forEach(m => {
         if (m.riveting_over === true && m.moveBelt_down === false) {
           this.scene.attach(m.cube);
-          this.dynamicMixer.length = 0;
+          const index = this.dynamicMixer.findIndex(am => am.id === m.name);
+          if (~index) {
+            this.dynamicMixer.splice(index, 1);
+          }
           this.dynamicMixer.push(m.creatMoveAnimationDynamic());
           m.playMove();
-          m.cube.position.setY(8);
+          m.cube.position.setY(0);
+          m.cube.position.add(new Vector3(0, 7, 0));
           console.log('moveBeltend', m.cube.position);
           const unsubscribe = m.moveEnd.subscribe((material: Material) => {
             if (m.moveBelt_down === true && m.moveLift === false) {
               const liftMachine = this.getMachine<LiftMachine>('liftMachine');
+              const index2 = this.dynamicMixer.findIndex(am => am.id === m.name);
+              if (~index2) {
+                this.dynamicMixer.splice(index2, 1);
+              }
               this.dynamicMixer.push(m.creatMoveYAnimationDynamic());
               m.playMove();
               liftMachine.playLiftBoardMoveUp();
@@ -479,15 +485,18 @@ export class RollerMetalComponent implements OnInit {
     this.getMachine<LiftMachine>('liftMachine').liftBoardMoveUpEnd.subscribe((lift: LiftMachine) => {
       this.materials.forEach(m => {
         if (m.moveBelt_down === true && m.moveLift === false) {
+          m.cube.position.setY(30);
           m.moveLift = true;
-          console.log('moveliftMachineend', m.cube.position);
-          this.dynamicMixer.length = 0;
+          const index = this.dynamicMixer.findIndex(am => am.id === m.name);
+          if (~index) {
+            this.dynamicMixer.splice(index, 1);
+          }
           this.dynamicMixer.push(m.creatMove2AnimationDynamic());
           m.playMove();
           const unsubscribe = m.moveEnd.subscribe((material: Material) => {
-            if (m.moveLift === true && m.robot_work === false) {
+            if (m.moveLift === true && m.beltMove2 === false) {
+              m.beltMove2 = true;
               const robot = this.getMachine<RobotMachine>('robotMachine');
-              robot.tongG.attach(m.cube);
               robot.playWork();
               unsubscribe.unsubscribe();
             }
@@ -499,7 +508,8 @@ export class RollerMetalComponent implements OnInit {
 
     this.getMachine<RobotMachine>('robotMachine').workEnd.subscribe((robot: RobotMachine) => {
       this.materials.forEach(m => {
-        if (m.moveLift === true && m.robot_work === false) {
+        if (m.beltMove2 === true && m.robot_work === false) {
+          robot.tongG.attach(m.cube);
           m.robot_work = true;
         }
       });
@@ -507,10 +517,31 @@ export class RollerMetalComponent implements OnInit {
     });
 
     this.getMachine<RobotMachine>('robotMachine').workBackEnd.subscribe((robot: RobotMachine) => {
+      console.log(this.materials);
       this.materials.forEach(m => {
         if (m.robot_work === true && m.robot_workBack === false) {
           m.robot_workBack = true;
           this.scene.attach(m.cube);
+          const index = this.dynamicMixer.findIndex(am => am.id === m.name);
+          if (~index) {
+            this.dynamicMixer.splice(index, 1);
+          }
+          this.dynamicMixer.push(m.creatMove3AnimationDynamic());
+          const unsubscribe = m.moveEnd.subscribe((material: Material) => {
+            const index2 = this.dynamicMixer.findIndex(am => am.id === m.name);
+            if (~index2) {
+              this.dynamicMixer.splice(index, 1);
+            }
+            unsubscribe.unsubscribe();
+            this.scene.remove(m.cube);
+            m.dynamicAnimation.mixer.uncacheRoot(m.cube);
+            const indexM = this.materials.findIndex(mi => mi.name === m.name);
+            if (~indexM) {
+              this.materials.splice(indexM, 1);
+            }
+          });
+          m.playMove();
+          robot.playRestore();
         }
       });
     });
@@ -538,6 +569,7 @@ export class RollerMetalComponent implements OnInit {
     this.materials.push(a);
     this.scene.add(a.cube);
     this.getMachine<AppendingMachine>('append')!.playVerticalDown();
+    // this.getMachine<SmallCutMachine>('smallCut').playTranslationLeft();
   }
 
 
