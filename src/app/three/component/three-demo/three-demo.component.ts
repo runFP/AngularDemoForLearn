@@ -32,14 +32,15 @@ export class ThreeDemoComponent implements OnInit {
 
     // 设置辅助
     this.states = this.threeCommonService.addStates(element);
+    this.threeCommonService.addGrid(this.scene);
     this.threeCommonService.addOrbitControls(this.camera, this.scene, this.renderer);
 
     this.container.nativeElement.append(this.renderer.domElement);
-    this.threeCommonService.loadMtlObj(
-      '/assets/modal/roller/上料机-静态.mtl',
-      '/assets/modal/roller/上料机-静态.obj',
-      this.scene
-    );
+    // this.threeCommonService.loadMtlObj(
+    //   '/assets/modal/roller/上料机-静态.mtl',
+    //   '/assets/modal/roller/上料机-静态.obj',
+    //   this.scene
+    // );
     this.animation();
   }
 

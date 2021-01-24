@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {DefaultLoadingManager, Group, LoadingManager, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
+import {Color, DefaultLoadingManager, Group, LoadingManager, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {MaterialCreator, MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import * as THREE from 'three';
 
 @Injectable()
 export class ThreeCommonServices {
@@ -28,11 +29,13 @@ export class ThreeCommonServices {
 
   getScene(): Scene {
     const scene = new Scene();
+    scene.background = new Color('#13528b');
     return scene;
   }
 
   getCamera(): PerspectiveCamera {
-    const camera = new PerspectiveCamera(60, this.width / this.height, 1, 200);
+    const camera = new PerspectiveCamera(60, this.width / this.height, 1, 2000);
+    camera.position.set(200, 0, 0);
     return camera;
   }
 
@@ -55,9 +58,18 @@ export class ThreeCommonServices {
   addOrbitControls(camera, scene, renderer) {
     const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.update();
-    orbitControls.addEventListener('change', (event) => {
-      renderer.render(scene, camera);
-    });
+    // ***** 添加下面事件会影响性能
+    // 如果有animation，并在里面执行了renderer.render(scene, camera)方法，
+    // 那这个无需在写
+    // orbitControls.addEventListener('change', (event) => {
+    //   renderer.render(scene, camera);
+    // });
+
+  }
+
+  addGrid(scene) {
+    const helper = new THREE.GridHelper(2000, 100);
+    scene.add(helper);
   }
 
   loadMtlObj(mtlPath: string, objPath: string, scene: Scene, manager: LoadingManager = DefaultLoadingManager) {
