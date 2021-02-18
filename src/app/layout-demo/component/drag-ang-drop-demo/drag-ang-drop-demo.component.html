@@ -46,7 +46,6 @@
   (nzOnCancel)="handleCancel()"
   (nzOnOk)="handleOk()"
   [nzMask]="false"
-  [nzStyle]="{top:0}"
   nzWrapClassName="abc"
 >
   <p>Content one</p>
@@ -56,6 +55,14 @@
 <ng-template #dragableHeader>
   <div cdkDragHandle>drag me</div>
 </ng-template>
+
+
+
+<button nz-button [nzType]="'primary'" (click)="showModal()"><span>自定义弹框</span></button>
+<div class="modal">
+  <div class="title">title</div>
+  <div class="content">content</div>
+</div>
 
 
 

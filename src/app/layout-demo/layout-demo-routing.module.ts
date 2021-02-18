@@ -9,6 +9,7 @@ import {DragAngDropDemoComponent} from './component/drag-ang-drop-demo/drag-ang-
 import {PortalDemoComponent} from './component/portal-demo/portal-demo.component';
 import {NgDragAndDropComponent} from './component/ng-drag-and-drop/ng-drag-and-drop.component';
 import {FlexMergeDynamicComponent} from './component/flex-merge-dynamic/flex-merge-dynamic.component';
+import {ModalPlusDemoComponent} from './component/modal-plus-demo/modal-plus-demo.component';
 
 export const childRoutes: Routes = [
   {path: 'lfrd', component: LeftFixRightDynamicComponent},
@@ -17,7 +18,8 @@ export const childRoutes: Routes = [
   {path: 'dragdrop', component: DragAngDropDemoComponent},
   {path: 'portal', component: PortalDemoComponent},
   {path: 'dragAndDrop', component: NgDragAndDropComponent},
-  {path: 'flexMergeDynamic', component: FlexMergeDynamicComponent}
+  {path: 'flexMergeDynamic', component: FlexMergeDynamicComponent},
+  {path: 'modalPlusDemo', component: ModalPlusDemoComponent}
 ];
 
 export const routes: Routes = [
@@ -37,6 +39,7 @@ export const names = [
       {name: 'portal'},
       {name: '自定义拖动层'},
       {name: '动态合并flex布局'},
+      {name: 'modalPlus'},
     ]
   }
 ];
