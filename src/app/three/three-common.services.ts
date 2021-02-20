@@ -1,10 +1,12 @@
-import {Injectable} from '@angular/core';
-import {Color, DefaultLoadingManager, Group, LoadingManager, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
+import {ComponentFactory, ComponentFactoryResolver, ComponentRef, Injectable, Type, ViewContainerRef} from '@angular/core';
+import {Box3, Color, DefaultLoadingManager, Group, LoadingManager, PerspectiveCamera, Scene, WebGLRenderer} from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {MaterialCreator, MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
+import {HelperComponent} from './component/three-demo/helper/helper.component';
 
 @Injectable()
 export class ThreeCommonServices {
@@ -34,13 +36,15 @@ export class ThreeCommonServices {
   }
 
   getCamera(): PerspectiveCamera {
-    const camera = new PerspectiveCamera(60, this.width / this.height, 1, 2000);
-    camera.position.set(200, 0, 0);
+    const camera = new PerspectiveCamera(10, this.width / this.height, 1, 100000);
+    camera.position.set(0, 100, 0);
+    camera.fov = 100;
+    camera.updateProjectionMatrix();
+    // camera.position.set(230539.4921875, 2926.2950134277344, 17348.68408203125);
     return camera;
   }
 
-  /**
-   * 帧数检测
+  /**   * 帧数检测
    * @param container
    */
   addStates(container: HTMLElement): Stats {
@@ -72,13 +76,48 @@ export class ThreeCommonServices {
     scene.add(helper);
   }
 
-  loadMtlObj(mtlPath: string, objPath: string, scene: Scene, manager: LoadingManager = DefaultLoadingManager) {
+  loadMtlObj(paths: ({ mtlPath: string, objPath: string } | { gltfPath: string })[], scene: Scene, manager: LoadingManager = DefaultLoadingManager) {
     const mtl = new MTLLoader(manager);
     const obj = new OBJLoader(manager);
-    mtl.load(mtlPath, (m: MaterialCreator) => {
-      obj.setMaterials(m).load(objPath, (o: Group) => {
-        scene.add(o);
-      });
+    const gltfLoader = new GLTFLoader(manager);
+    const box3 = new Box3();
+
+    paths.forEach(path => {
+      if ('gltfPath' in path) {
+        gltfLoader.load(path.gltfPath, (gltf) => {
+          const oobj = box3.expandByObject(gltf.scene);
+          console.log(oobj);
+          scene.add(gltf.scene);
+          console.log(scene);
+        });
+      } else {
+        mtl.load(path.mtlPath, (m: MaterialCreator) => {
+          obj.setMaterials(m).load(path.objPath, (o: Group) => {
+            const oobj = box3.expandByObject(o);
+            console.log(oobj);
+            scene.add(o);
+          });
+        });
+      }
+    });
+  }
+
+  addControlDom(
+    resolve: ComponentFactoryResolver,
+    viewContainerRef: ViewContainerRef,
+    component: Type<HelperComponent>,
+    value: { title: string, property: any, fields: { name: string, value: any }[] },
+    change = (p, v) => {
+      console.log(p, v);
+    }
+  ) {
+    const componentFactory = resolve.resolveComponentFactory(component);
+    const componentRef = viewContainerRef.createComponent<HelperComponent>(componentFactory);
+    componentRef.instance.title = value.title;
+    componentRef.instance.property = value.property;
+    componentRef.instance.fields = value.fields;
+    componentRef.instance.update.subscribe((p, v) => {
+      change(p, v);
     });
   }
 }

@@ -9,6 +9,7 @@ const offsetDistance = 5;
 export class FlexibleSizeDirective implements AfterViewInit {
   currentMouseClassName: string;
   isResize = false; // 判断是否处于拖拉尺寸状态
+  lastPosition = {x: 0, y: 0}; // 上一次鼠标位置
 
   constructor(
     private elementRef: ElementRef,
@@ -17,6 +18,9 @@ export class FlexibleSizeDirective implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    document.addEventListener('mousemove', e => {
+      console.log('d', e);
+    });
     this.elementRef.nativeElement.addEventListener('mousemove', (e) => {
       const width = this.elementRef.nativeElement.offsetWidth;
       const height = this.elementRef.nativeElement.offsetHeight;
@@ -45,6 +49,8 @@ export class FlexibleSizeDirective implements AfterViewInit {
     this.elementRef.nativeElement.addEventListener('mousedown', e => {
       if (this.currentMouseClassName !== '') {
         this.isResize = true;
+        this.lastPosition.x = e.pageX;
+        this.lastPosition.y = e.pageY;
       }
     });
     this.elementRef.nativeElement.addEventListener('mouseup', e => {
@@ -69,8 +75,12 @@ export class FlexibleSizeDirective implements AfterViewInit {
 
   private resize(e, width, height) {
     if (this.isResize) {
-      console.log(e);
+      const move = this.lastPosition.y - e.pageY;
+      this.lastPosition.y = e.pageY;
+      console.log('height', height);
+      this.renderer.setStyle(this.elementRef.nativeElement, 'height', `${height + move}px`);
     }
   }
+
 
 }

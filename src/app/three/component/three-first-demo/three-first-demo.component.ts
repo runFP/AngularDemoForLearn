@@ -70,13 +70,17 @@ export class ThreeFirstDemoComponent implements OnInit {
 
     const paths = [
       {
-        'mtlPath': '/assets/modal/total/ZONYI.mtl',
-        'objPath': '/assets/modal/total/ZONYI.obj'
+        'mtlPath': '/assets/modal/washingMachine/ZONYI.mtl',
+        'objPath': '/assets/modal/washingMachine/ZONYI.obj'
       },
-      {
-        'mtlPath': '/assets/modal/roller/2号-400T.mtl',
-        'objPath': '/assets/modal/roller/2号-400T.obj'
-      }
+     /* {
+        'mtlPath': '/assets/modal/washingMachine/ZONYI.mtl',
+        'objPath': '/assets/modal/washingMachine/ZONYI.obj'
+      },*/
+      // {
+      //   'mtlPath': '/assets/modal/roller/2号-400T.mtl',
+      //   'objPath': '/assets/modal/roller/2号-400T.obj'
+      // }
       /*, {
        'mtlPath': '/assets/modal/roller/3号-300T.mtl',
        'objPath': '/assets/modal/roller/3号-300T.obj'

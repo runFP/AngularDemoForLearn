@@ -20,6 +20,11 @@ const PATH = [
     mtlPath: '/assets/modal/roller/报警灯.mtl',
     objPath: '/assets/modal/roller/报警灯.obj'
   },
+  {
+    name: 'base',
+    mtlPath: '/assets/modal/roller/小车.mtl',
+    objPath: '/assets/modal/roller/小车.obj'
+  }
 ];
 
 export class BigPunchMachine extends BaseMachine {
