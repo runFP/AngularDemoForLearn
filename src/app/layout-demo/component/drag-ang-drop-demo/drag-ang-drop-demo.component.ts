@@ -63,11 +63,11 @@ export class DragAngDropDemoComponent implements OnInit {
     const html = this.dragRef.getRootElement();
     console.log(this.dragRef.disabled);
     if (this.dragRef.disabled) {
-      this.dragRef.enableHandle(html);
+      // this.dragRef.enableHandle(html);
       this.dragDisable = this.dragRef.disabled = false;
 
     } else {
-      this.dragRef.disableHandle(html);
+      // this.dragRef.disableHandle(html);
       this.dragDisable = this.dragRef.disabled = true;
     }
   }

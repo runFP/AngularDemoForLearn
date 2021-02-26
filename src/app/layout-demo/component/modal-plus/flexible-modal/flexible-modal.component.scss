@@ -1,0 +1,25 @@
+.modal-plus {
+  width: 400px;
+  background-color: #fff;
+  border: 1px solid #000;
+  .title {
+    display: flex;
+    border: 1px solid #f00;
+
+    .move {
+      cursor: move;
+    }
+
+    .title-content {
+      flex: 1;
+    }
+
+    .close {
+      width: 30px;
+    }
+  }
+
+  .content {
+    border: 1px solid #f00;
+  }
+}

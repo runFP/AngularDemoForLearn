@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit, } from '@angular/core';
 import {PORTAL_DATA} from '../portal-data';
 
 @Component({
@@ -6,8 +6,7 @@ import {PORTAL_DATA} from '../portal-data';
   templateUrl: './flexible-modal.component.html',
   styleUrls: ['./flexible-modal.component.scss']
 })
-export class FlexibleModalComponent implements OnInit {
-
+export class FlexibleModalComponent implements OnInit, AfterViewInit {
   constructor(
     @Inject(PORTAL_DATA) public data
   ) {
@@ -17,7 +16,9 @@ export class FlexibleModalComponent implements OnInit {
   }
 
   close() {
-    this.data.overlayRef.detach();
+    this.data.close();
   }
 
+  ngAfterViewInit(): void {
+  }
 }

@@ -1,8 +1,6 @@
-import {Component, Injector, OnInit} from '@angular/core';
-import {Overlay, OverlayPositionBuilder} from '@angular/cdk/overlay';
-import {ComponentPortal} from '@angular/cdk/portal';
-import {FlexibleModalComponent} from './flexible-modal/flexible-modal.component';
-import {PORTAL_DATA} from './portal-data';
+import {Component, OnInit} from '@angular/core';
+import {FlexibleModalComponent} from '../modal-plus/flexible-modal/flexible-modal.component';
+import {ModalPlusService} from '../modal-plus/modal-plus.service';
 
 
 @Component({
@@ -15,24 +13,23 @@ export class ModalPlusDemoComponent implements OnInit {
   injector;
 
   constructor(
-    private overlay: Overlay,
-    private overlayPositionBuilder: OverlayPositionBuilder,
+    private modalPlusService: ModalPlusService,
   ) {
   }
 
   ngOnInit() {
-    const global = this.overlayPositionBuilder.global().centerHorizontally().centerVertically();
-    this.overlayRef = this.overlay.create({positionStrategy: global});
-    this.injector = Injector.create([{provide: PORTAL_DATA, useValue: {overlayRef: this.overlayRef}}]);
   }
 
-  showModal() {
-    const flexibleModal = new ComponentPortal(FlexibleModalComponent, null, this.injector);
-    this.overlayRef.attach(flexibleModal);
+  showModal($event) {
+    this.modalPlusService.open(FlexibleModalComponent, null, $event.target);
+  }
+
+  showModal2($event) {
+    this.modalPlusService.open(FlexibleModalComponent, null, $event.target);
   }
 
   closeModal() {
-    this.overlayRef.detach();
+    // this.overlayRef.detach();
   }
 }
 

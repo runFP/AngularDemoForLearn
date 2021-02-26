@@ -1,0 +1,39 @@
+.aps-modal-plus {
+  transform-origin: center center 0;
+
+  &.e-resize, &.w-resize, &.ne-resize, &.nw-resize, &.n-resize, &.s-resize, &.se-resize, &.sw-resize {
+    user-select: none;
+  }
+
+  &.e-resize {
+    cursor: e-resize;
+  }
+
+  &.w-resize {
+    cursor: w-resize;
+  }
+
+  &.ne-resize {
+    cursor: ne-resize;
+  }
+
+  &.nw-resize {
+    cursor: nw-resize;
+  }
+
+  &.n-resize {
+    cursor: n-resize;
+  }
+
+  &.s-resize {
+    cursor: s-resize;
+  }
+
+  &.se-resize {
+    cursor: se-resize;
+  }
+
+  &.sw-resize {
+    cursor: sw-resize;
+  }
+}
