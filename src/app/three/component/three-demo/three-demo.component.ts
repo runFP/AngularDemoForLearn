@@ -1,7 +1,6 @@
 import {Component, ComponentFactoryResolver, ElementRef, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {ThreeCommonServices} from '../../three-common.services';
 import * as THREE from 'three';
-import {HelperComponent} from './helper/helper.component';
 
 @Component({
   selector: 'app-three-demo',
@@ -41,7 +40,7 @@ export class ThreeDemoComponent implements OnInit {
     this.threeCommonService.addOrbitControls(this.camera, this.scene, this.renderer);
 
     this.container.nativeElement.append(this.renderer.domElement);
-    this.threeCommonService.addControlDom(this.resolve, this.viewContainerRef, HelperComponent, {
+/*    this.threeCommonService.addControlDom(this.resolve, this.viewContainerRef, HelperComponent, {
       title: 'Camera',
       property: this.camera,
       fields: [
@@ -50,7 +49,7 @@ export class ThreeDemoComponent implements OnInit {
     }, (p, v) => {
       p[v.name] = v.value;
       p.updateProjectionMatrix();
-    });
+    });*/
 
     this.threeCommonService.loadMtlObj([
         {mtlPath: '/assets/modal/roller/上料机-静态.mtl', objPath: '/assets/modal/roller/上料机-静态.obj'},

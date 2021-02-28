@@ -6,13 +6,12 @@ import {ThreeRoutingModule} from './three-routing.module';
 import {FormsModule} from '@angular/forms';
 import {RollerMetalComponent} from './component/roller-metal/roller-metal.component';
 import {ThreeDemoComponent} from './component/three-demo/three-demo.component';
-import {HelperComponent} from './component/three-demo/helper/helper.component';
 import {MatFormFieldModule, MatInputModule} from '@angular/material';
 import {MatSelectModule} from '@angular/material';
 
 
 @NgModule({
-  declarations: [ThreeFirstDemoComponent, ThreeHomeComponent, RollerMetalComponent, ThreeDemoComponent, HelperComponent],
+  declarations: [ThreeFirstDemoComponent, ThreeHomeComponent, RollerMetalComponent, ThreeDemoComponent,],
   imports: [
     CommonModule,
     FormsModule,
@@ -21,7 +20,7 @@ import {MatSelectModule} from '@angular/material';
     MatSelectModule,
     MatInputModule,
   ],
-  entryComponents: [HelperComponent],
+  entryComponents: [],
 })
 export class ThreeModule {
 }

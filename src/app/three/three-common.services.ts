@@ -6,7 +6,6 @@ import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
-import {HelperComponent} from './component/three-demo/helper/helper.component';
 
 @Injectable()
 export class ThreeCommonServices {
@@ -105,14 +104,14 @@ export class ThreeCommonServices {
   addControlDom(
     resolve: ComponentFactoryResolver,
     viewContainerRef: ViewContainerRef,
-    component: Type<HelperComponent>,
+    component: Type<any>,
     value: { title: string, property: any, fields: { name: string, value: any }[] },
     change = (p, v) => {
       console.log(p, v);
     }
   ) {
     const componentFactory = resolve.resolveComponentFactory(component);
-    const componentRef = viewContainerRef.createComponent<HelperComponent>(componentFactory);
+    const componentRef = viewContainerRef.createComponent<any>(componentFactory);
     componentRef.instance.title = value.title;
     componentRef.instance.property = value.property;
     componentRef.instance.fields = value.fields;
