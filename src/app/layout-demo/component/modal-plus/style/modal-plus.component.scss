@@ -1,5 +1,10 @@
+.aps-modal-plus-container {
+  pointer-events: none !important;
+}
+
 .aps-modal-plus {
   transform-origin: center center 0;
+  pointer-events: auto;
 
   &.e-resize, &.w-resize, &.ne-resize, &.nw-resize, &.n-resize, &.s-resize, &.se-resize, &.sw-resize {
     user-select: none;

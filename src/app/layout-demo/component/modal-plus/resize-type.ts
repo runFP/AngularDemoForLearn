@@ -1,3 +1,9 @@
+/**
+ * N: north
+ * S: south
+ * E: east
+ * W: west
+ */
 export enum RESIZE_TYPE {
   NW = 'nw-resize',
   NE = 'ne-resize',

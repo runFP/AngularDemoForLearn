@@ -1,28 +1,46 @@
-import {ComponentRef, ElementRef, Injectable, Injector, OnInit, Optional, Renderer2, RendererFactory2} from '@angular/core';
+/**
+ * 该服务主要配合apsFlexibleSize指令，实现的功能有：
+ * 1.管理弹框
+ * 2.选中弹框置顶
+ * 3.传入唯一标识值，可防止点击同一按钮重复打开弹框
+ * 4.配合apsFlexibleSize指令实现拖拉元素变更尺寸
+ */
+import {ComponentRef, ElementRef, Injectable, Injector, RendererFactory2} from '@angular/core';
 import {Overlay, OverlayPositionBuilder, OverlayRef} from '@angular/cdk/overlay';
 import {PORTAL_DATA} from './portal-data';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {RESIZE_TYPE} from './resize-type';
 import {DragRef} from '@angular/cdk/drag-drop';
+import {getSize, getTransform} from './utils';
 
-// 鼠标离边缘位置多少时可以调整
+// 鼠标离边缘位置多少时可以变更尺寸
 const offsetDistance = 5;
 
 @Injectable()
 export class ModalPlusService {
-  /** 管理弹框，防止重复打开相同弹框功能*/
-  modalPlusContainer: ModalPlusRef[] = []; // 弹框容器，弹框当前弹框数量
-  targetMapId = new Map();
   renderer;
 
+  /** 管理弹框 */
+  modalPlusContainer: ModalPlusRef[] = []; // 弹框容器，弹框当前弹框数量
+
+  /** 有唯一标识值时，防止重复打开相同弹框功能*/
+  targetMapId = new Map();
+
+  /** 管理选中的弹框置顶 */
+  lastModalPlus: HTMLElement | null = null; // 上次选中的弹框，用来将当前弹框置顶
+
   /** 管理可以变更尺寸元素 */
-  isActiveMouseListener = false;
   resizeElementContainer: ResizeElementInf[] = [];  // 重设尺寸元素容器
+
+  isActiveMouseListener = false; // 是否激活了鼠标事件监听，变更尺寸功能需要鼠标事件协助
+
+  /** 变更尺寸流程状态 必须isMatchResizeType为ture,才能激活isActiveResize，从而启动变更尺寸 */
   activeResizeInf: { isMatchResizeType: boolean, isActiveResize: boolean, activeItem: ResizeElementInf } = {
-    isMatchResizeType: false, // 是否已有元素匹配了重调尺寸类型
-    isActiveResize: false, // 是否已有元素处于重调尺寸中
-    activeItem: null,
+    isMatchResizeType: false, // 是否已有元素匹配了重调尺寸类型,即鼠标已移动到元素边界
+    isActiveResize: false, // 是否已有元素处于重调尺寸中，即在边界按下了鼠标
+    activeItem: null, // 变更尺寸元素的元数据
   };
+
   private _downHandler = this._mouseDown.bind(this);
   private _moveHandler = this._mouseMove.bind(this);
   private _upHandler = this._mouseUp.bind(this);
@@ -55,7 +73,7 @@ export class ModalPlusService {
     }
 
     const global = this.overlayPositionBuilder.global().centerHorizontally().centerVertically();
-    const overlayRef = this.overlay.create({positionStrategy: global});
+    const overlayRef = this.overlay.create({positionStrategy: global, panelClass: 'aps-modal-plus-container'});
     const injector = this._createInjector(id, data);
     const flexibleModal = new ComponentPortal(component, null, injector);
     const componentRef: ComponentRef<any> = overlayRef.attach(flexibleModal);
@@ -156,14 +174,16 @@ export class ModalPlusService {
 
         // 激活回调
         containerItem.mousemoveCallback(e);
+
         if (!this.activeResizeInf.isMatchResizeType) {
           this.activeResizeInf.isMatchResizeType = this.matchResizeType(containerItem, e);
           if (this.activeResizeInf.isMatchResizeType) {
             this.activeResizeInf.activeItem = containerItem;
+            break;
           }
         }
       }
-    } else {
+    } else if (this.activeResizeInf.isActiveResize) {
       // 变更尺寸
       this.resize(e);
     }
@@ -175,16 +195,35 @@ export class ModalPlusService {
       this.activeResizeInf.isActiveResize = true;
       this.mouseInfo.oldPosition = {x: e.x, y: e.y};
     }
-    console.log(this.activeResizeInf);
   }
 
   private _mouseUp(e: MouseEvent) {
-    this.activeResizeInf.isMatchResizeType = false;
-    this.activeResizeInf.isActiveResize = false;
-    this.activeResizeInf.activeItem = null;
+    if (this.activeResizeInf.isActiveResize) {
+      this.activeResizeInf.isMatchResizeType = false;
+      this.activeResizeInf.isActiveResize = false;
+      const containerEle = this.activeResizeInf.activeItem.ele;
+      const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
+      const translatePoint = getTransform(ele.style.transform);
+      const point = {x: translatePoint.x, y: translatePoint.y};
+      // 需要将原有translate值清除，否则会dragRef会在此基础上在添加translate
+      ele.style.transform = '';
+      // 将变更尺寸后坐标更新到拖动功能坐标
+      this.activeResizeInf.activeItem.dragRef.setFreeDragPosition(point);
+      this.activeResizeInf.activeItem = null;
+    }
   }
 
-  addResizeElement(ele: ElementRef | HTMLElement, dragRef: DragRef | null = null, mouseupCallback: (...arg) => any = function (e) {
+  /**
+   * 添加可变更尺寸元素
+   * @param ele 变更尺寸元素
+   * @param dragRef 若元素具有拖动功能，传入拖动引用
+   * @param min 尺寸变更最小值
+   * @param max 尺寸变更最大值
+   * @param mouseupCallback 鼠标回调
+   * @param mousemoveCallback 鼠标回调
+   * @param mousedownCallback 鼠标回调
+   */
+  addResizeElement(ele: ElementRef | HTMLElement, dragRef: DragRef | null = null, min: number, max: number, mouseupCallback: (...arg) => any = function (e) {
   }, mousemoveCallback: (...arg) => any = function (e) {
   }, mousedownCallback: (...arg) => any = function (e) {
   }) {
@@ -204,7 +243,7 @@ export class ModalPlusService {
    * @param active
    * @private
    */
-  private activeDragDisable(dragRef: DragRef | null, active: boolean) {
+  activeDragDisable(dragRef: DragRef | null, active: boolean) {
     if (dragRef !== null) {
       dragRef.disabled = active;
     }
@@ -219,13 +258,13 @@ export class ModalPlusService {
   private matchResizeType(containerItem: ResizeElementInf, e): boolean {
     const containerEle = containerItem.ele;
     const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
-    const {width, height} = this.getSize(ele);
+    const {width, height} = getSize(ele);
     const top = ele.getBoundingClientRect().top;
     const left = ele.getBoundingClientRect().left;
     const right = ele.getBoundingClientRect().right;
     const bottom = ele.getBoundingClientRect().bottom;
-    const layerY = e.y - ele.getBoundingClientRect().top;
-    const layerX = e.x - ele.getBoundingClientRect().left;
+    const layerY = e.y - top;
+    const layerX = e.x - left;
 
     if (e.x >= left && e.x <= right && e.y >= top && e.y <= bottom) {
       if (layerX - offsetDistance <= 0 && layerY - offsetDistance <= 0) {
@@ -289,44 +328,58 @@ export class ModalPlusService {
     }
   }
 
-  private getSize(ele: HTMLElement): { width: number, height: number } {
-    return {
-      width: ele.offsetWidth,
-      height: ele.offsetHeight,
-    };
-  }
-
   private resize(e) {
     if (this.activeResizeInf.isActiveResize) {
       const movementX = this.mouseInfo.oldPosition.x - e.x;
       const movementY = this.mouseInfo.oldPosition.y - e.y;
       this.mouseInfo.oldPosition = {x: e.x, y: e.y};
-      const containerEle = this.activeResizeInf.activeItem.ele;
+      const activeItem = this.activeResizeInf.activeItem;
+      const containerEle = activeItem.ele;
+      const resizeType = activeItem.existedClassName;
       const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
-      const {width, height} = this.getSize(ele);
+      const {width, height} = getSize(ele);
       const lastTranslate = getTransform(ele.style.transform);
 
-      this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
-      this.renderer.setStyle(ele, 'transform', `translate3d(0px, ${lastTranslate.y - movementY / 2}px, 0px)`);
-    }
-
-    function getTransform(transform: string): { x: number, y: number, z: number } {
-      const reg = /^.+\((.*)\)/;
-      const match = transform.match(reg);
-      const transValue = {x: 0, y: 0, z: 0};
-      if (match) {
-        const valueArr: number | string[] = match[1].split(',');
-        valueArr.forEach((v, i) => {
-          valueArr[i] = v.replace('px', '');
-        });
-        transValue.x = Number(valueArr[0]);
-        transValue.y = Number(valueArr[1]);
-        transValue.z = Number(valueArr[2]);
+      console.log('resizeType', resizeType);
+      if (resizeType === RESIZE_TYPE.NW) {
+        this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
+        this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.NE) {
+        this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
+        this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.N) {
+        this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.SW) {
+        this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
+        this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.W) {
+        this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.SE) {
+        this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
+        this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.E) {
+        this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
+      } else if (resizeType === RESIZE_TYPE.S) {
+        this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y  - movementY / 2}px, 0)`);
       }
-      return transValue;
     }
   }
 
+  showCurrentModalPlus(el: HTMLElement) {
+    if (this.lastModalPlus) {
+      this.renderer.removeStyle(this.lastModalPlus, 'zIndex');
+    }
+    this.renderer.setStyle(el, 'zIndex', 1001);
+    this.lastModalPlus = el;
+  }
 }
 
 export interface ModalPlusRef {
@@ -339,7 +392,7 @@ export interface ModalPlusRef {
 export interface ResizeElementInf {
   ele: ElementRef | HTMLElement;
   dragRef: DragRef | null;
-  existedClassName: string;
+  existedClassName: string; // 尺寸变更类型
   mouseupCallback: (...arg) => any;
   mousemoveCallback: (...arg) => any;
   mousedownCallback: (...arg) => any;

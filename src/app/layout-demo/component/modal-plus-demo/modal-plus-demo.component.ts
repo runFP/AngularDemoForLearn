@@ -21,11 +21,11 @@ export class ModalPlusDemoComponent implements OnInit {
   }
 
   showModal($event) {
-    this.modalPlusService.open(FlexibleModalComponent, null, $event.target);
+    this.modalPlusService.open(FlexibleModalComponent, {name: 1});
   }
 
   showModal2($event) {
-    this.modalPlusService.open(FlexibleModalComponent, null, $event.target);
+    this.modalPlusService.open(FlexibleModalComponent, {name: 2});
   }
 
   closeModal() {

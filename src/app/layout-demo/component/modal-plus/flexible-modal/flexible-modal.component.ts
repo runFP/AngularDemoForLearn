@@ -1,5 +1,6 @@
-import {AfterViewInit, Component, Inject, OnInit, } from '@angular/core';
+import {AfterViewInit, Component, HostBinding, Inject, OnInit, ViewChild,} from '@angular/core';
 import {PORTAL_DATA} from '../portal-data';
+import {FlexibleSizeDirective} from '../flexible-size.directive';
 
 @Component({
   selector: 'app-flexible-modal',
@@ -7,8 +8,11 @@ import {PORTAL_DATA} from '../portal-data';
   styleUrls: ['./flexible-modal.component.scss']
 })
 export class FlexibleModalComponent implements OnInit, AfterViewInit {
+  @ViewChild(FlexibleSizeDirective, {static: false}) flexibleSizeDirective: FlexibleSizeDirective;
+  @ViewChild('titleHandle', {static: false}) titleHandle: HTMLElement;
+
   constructor(
-    @Inject(PORTAL_DATA) public data
+    @Inject(PORTAL_DATA) public data,
   ) {
   }
 
@@ -20,5 +24,7 @@ export class FlexibleModalComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.flexibleSizeDirective.setDragHandle([this.titleHandle]);
   }
+
 }
