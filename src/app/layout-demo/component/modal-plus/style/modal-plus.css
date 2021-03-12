@@ -1,0 +1,38 @@
+@import '~@angular/cdk/overlay-prebuilt.css';
+.aps-modal-plus-container {
+  pointer-events: none !important;
+}
+
+.aps-modal-plus {
+  transform-origin: center center 0;
+  pointer-events: auto;
+}
+.aps-modal-plus.e-resize, .aps-modal-plus.w-resize, .aps-modal-plus.ne-resize, .aps-modal-plus.nw-resize, .aps-modal-plus.n-resize, .aps-modal-plus.s-resize, .aps-modal-plus.se-resize, .aps-modal-plus.sw-resize {
+  user-select: none;
+}
+.aps-modal-plus.e-resize {
+  cursor: e-resize;
+}
+.aps-modal-plus.w-resize {
+  cursor: w-resize;
+}
+.aps-modal-plus.ne-resize {
+  cursor: ne-resize;
+}
+.aps-modal-plus.nw-resize {
+  cursor: nw-resize;
+}
+.aps-modal-plus.n-resize {
+  cursor: n-resize;
+}
+.aps-modal-plus.s-resize {
+  cursor: s-resize;
+}
+.aps-modal-plus.se-resize {
+  cursor: se-resize;
+}
+.aps-modal-plus.sw-resize {
+  cursor: sw-resize;
+}
+
+/*# sourceMappingURL=modal-plus.css.map */
