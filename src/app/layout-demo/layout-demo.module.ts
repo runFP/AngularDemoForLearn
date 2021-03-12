@@ -44,6 +44,7 @@ import { RootCellComponent } from './component/flex-merge-dynamic/root-cell/root
 import {SelectedRangeComponent} from './component/flex-merge-dynamic/selected-range/selected-range.component';
 import {ModalPlusModule} from './component/modal-plus/modal-plus.module';
 import { ModalPlusDemoComponent } from './component/modal-plus-demo/modal-plus-demo.component';
+import {FlexibleModalComponent} from './component/modal-plus/flexible-modal/flexible-modal.component';
 
 
 @NgModule({
@@ -68,6 +69,7 @@ import { ModalPlusDemoComponent } from './component/modal-plus-demo/modal-plus-d
     RootCellComponent,
     SelectedRangeComponent,
     ModalPlusDemoComponent,
+    FlexibleModalComponent,
   ],
   imports: [
     CommonModule,
@@ -93,6 +95,7 @@ import { ModalPlusDemoComponent } from './component/modal-plus-demo/modal-plus-d
     ContainerCellComponent,
     SelectedRangeComponent,
     CellComponent,
+    FlexibleModalComponent,
   ],
 })
 export class LayoutDemoModule {

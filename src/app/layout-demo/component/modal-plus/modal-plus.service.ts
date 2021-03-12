@@ -77,6 +77,8 @@ export class ModalPlusService {
     const injector = this._createInjector(id, data);
     const flexibleModal = new ComponentPortal(component, null, injector);
     const componentRef: ComponentRef<any> = overlayRef.attach(flexibleModal);
+    // 针对不结合拖拉指令，仅单独作为弹框使用
+    this.renderer.addClass(componentRef.location.nativeElement.firstElementChild, 'aps-modal-plus');
     this._open(id, overlayRef, componentRef, target);
   }
 

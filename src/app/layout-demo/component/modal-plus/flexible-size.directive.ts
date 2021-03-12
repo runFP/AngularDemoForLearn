@@ -1,7 +1,7 @@
 /**
  * 拖动和调整尺寸功能指令
  */
-import {AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Optional, Renderer2} from '@angular/core';
+import {AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {ModalPlusService} from './modal-plus.service';
 import {DragDrop, DragRef} from '@angular/cdk/drag-drop';
 import {getCdkGlobalOverlayWrapper} from './utils';
@@ -35,6 +35,8 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
   dragRef: DragRef | null = null;
   dragAndResizeRecord = {};
 
+  private _mousedownHandle = this._mouseDown.bind(this);
+
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,
@@ -54,18 +56,24 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
     this.modalPlusService.addResizeElement(this.elementRef, this.dragRef, this.min, this.max);
   }
 
+  private _mouseDown(e) {
+    const html = getCdkGlobalOverlayWrapper(e.target);
+    if (html && this.modalPlusService.lastModalPlus !== html) {
+      this.displayTop(html);
+    }
+  }
+
   ngAfterViewInit(): void {
     this.modalPlusService.enableDocumentMouseListener();
-    this.elementRef.nativeElement.addEventListener('mousedown', e => {
-      const html = getCdkGlobalOverlayWrapper(e.target);
-      if (html && this.modalPlusService.lastModalPlus !== html) {
-        this.displayTop(html);
-      }
-    });
+    this.elementRef.nativeElement.addEventListener('mousedown', this._mousedownHandle);
   }
 
   ngOnDestroy(): void {
     this.modalPlusService.deleteResizeElement(this.elementRef);
+    if (this.modalPlusService.resizeElementContainer.length === 0) {
+      this.modalPlusService.disableDocumentMouseListener();
+    }
+    this.elementRef.nativeElement.removeEventListener('mousedown', this._mousedownHandle);
   }
 
   setDragHandle(handles: (HTMLElement | ElementRef<HTMLElement>)[] | null) {
