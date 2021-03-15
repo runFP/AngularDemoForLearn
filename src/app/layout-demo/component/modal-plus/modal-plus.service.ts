@@ -5,16 +5,17 @@
  * 3.传入唯一标识值，可防止点击同一按钮重复打开弹框
  * 4.配合apsFlexibleSize指令实现拖拉元素变更尺寸
  */
-import {ComponentRef, ElementRef, Injectable, Injector, RendererFactory2} from '@angular/core';
-import {Overlay, OverlayPositionBuilder, OverlayRef} from '@angular/cdk/overlay';
-import {PORTAL_DATA} from './portal-data';
-import {ComponentPortal} from '@angular/cdk/portal';
-import {RESIZE_TYPE} from './resize-type';
-import {DragRef} from '@angular/cdk/drag-drop';
-import {getSize, getTransform} from './utils';
+import { ComponentRef, ElementRef, Injectable, Injector, RendererFactory2 } from '@angular/core';
+import { Overlay, OverlayContainer, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
+import { PORTAL_DATA } from './portal-data';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { RESIZE_TYPE } from './resize-type';
+import { DragRef } from '@angular/cdk/drag-drop';
+import { getSize, getTransform } from './utils';
 
 // 鼠标离边缘位置多少时可以变更尺寸
 const offsetDistance = 5;
+const Z_INDEX = 999;
 
 @Injectable()
 export class ModalPlusService {
@@ -45,15 +46,16 @@ export class ModalPlusService {
   private _moveHandler = this._mouseMove.bind(this);
   private _upHandler = this._mouseUp.bind(this);
   mouseInfo = {
-    oldPosition: {x: null, y: null},
-    newPosition: {x: null, y: null},
-    movement: {x: null, y: null},
+    oldPosition: { x: null, y: null },
+    newPosition: { x: null, y: null },
+    movement: { x: null, y: null },
   };
 
   constructor(
     private overlay: Overlay,
     private rendererFactory: RendererFactory2,
     private overlayPositionBuilder: OverlayPositionBuilder,
+    private overlayContainer: OverlayContainer,
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
@@ -65,6 +67,9 @@ export class ModalPlusService {
    * @param target 通过触发事件的target来判断弹框是否唯一（打开的弹框如果已经存在，不会重复创建,可以是点击的按钮，也可以是一行数据的id等等,要能唯一标识的值）
    */
   open(component, data?: { [key: string]: any }, target?: any) {
+    console.log(this.overlayContainer.getContainerElement(),
+    );
+
     const id = this._getId();
     if (target && this.targetMapId.has(target)) {
       return;
@@ -73,12 +78,17 @@ export class ModalPlusService {
     }
 
     const global = this.overlayPositionBuilder.global().centerHorizontally().centerVertically();
-    const overlayRef = this.overlay.create({positionStrategy: global, panelClass: 'aps-modal-plus-container'});
+    const overlayRef = this.overlay.create({
+      positionStrategy: global,
+      panelClass: 'aps-modal-plus-container',
+    });
     const injector = this._createInjector(id, data);
     const flexibleModal = new ComponentPortal(component, null, injector);
     const componentRef: ComponentRef<any> = overlayRef.attach(flexibleModal);
-    // 针对不结合拖拉指令，仅单独作为弹框使用
+    // 指令内也重复添加，考虑到可能会出现不搭配指令使用，仅当做弹框的情况
     this.renderer.addClass(componentRef.location.nativeElement.firstElementChild, 'aps-modal-plus');
+    // 避免和其他使用了material CDK的其他库在层级上的冲突
+    this.renderer.setStyle(componentRef.location.nativeElement.parentElement.parentElement, 'zIndex', Z_INDEX);
     this._open(id, overlayRef, componentRef, target);
   }
 
@@ -90,7 +100,6 @@ export class ModalPlusService {
     return (+new Date()).toString(16); // 弹框唯一标识
   }
 
-
   private _createInjector(id, data): Injector {
     const value = {
       close: () => {
@@ -98,7 +107,7 @@ export class ModalPlusService {
       },
       ...data,
     };
-    return Injector.create([{provide: PORTAL_DATA, useValue: value}]);
+    return Injector.create([{ provide: PORTAL_DATA, useValue: value }]);
   }
 
   /**
@@ -110,7 +119,7 @@ export class ModalPlusService {
    * @private
    */
   private _open(id, overlayRef: OverlayRef, componentRef: ComponentRef<any>, target = null) {
-    this.modalPlusContainer.push({id, overlayRef, componentRef, target});
+    this.modalPlusContainer.push({ id, overlayRef, componentRef, target });
   }
 
   /**
@@ -155,7 +164,6 @@ export class ModalPlusService {
       document.addEventListener('mouseup', this._upHandler);
       this.isActiveMouseListener = true;
     }
-
   }
 
   disableDocumentMouseListener() {
@@ -195,7 +203,7 @@ export class ModalPlusService {
   private _mouseDown(e: MouseEvent) {
     if (this.activeResizeInf.isMatchResizeType) {
       this.activeResizeInf.isActiveResize = true;
-      this.mouseInfo.oldPosition = {x: e.x, y: e.y};
+      this.mouseInfo.oldPosition = { x: e.x, y: e.y };
     }
   }
 
@@ -206,7 +214,7 @@ export class ModalPlusService {
       const containerEle = this.activeResizeInf.activeItem.ele;
       const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
       const translatePoint = getTransform(ele.style.transform);
-      const point = {x: translatePoint.x, y: translatePoint.y};
+      const point = { x: translatePoint.x, y: translatePoint.y };
       // 需要将原有translate值清除，否则会dragRef会在此基础上在添加translate
       ele.style.transform = '';
       // 将变更尺寸后坐标更新到拖动功能坐标
@@ -225,11 +233,18 @@ export class ModalPlusService {
    * @param mousemoveCallback 鼠标回调
    * @param mousedownCallback 鼠标回调
    */
-  addResizeElement(ele: ElementRef | HTMLElement, dragRef: DragRef | null = null, min: number, max: number, mouseupCallback: (...arg) => any = function (e) {
-  }, mousemoveCallback: (...arg) => any = function (e) {
-  }, mousedownCallback: (...arg) => any = function (e) {
+  addResizeElement(ele: ElementRef | HTMLElement, dragRef: DragRef | null = null, min: number, max: number, mouseupCallback: (...arg) => any = function(e) {
+  }, mousemoveCallback: (...arg) => any = function(e) {
+  }, mousedownCallback: (...arg) => any = function(e) {
   }) {
-    this.resizeElementContainer.push({ele, dragRef, existedClassName: '', mouseupCallback, mousemoveCallback, mousedownCallback});
+    this.resizeElementContainer.push({
+      ele,
+      dragRef,
+      existedClassName: '',
+      mouseupCallback,
+      mousemoveCallback,
+      mousedownCallback,
+    });
   }
 
   deleteResizeElement(ele: ElementRef | HTMLElement) {
@@ -260,7 +275,7 @@ export class ModalPlusService {
   private matchResizeType(containerItem: ResizeElementInf, e): boolean {
     const containerEle = containerItem.ele;
     const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
-    const {width, height} = getSize(ele);
+    const { width, height } = getSize(ele);
     const top = ele.getBoundingClientRect().top;
     const left = ele.getBoundingClientRect().left;
     const right = ele.getBoundingClientRect().right;
@@ -334,15 +349,14 @@ export class ModalPlusService {
     if (this.activeResizeInf.isActiveResize) {
       const movementX = this.mouseInfo.oldPosition.x - e.x;
       const movementY = this.mouseInfo.oldPosition.y - e.y;
-      this.mouseInfo.oldPosition = {x: e.x, y: e.y};
+      this.mouseInfo.oldPosition = { x: e.x, y: e.y };
       const activeItem = this.activeResizeInf.activeItem;
       const containerEle = activeItem.ele;
       const resizeType = activeItem.existedClassName;
       const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
-      const {width, height} = getSize(ele);
+      const { width, height } = getSize(ele);
       const lastTranslate = getTransform(ele.style.transform);
 
-      console.log('resizeType', resizeType);
       if (resizeType === RESIZE_TYPE.NW) {
         this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
         this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
@@ -370,16 +384,16 @@ export class ModalPlusService {
         this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
       } else if (resizeType === RESIZE_TYPE.S) {
         this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y  - movementY / 2}px, 0)`);
+        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
       }
     }
   }
 
   showCurrentModalPlus(el: HTMLElement) {
     if (this.lastModalPlus) {
-      this.renderer.removeStyle(this.lastModalPlus, 'zIndex');
+      this.renderer.setStyle(this.lastModalPlus, 'zIndex', Z_INDEX);
     }
-    this.renderer.setStyle(el, 'zIndex', 1001);
+    this.renderer.setStyle(el, 'zIndex', 1000);
     this.lastModalPlus = el;
   }
 }

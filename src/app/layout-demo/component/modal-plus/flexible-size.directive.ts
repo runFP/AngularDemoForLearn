@@ -1,10 +1,10 @@
 /**
  * 拖动和调整尺寸功能指令
  */
-import {AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2} from '@angular/core';
-import {ModalPlusService} from './modal-plus.service';
-import {DragDrop, DragRef} from '@angular/cdk/drag-drop';
-import {getCdkGlobalOverlayWrapper} from './utils';
+import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ModalPlusService } from './modal-plus.service';
+import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
+import { getCdkGlobalOverlayWrapper } from './utils';
 
 @Directive({
   selector: '[apsFlexibleSize]',
@@ -70,9 +70,6 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.modalPlusService.deleteResizeElement(this.elementRef);
-    if (this.modalPlusService.resizeElementContainer.length === 0) {
-      this.modalPlusService.disableDocumentMouseListener();
-    }
     this.elementRef.nativeElement.removeEventListener('mousedown', this._mousedownHandle);
   }
 
