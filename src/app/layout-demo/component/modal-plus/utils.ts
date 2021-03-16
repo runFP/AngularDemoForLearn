@@ -1,5 +1,5 @@
 export function getTransform(transform: string): { x: number, y: number, z: number } {
-  const reg = /^.+\((.*)\)/;
+  const reg = /translate3d\(((-*\d*\.*\d*px,*\s*)*)\)/;
   const match = transform.match(reg);
   const transValue = {x: 0, y: 0, z: 0};
   if (match) {
@@ -12,6 +12,15 @@ export function getTransform(transform: string): { x: number, y: number, z: numb
     transValue.z = Number(valueArr[2]);
   }
   return transValue;
+}
+
+export function getScale(transform: string): string {
+  const reg = /^.*scale\(((-*\d*\.*\d*,*\s*)*)\)/;
+  const match = transform.match(reg);
+  if (match) {
+    return match[1];
+  }
+  return '';
 }
 
 export function getSize(ele: HTMLElement): { width: number, height: number } {
@@ -29,5 +38,11 @@ export function getCdkGlobalOverlayWrapper(html: HTMLElement) {
     html = html.parentElement;
   }
   return false;
+}
+
+
+export function px2Percent(total, deviation): number {
+  const newVal = total + deviation;
+  return newVal / total;
 }
 

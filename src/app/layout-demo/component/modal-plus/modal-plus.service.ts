@@ -5,13 +5,13 @@
  * 3.传入唯一标识值，可防止点击同一按钮重复打开弹框
  * 4.配合apsFlexibleSize指令实现拖拉元素变更尺寸
  */
-import { ComponentRef, ElementRef, Injectable, Injector, RendererFactory2 } from '@angular/core';
-import { Overlay, OverlayContainer, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
-import { PORTAL_DATA } from './portal-data';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { RESIZE_TYPE } from './resize-type';
-import { DragRef } from '@angular/cdk/drag-drop';
-import { getSize, getTransform } from './utils';
+import {ComponentRef, ElementRef, Injectable, Injector, RendererFactory2} from '@angular/core';
+import {Overlay, OverlayContainer, OverlayPositionBuilder, OverlayRef} from '@angular/cdk/overlay';
+import {PORTAL_DATA} from './portal-data';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {RESIZE_TYPE} from './resize-type';
+import {DragRef} from '@angular/cdk/drag-drop';
+import {getScale, getSize, getTransform, px2Percent} from './utils';
 
 // 鼠标离边缘位置多少时可以变更尺寸
 const offsetDistance = 5;
@@ -42,13 +42,16 @@ export class ModalPlusService {
     activeItem: null, // 变更尺寸元素的元数据
   };
 
+  /** true使用scale来进行缩放，false为直接放大宽高*/
+  scaleMode = true;
+
   private _downHandler = this._mouseDown.bind(this);
   private _moveHandler = this._mouseMove.bind(this);
   private _upHandler = this._mouseUp.bind(this);
   mouseInfo = {
-    oldPosition: { x: null, y: null },
-    newPosition: { x: null, y: null },
-    movement: { x: null, y: null },
+    oldPosition: {x: null, y: null},
+    newPosition: {x: null, y: null},
+    movement: {x: null, y: null},
   };
 
   constructor(
@@ -92,6 +95,10 @@ export class ModalPlusService {
     this._open(id, overlayRef, componentRef, target);
   }
 
+  setScaleMode() {
+    this.scaleMode = !this.scaleMode;
+  }
+
   /**
    * 弹框唯一标识
    * @private
@@ -107,7 +114,7 @@ export class ModalPlusService {
       },
       ...data,
     };
-    return Injector.create([{ provide: PORTAL_DATA, useValue: value }]);
+    return Injector.create([{provide: PORTAL_DATA, useValue: value}]);
   }
 
   /**
@@ -119,7 +126,7 @@ export class ModalPlusService {
    * @private
    */
   private _open(id, overlayRef: OverlayRef, componentRef: ComponentRef<any>, target = null) {
-    this.modalPlusContainer.push({ id, overlayRef, componentRef, target });
+    this.modalPlusContainer.push({id, overlayRef, componentRef, target});
   }
 
   /**
@@ -203,7 +210,7 @@ export class ModalPlusService {
   private _mouseDown(e: MouseEvent) {
     if (this.activeResizeInf.isMatchResizeType) {
       this.activeResizeInf.isActiveResize = true;
-      this.mouseInfo.oldPosition = { x: e.x, y: e.y };
+      this.mouseInfo.oldPosition = {x: e.x, y: e.y};
     }
   }
 
@@ -211,13 +218,20 @@ export class ModalPlusService {
     if (this.activeResizeInf.isActiveResize) {
       this.activeResizeInf.isMatchResizeType = false;
       this.activeResizeInf.isActiveResize = false;
+
       const containerEle = this.activeResizeInf.activeItem.ele;
       const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
       const translatePoint = getTransform(ele.style.transform);
-      const point = { x: translatePoint.x, y: translatePoint.y };
-      // 需要将原有translate值清除，否则会dragRef会在此基础上在添加translate
-      ele.style.transform = '';
-      // 将变更尺寸后坐标更新到拖动功能坐标
+      const scale = getScale(ele.style.transform);
+      const point = {x: translatePoint.x, y: translatePoint.y};
+
+      if (this.scaleMode) {
+        // @ts-ignore 由于_initialTransform为dragRef的私有变量，且没有任何方法对其进行赋值，但我们必须要每次初始化，以记录每次scale的值
+        this.activeResizeInf.activeItem.dragRef._initialTransform = null;
+        this.renderer.setStyle(ele, 'transform', `scale(${scale})`);
+      } else {
+        ele.style.transform = '';
+      }
       this.activeResizeInf.activeItem.dragRef.setFreeDragPosition(point);
       this.activeResizeInf.activeItem = null;
     }
@@ -227,20 +241,22 @@ export class ModalPlusService {
    * 添加可变更尺寸元素
    * @param ele 变更尺寸元素
    * @param dragRef 若元素具有拖动功能，传入拖动引用
+   * @param scaleInf scale模式下的信息
    * @param min 尺寸变更最小值
    * @param max 尺寸变更最大值
    * @param mouseupCallback 鼠标回调
    * @param mousemoveCallback 鼠标回调
    * @param mousedownCallback 鼠标回调
    */
-  addResizeElement(ele: ElementRef | HTMLElement, dragRef: DragRef | null = null, min: number, max: number, mouseupCallback: (...arg) => any = function(e) {
-  }, mousemoveCallback: (...arg) => any = function(e) {
-  }, mousedownCallback: (...arg) => any = function(e) {
+  addResizeElement(ele: ElementRef | HTMLElement, dragRef: DragRef | null = null, scaleInf: ScaleInf, min: number, max: number, mouseupCallback: (...arg) => any = function (e) {
+  }, mousemoveCallback: (...arg) => any = function (e) {
+  }, mousedownCallback: (...arg) => any = function (e) {
   }) {
     this.resizeElementContainer.push({
       ele,
       dragRef,
       existedClassName: '',
+      scaleInf,
       mouseupCallback,
       mousemoveCallback,
       mousedownCallback,
@@ -275,13 +291,14 @@ export class ModalPlusService {
   private matchResizeType(containerItem: ResizeElementInf, e): boolean {
     const containerEle = containerItem.ele;
     const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
-    const { width, height } = getSize(ele);
+    const {width, height} = ele.getBoundingClientRect();
     const top = ele.getBoundingClientRect().top;
     const left = ele.getBoundingClientRect().left;
     const right = ele.getBoundingClientRect().right;
     const bottom = ele.getBoundingClientRect().bottom;
     const layerY = e.y - top;
     const layerX = e.x - left;
+
 
     if (e.x >= left && e.x <= right && e.y >= top && e.y <= bottom) {
       if (layerX - offsetDistance <= 0 && layerY - offsetDistance <= 0) {
@@ -349,45 +366,107 @@ export class ModalPlusService {
     if (this.activeResizeInf.isActiveResize) {
       const movementX = this.mouseInfo.oldPosition.x - e.x;
       const movementY = this.mouseInfo.oldPosition.y - e.y;
-      this.mouseInfo.oldPosition = { x: e.x, y: e.y };
+      this.mouseInfo.oldPosition = {x: e.x, y: e.y};
       const activeItem = this.activeResizeInf.activeItem;
       const containerEle = activeItem.ele;
       const resizeType = activeItem.existedClassName;
       const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
-      const { width, height } = getSize(ele);
+      const {width, height} = getSize(ele);
       const lastTranslate = getTransform(ele.style.transform);
 
+      // translate缩放
+      // 1.计算缩放值
+      // 2.缩放是根据原因尺寸缩放
+      //   1)记录自身原有尺寸
+      //   2)根据缩放差值计算缩放百分比
+      //      2.1 差值记录，每次差值增减都放在一个总差值变量，这样将对精确，而不考虑获取上一次缩放百分比再进行计算
+      // 每个弹框有自身起始宽高记录，有自身的总差值记录
+
+
       if (resizeType === RESIZE_TYPE.NW) {
-        this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
-        this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.width += movementX;
+          activeItem.scaleInf.totalDeviation.height += movementY;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
+          this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.NE) {
-        this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
-        this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.width -= movementX;
+          activeItem.scaleInf.totalDeviation.height += movementY;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
+          this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.N) {
-        this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.height += movementY;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'height', `${height + movementY}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.SW) {
-        this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
-        this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.width += movementX;
+          activeItem.scaleInf.totalDeviation.height -= movementY;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
+          this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.W) {
-        this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.width += movementX;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'width', `${width + movementX}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.SE) {
-        this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
-        this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.width -= movementX;
+          activeItem.scaleInf.totalDeviation.height -= movementY;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
+          this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.E) {
-        this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.width -= movementX;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'width', `${width - movementX}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
+        }
       } else if (resizeType === RESIZE_TYPE.S) {
-        this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
-        this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        if (this.scaleMode) {
+          activeItem.scaleInf.totalDeviation.height -= movementY;
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)
+          scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
+        } else {
+          this.renderer.setStyle(ele, 'height', `${height - movementY}px`);
+          this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
+        }
       }
     }
   }
+
 
   showCurrentModalPlus(el: HTMLElement) {
     if (this.lastModalPlus) {
@@ -409,7 +488,20 @@ export interface ResizeElementInf {
   ele: ElementRef | HTMLElement;
   dragRef: DragRef | null;
   existedClassName: string; // 尺寸变更类型
+  scaleInf: ScaleInf;
   mouseupCallback: (...arg) => any;
   mousemoveCallback: (...arg) => any;
   mousedownCallback: (...arg) => any;
 }
+
+export interface ScaleInf {
+  size: {
+    width: number;
+    height: number
+  };
+  totalDeviation: {
+    width: number;
+    height: number
+  };
+}
+

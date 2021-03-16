@@ -1,10 +1,10 @@
 /**
  * 拖动和调整尺寸功能指令
  */
-import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { ModalPlusService } from './modal-plus.service';
-import { DragDrop, DragRef } from '@angular/cdk/drag-drop';
-import { getCdkGlobalOverlayWrapper } from './utils';
+import {AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2} from '@angular/core';
+import {ModalPlusService} from './modal-plus.service';
+import {DragDrop, DragRef} from '@angular/cdk/drag-drop';
+import {getCdkGlobalOverlayWrapper, getSize} from './utils';
 
 @Directive({
   selector: '[apsFlexibleSize]',
@@ -31,6 +31,26 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   dragHandles: (HTMLElement | ElementRef<HTMLElement>)[] | null = null;
 
+  // 当缩放采用scaleMode模式时，作为弹框有自身起始宽高记录以及总差值记录
+  scaleModeInf = {
+    size: {width: 0, height: 0},
+    totalDeviation: {
+      _width: 0, _height: 0,
+      set width(val: number) {
+        this._width = val;
+      },
+      get width(): number {
+        return this._width;
+      },
+      set height(val) {
+        this._height = val;
+      },
+      get height(): number {
+        return this._height;
+      },
+    },
+  };
+
   isResize = false; // 判断是否处于拖拉尺寸状态
   dragRef: DragRef | null = null;
   dragAndResizeRecord = {};
@@ -53,7 +73,7 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.renderer.addClass(this.elementRef.nativeElement, 'aps-modal-plus');
-    this.modalPlusService.addResizeElement(this.elementRef, this.dragRef, this.min, this.max);
+    this.modalPlusService.addResizeElement(this.elementRef, this.dragRef, this.scaleModeInf, this.min, this.max);
   }
 
   private _mouseDown(e) {
@@ -66,6 +86,10 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.modalPlusService.enableDocumentMouseListener();
     this.elementRef.nativeElement.addEventListener('mousedown', this._mousedownHandle);
+    // 记录组件起始尺寸
+    const {width, height} = getSize(this.elementRef.nativeElement);
+    this.scaleModeInf.size.width = width;
+    this.scaleModeInf.size.height = height;
   }
 
   ngOnDestroy(): void {
