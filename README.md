@@ -1,3 +1,3 @@
 # AngularDemo
 
-平时自己写的一些angular demo（包含组件和指令）集合
+##为学习Angular写的一些demo（包含agGrid）集合
