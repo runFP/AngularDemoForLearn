@@ -17,19 +17,14 @@ export class AggridWorkWithFormComponent implements OnInit {
   validatedRule: { [key: string]: { rule: any, tips: any } } = {};
   items: { [key: string]: any } = {xiaoming: {name: 'xiaoming', age: 18}, daming: {name: 'daming', age: 18}};
   arr = [{name: 'a', age: 18}, {name: 'b', age: 17}];
+  arr2 = [0, 1, 2];
   i = 0;
   brr = [1, 2, 3];
 
   change() {
-    // const item = this.arr.slice(0, 1)[0];
-    // item.name = 'abc';
-    // const newItem = [item, ...this.arr.slice(1)];
-
     this.arr[0].name = 'abc';
-    // this.arr = [...this.arr, {name: 'abc', age: 16}];
-    // this.arr = [...this.arr];
-    // this.arr.push({name: 'abc', age: 16});
-    // this.brr[1] = 5;
+    this.arr2[0] = 6;
+
   }
 
   frameworkComponents: { [p: string]: { new(): any } } = {

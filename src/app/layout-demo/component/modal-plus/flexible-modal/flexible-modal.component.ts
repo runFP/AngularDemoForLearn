@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, HostBinding, Inject, OnInit, ViewChild,} from '@angular/core';
+import {AfterViewInit, Component, HostBinding, Inject, OnInit, ViewChild} from '@angular/core';
 import {PORTAL_DATA} from '../portal-data';
 import {FlexibleSizeDirective} from '../flexible-size.directive';
 

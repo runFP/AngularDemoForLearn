@@ -7,9 +7,9 @@ import {ThreeCommonServices} from './three-common.services';
 import {ThreeDemoComponent} from './component/three-demo/three-demo.component';
 
 export const childRoutes: Routes = [
-  {path: 'first', component: ThreeFirstDemoComponent},
+  // {path: 'first', component: ThreeFirstDemoComponent},
   {path: 'roller-metal', component: RollerMetalComponent},
-  {path: 'three-demo', component: ThreeDemoComponent},
+  // {path: 'three-demo', component: ThreeDemoComponent},
 ];
 
 export const routes: Routes = [
@@ -19,9 +19,9 @@ export const routes: Routes = [
 export const names = [
   {
     name: 'three', children: [
-      {name: '第一个threeDemo'},
+      // {name: '第一个threeDemo'},
       {name: '滚筒钣金'},
-      {name: 'three探索'},
+      // {name: 'three探索'},
     ]
   }
 ];

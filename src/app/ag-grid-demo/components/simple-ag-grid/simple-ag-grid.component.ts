@@ -44,9 +44,14 @@ export class SimpleAgGridComponent implements OnInit, AfterViewInit {
         } else {
           return null;
         }
-      }
+      },
+      rowSpan: function (params) {
+        return params.data.rowSpan;
+      },
     }, // 排序
-    {headerName: 'Model', field: 'model', filter: 'filterTest', cellStyle: {'text-align': 'center'}}, // 过滤
+    {
+      headerName: 'Model', field: 'model',
+    }, // 过滤
     {headerName: 'Price', field: 'price', checkboxSelection: true},
     {
       headerName: 'A',
@@ -114,8 +119,12 @@ export class SimpleAgGridComponent implements OnInit, AfterViewInit {
     {make: 'Porsche6', model: 'BBoxter', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
     {make: 'Porsche7', model: 'AAxter', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
     {make: 'Porsche8', model: 'AAxter', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
-    {make: 'Porsche9', model: 'MAoxter', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
+    {make: 'Porsche9', rowSpan: 6, rowSpan2: 2, model: 'MAoxter', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
     {make: 'porsche9', model: 'MAoxter', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
+    {make: 'porsche9', rowSpan2: 4, model: 'MAoxter2', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
+    {make: 'porsche9', model: '', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
+    {make: 'porsche9', model: '', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
+    {make: 'porsche9', model: 'MAoxter2', price: 72000, a: 'aaaa', b: 'bbbb', c: '', cc: null},
   ];
 
   // 数据2
@@ -142,6 +151,7 @@ export class SimpleAgGridComponent implements OnInit, AfterViewInit {
 
   // 配置
   gridOptions: GridOptions = {
+    suppressRowTransform: true,
     // localeTextFunc: (key, defaultValue) => {
     //   console.log(key, defaultValue);
     // },

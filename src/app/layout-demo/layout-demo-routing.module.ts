@@ -12,11 +12,11 @@ import {FlexMergeDynamicComponent} from './component/flex-merge-dynamic/flex-mer
 import {ModalPlusDemoComponent} from './component/modal-plus-demo/modal-plus-demo.component';
 
 export const childRoutes: Routes = [
-  {path: 'lfrd', component: LeftFixRightDynamicComponent},
-  {path: 'cdkstepper', component: CDKStepperDemoComponent},
-  {path: 'overlay', component: OverlayDemoComponent},
-  {path: 'dragdrop', component: DragAngDropDemoComponent},
-  {path: 'portal', component: PortalDemoComponent},
+  // {path: 'lfrd', component: LeftFixRightDynamicComponent},
+  // {path: 'cdkstepper', component: CDKStepperDemoComponent},
+  // {path: 'overlay', component: OverlayDemoComponent},
+  // {path: 'dragdrop', component: DragAngDropDemoComponent},
+  // {path: 'portal', component: PortalDemoComponent},
   {path: 'dragAndDrop', component: NgDragAndDropComponent},
   {path: 'flexMergeDynamic', component: FlexMergeDynamicComponent},
   {path: 'modalPlusDemo', component: ModalPlusDemoComponent}
@@ -32,14 +32,14 @@ export const routes: Routes = [
 export const names = [
   {
     name: '布局', children: [
-      {name: '外层结构布局'},
-      {name: '自定义cdkStepper'},
-      {name: '自定义overlay'},
-      {name: '拖放(modal,div...)'},
-      {name: 'portal'},
+      // {name: '外层结构布局'},
+      // {name: '自定义cdkStepper'},
+      // {name: '自定义overlay'},
+      // {name: '拖放(modal,div...)'},
+      // {name: 'portal'},
       {name: '自定义拖动层'},
       {name: '动态合并flex布局'},
-      {name: 'modalPlus'},
+      {name: '弹框modalPlus'},
     ]
   }
 ];

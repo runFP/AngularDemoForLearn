@@ -1,7 +1,22 @@
-<button nz-button [nzType]="'primary'" (click)="showModal($event)"><span>打開</span></button>
-<button nz-button [nzType]="'primary'" (click)="showModal2($event)"><span>打開2</span></button>
-<button nz-button [nzType]="'primary'" (click)="closeModal()" ><span>關閉</span></button>
-<div apsFlexibleSize>
-  wioeurwaeoiuroajkdfhkas
+<dl>
+  <dt>加强型弹框:</dt>
+  <dd>modalPlusService</dd>
+  <dd>apsFlexibleSize</dd>
+  <dd>功能：</dd>
+  <dd>1.支持唯一窗口打开</dd>
+  <dd>2.将缩放功能独立作为指令可与弹框搭配或单独使用</dd>
+  <dd>3.支持2种缩放模式：scale和size</dd>
+</dl>
+
+
+<button nz-button [nzType]="'primary'" (click)="showModal($event)"><span>打開弹框1</span></button> |
+<button nz-button [nzType]="'primary'" (click)="showModal2($event)"><span>打開弹框2</span></button> |
+<!--<button nz-button [nzType]="'primary'" (click)="toggleModel()"><span>切换缩放模式</span></button>-->
+<!--<button nz-button [nzType]="'primary'" (click)="closeModal()"><span>關閉</span></button>-->
+<div apsFlexibleSize [scaleMode]="true" style="width: 200px;height: 100px; border: 1px solid #000;">
+  我是单独使用了apsFlexibleSize指令,scale缩放模式的容器
+</div>
+<div apsFlexibleSize style="width: 200px;height: 100px; border: 1px solid #000;">
+  我是单独使用了apsFlexibleSize指令,size缩放模式的容器
 </div>
 

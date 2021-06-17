@@ -1,9 +1,12 @@
-<p>
-  simple-ag-grid works!
-</p>
+<ul>
+  <li>与agGrid交互的颜色组件</li>
+  <li> 1.可变更选择列的颜色</li>
+  <li>2.可获取所有颜色的变更记录</li>
+  <li>3.可自定义颜色梯度</li>
+</ul>
 <ag-grid-angular
   #agGrid
-  style="width: 500px; height: 200px;"
+  style="width: 500px; height: 300px;"
   class="ag-theme-balham"
   [gridOptions]="gridOptions"
   [rowData]="rowData"
@@ -17,54 +20,16 @@
   (gridReady)="onGridReady($event)"
 >
 </ag-grid-angular>
-<dl>
+<dl class="btn">
   <dt></dt>
-  <dd>重设数据
-    <button (click)="resetData()">resetData</button>
-  </dd>
-  <dd>滚动到第9行
-    <button (click)="goToLine()">goToLine</button>
-  </dd>
-  <dd>获取选中的行
-    <button (click)="getSelectedRows()">getSelectedRows</button>
-  </dd>
-  <dd>获取选中的范围
-    <button (click)="getCellRanges()">getSelectedRows</button>
-  </dd>
-  <dd>设置冻结行/固定行
-    <button (click)="setPinnedRow()">setPinnedRow</button>
-  </dd>
   <dd>
-    刷新第一行A列
-    <button (click)="refreshColumn()">refresh column A</button>
-  </dd>
-  <dd>
-    获取列状态
-    <button (click)="getColumnState()">getColumnState</button>
-  </dd>
-  <dd>
-    获取列状态
-    <button (click)="getValueColumns()">getColumnState</button>
-  </dd>
-  <dd>
-    获取所有颜色变更记录
+    获取所有颜色变更记录(log)
     <button (click)="getAllRecord()">getAllRecord</button>
   </dd>
   <dd>
-    <button (click)="openPickColor()">openPickColor</button>
-    选择某列，变更颜色
-    <input
-      #cp="ngxColorPicker"
-      [(colorPicker)]="color"
-      [style.background]="color"
-      [cpOKButton]="true"
-      cpOKButtonText="确定"
-      [cpSaveClickOutside]="false"
-      cpOKButtonClass="ant-btn ant-btn-primary"
-      (colorPickerSelect)="pickerClose($event)"
-    />
+    选择列，变更颜色（maki列有cellStyle，因此无法变更）
+    <picker-color (colorPickerSelect)="pickerClose($event)"></picker-color>
   </dd>
-  <dd><picker-color (colorPickerSelect)="pickerClose($event)"></picker-color></dd>
 </dl>
 
 

@@ -31,8 +31,16 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   dragHandles: (HTMLElement | ElementRef<HTMLElement>)[] | null = null;
 
+  @Input()
+  scaleMode = false;
+
+  // 指令对应的模态框id
+  @Input()
+  modalId = null;
+
   // 当缩放采用scaleMode模式时，作为弹框有自身起始宽高记录以及总差值记录
   scaleModeInf = {
+    scaleMode: this.scaleMode,
     size: {width: 0, height: 0},
     totalDeviation: {
       _width: 0, _height: 0,
@@ -73,6 +81,8 @@ export class FlexibleSizeDirective implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.renderer.addClass(this.elementRef.nativeElement, 'aps-modal-plus');
+
+    this.scaleModeInf.scaleMode = this.scaleMode;
     this.modalPlusService.addResizeElement(this.elementRef, this.dragRef, this.scaleModeInf, this.min, this.max);
   }
 

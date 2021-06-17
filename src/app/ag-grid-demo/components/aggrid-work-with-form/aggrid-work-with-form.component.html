@@ -17,8 +17,13 @@
 <button (click)="addNewLine()">addNewLine</button>
 
 <hr>
+
+angular直接变更数组的值（不管是值否引用）可以引起视图更新
 <div *ngFor="let item of arr">
  {{item.name}}-{{item.age}};
+</div>
+<div *ngFor="let item of arr2">
+  {{item}};
 </div>
 
 <button (click)="change()">change</button>

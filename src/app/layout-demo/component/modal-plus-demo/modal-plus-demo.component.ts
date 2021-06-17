@@ -11,6 +11,8 @@ import {ModalPlusService} from '../modal-plus/modal-plus.service';
 export class ModalPlusDemoComponent implements OnInit {
   overlayRef;
   injector;
+  modalAId: string;
+  modalBId: string;
 
   constructor(
     private modalPlusService: ModalPlusService,
@@ -21,11 +23,15 @@ export class ModalPlusDemoComponent implements OnInit {
   }
 
   showModal($event) {
-    this.modalPlusService.open(FlexibleModalComponent, {name: 1});
+    this.modalAId = this.modalPlusService.open(FlexibleModalComponent, {name: 1});
   }
 
   showModal2($event) {
-    this.modalPlusService.open(FlexibleModalComponent, {name: 2});
+    this.modalBId = this.modalPlusService.open(FlexibleModalComponent, {name: 2});
+  }
+
+  toggleModel() {
+    this.modalPlusService.setScaleMode(this.modalAId);
   }
 
   closeModal() {

@@ -17,9 +17,9 @@ export const routes: Routes = [
 export const names = [
   {
     name: 'agGrid', children: [
-      {name: '简单示例'},
-      {name: '结合AngularFrom'},
-      {name: '钩子函数大全'},
+      {name: 'agGrid颜色变更组件'},
+      {name: 'agGrid结合AngularFrom做校验'},
+      {name: 'agGrid钩子函数大全'},
     ]
   }
 ];

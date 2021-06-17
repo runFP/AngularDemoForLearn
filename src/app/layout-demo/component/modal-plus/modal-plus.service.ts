@@ -42,8 +42,10 @@ export class ModalPlusService {
     activeItem: null, // 变更尺寸元素的元数据
   };
 
-  /** true使用scale来进行缩放，false为直接放大宽高*/
-  scaleMode = true;
+  /**
+   * 全局控制切换缩放模式，优先级低于FlexibleSizeDirective指令的配置缩放模式控制
+   * true使用scale来进行缩放，false为直接放大宽高*/
+  scaleMode = false;
 
   private _downHandler = this._mouseDown.bind(this);
   private _moveHandler = this._mouseMove.bind(this);
@@ -69,9 +71,7 @@ export class ModalPlusService {
    * @param data 传递到弹框参数
    * @param target 通过触发事件的target来判断弹框是否唯一（打开的弹框如果已经存在，不会重复创建,可以是点击的按钮，也可以是一行数据的id等等,要能唯一标识的值）
    */
-  open(component, data?: { [key: string]: any }, target?: any) {
-    console.log(this.overlayContainer.getContainerElement(),
-    );
+  open(component, data?: { [key: string]: any }, scaleMode?: boolean, target?: any): string {
 
     const id = this._getId();
     if (target && this.targetMapId.has(target)) {
@@ -93,9 +93,14 @@ export class ModalPlusService {
     // 避免和其他使用了material CDK的其他库在层级上的冲突
     this.renderer.setStyle(componentRef.location.nativeElement.parentElement.parentElement, 'zIndex', Z_INDEX);
     this._open(id, overlayRef, componentRef, target);
+    return id;
   }
 
-  setScaleMode() {
+  /**
+   * 可动态切换缩放模式
+   * @param id 模态框的身份ID,
+   */
+  setScaleMode(id?: string) {
     this.scaleMode = !this.scaleMode;
   }
 
@@ -202,6 +207,7 @@ export class ModalPlusService {
       }
     } else if (this.activeResizeInf.isActiveResize) {
       // 变更尺寸
+      console.log('containerItem', this.activeResizeInf.activeItem);
       this.resize(e);
     }
 
@@ -225,7 +231,7 @@ export class ModalPlusService {
       const scale = getScale(ele.style.transform);
       const point = {x: translatePoint.x, y: translatePoint.y};
 
-      if (this.scaleMode) {
+      if (this.activeResizeInf.activeItem.scaleInf.scaleMode) {
         // @ts-ignore 由于_initialTransform为dragRef的私有变量，且没有任何方法对其进行赋值，但我们必须要每次初始化，以记录每次scale的值
         this.activeResizeInf.activeItem.dragRef._initialTransform = null;
         this.renderer.setStyle(ele, 'transform', `scale(${scale})`);
@@ -373,7 +379,7 @@ export class ModalPlusService {
       const ele: HTMLElement = containerEle instanceof ElementRef ? containerEle.nativeElement : containerEle;
       const {width, height} = getSize(ele);
       const lastTranslate = getTransform(ele.style.transform);
-
+      const scaleMode = activeItem.scaleInf.scaleMode;
       // translate缩放
       // 1.计算缩放值
       // 2.缩放是根据原因尺寸缩放
@@ -384,7 +390,7 @@ export class ModalPlusService {
 
 
       if (resizeType === RESIZE_TYPE.NW) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.width += movementX;
           activeItem.scaleInf.totalDeviation.height += movementY;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
@@ -395,7 +401,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.NE) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.width -= movementX;
           activeItem.scaleInf.totalDeviation.height += movementY;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
@@ -406,7 +412,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.N) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.height += movementY;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)
           scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
@@ -415,7 +421,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.SW) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.width += movementX;
           activeItem.scaleInf.totalDeviation.height -= movementY;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
@@ -426,7 +432,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.W) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.width += movementX;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)
           scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
@@ -435,7 +441,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.SE) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.width -= movementX;
           activeItem.scaleInf.totalDeviation.height -= movementY;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)
@@ -446,7 +452,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y - movementY / 2}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.E) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.width -= movementX;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)
           scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
@@ -455,7 +461,7 @@ export class ModalPlusService {
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x - movementX / 2}px, ${lastTranslate.y}px, 0)`);
         }
       } else if (resizeType === RESIZE_TYPE.S) {
-        if (this.scaleMode) {
+        if (scaleMode) {
           activeItem.scaleInf.totalDeviation.height -= movementY;
           this.renderer.setStyle(ele, 'transform', `translate3d(${lastTranslate.x}px, ${lastTranslate.y - movementY / 2}px, 0)
           scale(${px2Percent(width, activeItem.scaleInf.totalDeviation.width)}, ${px2Percent(height, activeItem.scaleInf.totalDeviation.height)})`);
@@ -495,6 +501,7 @@ export interface ResizeElementInf {
 }
 
 export interface ScaleInf {
+  scaleMode: boolean;
   size: {
     width: number;
     height: number
